@@ -1,7 +1,10 @@
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
 ConversationHandler, RegexHandler)
 
+import paramiko
+
 import logging, subprocess, sys
+
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -66,8 +69,23 @@ def login_end(bot, update, user_data):
 
     update.message.reply_text("Your username: " + user_data['username'])
     update.message.reply_text("Your password: " + user_data['password'])
+    update.message.reply_text("This credentials will be used for future \
+                              connections.")
 
     return ConversationHandler.END
+
+
+# Connection functions
+def connect(bot, update, user_data, args):
+    client = paramiko.SSHClient()
+    client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.WarningPolicy)
+
+    client.connect(args[0], 22, user_data['username'], user_data['password'])
+    update.message.reply_text("Sucessfully connected to " + args[0] + "!\n"
+                            + "To run commands in remote use /rrun [command]")
+
+    user_data['client'] = client
 
 
 def main():
@@ -98,6 +116,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
+    dp.add_handler(CommandHandler("connect", connect, pass_user_data=True, pass_args=True))
 
     # Conv handler for /login
     login_conv_handler = ConversationHandler(
