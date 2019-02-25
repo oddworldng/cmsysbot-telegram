@@ -88,6 +88,20 @@ def connect(bot, update, user_data, args):
     user_data['client'] = client
 
 
+def remote_run(bot, update, user_data, args):
+    if('client' in user_data):
+        print("Executing: " + " ".join(args))
+
+        client = user_data['client']
+        stdin, stdout, stderr = client.exec_command(" ".join(args))
+
+        output_message = stdout.read().decode('utf-8')
+        update.message.reply_text(output_message)
+    else:
+        update.message.reply_text("Start a connection first with /connect")
+
+
+
 def main():
     if(len(sys.argv) != 2):
         print("Use: main.py TOKEN.txt")
@@ -117,6 +131,7 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
     dp.add_handler(CommandHandler("connect", connect, pass_user_data=True, pass_args=True))
+    dp.add_handler(CommandHandler("rrun", remote_run, pass_user_data=True, pass_args=True))
 
     # Conv handler for /login
     login_conv_handler = ConversationHandler(
