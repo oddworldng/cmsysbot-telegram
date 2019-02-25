@@ -1,4 +1,6 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
+ConversationHandler, RegexHandler)
+
 import logging, subprocess, sys
 
 # Enable logging
@@ -6,6 +8,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+
+USERNAME, PASSWORD = range(2)
 
 
 # Define a few command handlers. These usually take the two arguments bot and
@@ -30,6 +35,41 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
+# Login functions
+def login(bot, update):
+    update.message.reply_text("Please introduce your username and password")
+    return ask_username(bot, update)
+
+
+def ask_username(bot, update):
+    update.message.reply_text("Enter your username: ")
+    return USERNAME
+
+
+def get_username(bot, update, user_data):
+    user_data['username'] = update.message.text
+    return ask_password(bot, update)
+
+
+def ask_password(bot, update):
+    update.message.reply_text("Enter your password: ")
+    return PASSWORD
+
+
+def get_password(bot, update, user_data):
+    user_data['password'] = update.message.text
+    return login_end(bot, update, user_data)
+
+
+def login_end(bot, update, user_data):
+    user_data['password'] = update.message.text
+
+    update.message.reply_text("Your username: " + user_data['username'])
+    update.message.reply_text("Your password: " + user_data['password'])
+
+    return ConversationHandler.END
+
+
 def main():
     if(len(sys.argv) != 2):
         print("Use: main.py TOKEN.txt")
@@ -51,14 +91,31 @@ def main():
     """Start the bot."""
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(token)
-
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # on different commands - answer in Telegram
+    # Different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
+
+    # Conv handler for /login
+    login_conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('login', login)],
+
+        states={
+            USERNAME: [MessageHandler(Filters.text,
+                                      get_username,
+                                      pass_user_data=True)],
+            PASSWORD: [MessageHandler(Filters.text,
+                                      get_password,
+                                      pass_user_data=True)],
+        },
+
+        fallbacks=[RegexHandler('^Done$', login_end)]
+    )
+
+    dp.add_handler(login_conv_handler)
 
     # log all errors
     dp.add_error_handler(error)
