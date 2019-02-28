@@ -1,0 +1,2 @@
+python-telegram-bot==11.1.0
+paramiko==2.4.2

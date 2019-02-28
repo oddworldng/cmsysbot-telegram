@@ -1,3 +1,6 @@
 *.txt
 *.swp
 *~
+
+# Exceptions
+!requirements.txt
