@@ -4,3 +4,6 @@
 
 # Exceptions
 !requirements.txt
+
+# Directory
+.idea/
