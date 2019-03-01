@@ -1,17 +1,16 @@
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-ConversationHandler, RegexHandler)
+                          ConversationHandler, RegexHandler)
 
 import paramiko
-
-import logging, subprocess, sys
-
+import logging
+import subprocess
+import sys
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-
 
 USERNAME, PASSWORD = range(2)
 
@@ -83,13 +82,13 @@ def connect(bot, update, user_data, args):
 
     client.connect(args[0], 22, user_data['username'], user_data['password'])
     update.message.reply_text("Sucessfully connected to " + args[0] + "!\n"
-                            + "To run commands in remote use /rrun [command]")
+                              + "To run commands in remote use /rrun [command]")
 
     user_data['client'] = client
 
 
 def remote_run(bot, update, user_data, args):
-    if('client' in user_data):
+    if ('client' in user_data):
         print("Executing: " + " ".join(args))
 
         client = user_data['client']
@@ -101,9 +100,8 @@ def remote_run(bot, update, user_data, args):
         update.message.reply_text("Start a connection first with /connect")
 
 
-
 def main():
-    if(len(sys.argv) != 2):
+    if (len(sys.argv) != 2):
         print("Use: main.py TOKEN.txt")
         return
 
@@ -116,9 +114,8 @@ def main():
     except FileNotFoundError:
         print("File  " + sys.argv[1] + "  does not exist or can't be opened: ",
               "\nCreate a TOKEN.txt file and put your Telegram Bot Token as",
-              "the first line");
+              "the first line")
         return
-
 
     """Start the bot."""
     # Create the EventHandler and pass it your bot's token.
@@ -166,4 +163,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
