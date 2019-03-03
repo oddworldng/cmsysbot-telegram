@@ -74,6 +74,25 @@ def login_end(bot, update, user_data):
     return ConversationHandler.END
 
 
+# Execute command as root
+def run_as_root(bot, update, user_data, args):
+
+    if 'client' in user_data:
+
+        # Variables
+        client = user_data['client']
+        password = user_data['password']
+
+        # Run as root
+        arguments = " ".join(args)
+        command = ' printf "' + password + '\\n" | sudo --stdin ' + arguments
+        stdin, stdout, stderr = client.exec_command(command)
+
+        # Output
+        output_message = stdout.read().decode('utf-8')
+        update.message.reply_text(output_message)
+
+
 # Connection functions
 def connect(bot, update, user_data, args):
     client = paramiko.SSHClient()
@@ -128,6 +147,7 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
     dp.add_handler(CommandHandler("connect", connect, pass_user_data=True, pass_args=True))
+    dp.add_handler(CommandHandler("sudo", run_as_root, pass_user_data=True, pass_args=True))
     dp.add_handler(CommandHandler("rrun", remote_run, pass_user_data=True, pass_args=True))
 
     # Conv handler for /login
