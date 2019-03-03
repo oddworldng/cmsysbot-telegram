@@ -4,9 +4,9 @@
   "email": "",
   "structure": {
     "single": "",
-    "sections": {
-      "section": "",
-      "section": ""
+    "multiple": {
+      "name": "",
+      "sections": []
     }
   }
 }
