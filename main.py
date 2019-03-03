@@ -107,7 +107,7 @@ def connect(bot, update, user_data, args):
 
 
 def remote_run(bot, update, user_data, args):
-    if ('client' in user_data):
+    if 'client' in user_data:
         print("Executing: " + " ".join(args))
 
         client = user_data['client']
@@ -120,7 +120,7 @@ def remote_run(bot, update, user_data, args):
 
 
 def main():
-    if (len(sys.argv) != 2):
+    if len(sys.argv) != 2:
         print("Use: main.py TOKEN.txt")
         return
 
