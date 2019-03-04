@@ -27,8 +27,8 @@ def build_menu(buttons, n_cols=1, header_buttons=None, footer_buttons=None):
     return menu
 
 
-def return_button(pattern):
-    return [InlineKeyboardButton("Return", callback_data=pattern)]
+def create_button(label, callback_data):
+    return [InlineKeyboardButton(label, callback_data=callback_data)]
 
 
 # ##### MAIN MENU
@@ -56,7 +56,9 @@ def department_menu_keyboard():
     strings = [o['name'] for o in helper.config['structure']]
 
     return build_keyboard(
-        strings, n_cols=2, footer_buttons=return_button("Main"))
+        strings,
+        n_cols=2,
+        footer_buttons=create_button("Return", callback_data="Main"))
 
 
 def department_menu(bot, update):
@@ -79,7 +81,7 @@ def section_menu_keyboard(selected_option):
     strings = helper.config['structure'][i]['sections']
 
     return build_keyboard(
-        strings, n_cols=2, footer_buttons=return_button("Connect"))
+        strings, n_cols=2, footer_buttons=create_button("Return", "Connect"))
 
 
 def section_menu(bot, update, user_data):
@@ -98,14 +100,11 @@ def confirm_connection_message():
 
 
 def confirm_connection_keybord(strings, user_data):
-    button = [
-        InlineKeyboardButton("Connect to a different ip", callback_data="ip")
-    ]
     return build_keyboard(
         strings,
         n_cols=1,
-        header_buttons=button,
-        footer_buttons=return_button(user_data['department']))
+        header_buttons=create_button("Connect to a different ip", "Ip"),
+        footer_buttons=create_button("Return", user_data['department']))
 
 
 def confirm_connection_menu(bot, update, user_data):
