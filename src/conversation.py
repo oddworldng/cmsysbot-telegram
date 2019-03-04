@@ -5,9 +5,10 @@ from telegram.ext import (ConversationHandler, CommandHandler,
 import menu
 import helper
 
-USERNAME, PASSWORD = range(2)
+IP, USERNAME, PASSWORD = range(3)
 
 
+# ##### LOGIN CONVERSATION
 def login(bot, update):
     message = helper.getMessage(update)
     message.reply_text("Please introduce your username and password")
@@ -44,9 +45,24 @@ def login_end(bot, update, user_data):
     return ConversationHandler.END
 
 
+# ##### IP CONVERSATION
+def ip(bot, update):
+    query = update.callback_query
+    query.message.reply_text("Introduce an ip: ")
+    return IP
+
+
+def get_ip(bot, update, user_data):
+    user_data['bridge_ip'] = update.message.text
+
+    update.message.reply_text("Connect to: " + user_data['bridge_ip'])
+
+    return ConversationHandler.END
+
+
 def add_conversation_callbacks(dp):
     login_conv_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(login, pattern="login"),
+        entry_points=[CallbackQueryHandler(login, pattern="Login"),
                       CommandHandler("login", login)],
         states={
             USERNAME:
@@ -56,4 +72,14 @@ def add_conversation_callbacks(dp):
         },
         fallbacks=[])
 
+    ip_conv_handler = ConversationHandler(
+        entry_points=[CallbackQueryHandler(ip, pattern="Ip")],
+
+        states={
+            IP:
+            [MessageHandler(Filters.text, get_ip, pass_user_data=True)]
+        },
+        fallbacks=[])
+
     dp.add_handler(login_conv_handler)
+    dp.add_handler(ip_conv_handler)

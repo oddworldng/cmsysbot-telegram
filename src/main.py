@@ -20,14 +20,14 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
+def start(bot, update):
+    """Open a new menu when the command /start is issued."""
+    menu.new_menu(bot, update)
+
+
 def help(bot, update):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
-
-
-def run(bot, update, args):
-    result = subprocess.run(list(args), stdout=subprocess.PIPE)
-    update.message.reply_text(result.stdout.decode('utf-8'))
 
 
 def error(bot, update, error):
@@ -35,8 +35,14 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
-# Execute command as root
+def run(bot, update, args):
+    """"Execute a *nix command in the machine where the bot is hosted."""
+    result = subprocess.run(list(args), stdout=subprocess.PIPE)
+    update.message.reply_text(result.stdout.decode('utf-8'))
+
+
 def run_as_root(bot, update, user_data, args):
+    """Promote user to root and execute command"""
 
     if 'client' in user_data:
 
@@ -56,6 +62,9 @@ def run_as_root(bot, update, user_data, args):
 
 # Connection functions
 def connect(bot, update, user_data, args):
+    """
+    Establish a SSH connection from the bot machine to the bridge computer
+    """
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.WarningPolicy)
@@ -68,6 +77,9 @@ def connect(bot, update, user_data, args):
 
 
 def remote_run(bot, update, user_data, args):
+    """
+    Run a *nix command in the bridge computer
+    """
     if 'client' in user_data:
         print("Executing: " + " ".join(args))
 
@@ -102,7 +114,7 @@ def main():
     dp = updater.dispatcher
 
     # Different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", menu.start))
+    dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
     dp.add_handler(

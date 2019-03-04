@@ -4,8 +4,7 @@ from telegram.ext import CallbackQueryHandler
 import helper
 
 
-def start(bot, update):
-    """Entry point for the menu. Replies a new message"""
+def new_menu(bot, update):
     update.message.reply_text(
         text=main_menu_message(), reply_markup=main_menu_keyboard())
 
@@ -93,13 +92,13 @@ def section_menu(bot, update, user_data):
         reply_markup=section_menu_keyboard(user_data['department']))
 
 
-# ##### CONFIRM MENU
-def confirm_connection_message():
+# ##### IP MENU
+def ip_selection_menu_message():
     return ("Select a 'bridge' computer for the local connection. " +
             "All the commands and scripts will be issued from this computer")
 
 
-def confirm_connection_keybord(strings, user_data):
+def ip_selection_menu_keyboard(strings, user_data):
     return build_keyboard(
         strings,
         n_cols=1,
@@ -107,7 +106,7 @@ def confirm_connection_keybord(strings, user_data):
         footer_buttons=create_button("Return", user_data['department']))
 
 
-def confirm_connection_menu(bot, update, user_data):
+def ip_selection_menu(bot, update, user_data):
     query = update.callback_query
     user_data['section'] = query.data
 
@@ -120,8 +119,8 @@ def confirm_connection_menu(bot, update, user_data):
                if o['ip']]
 
     query.message.edit_text(
-        text=confirm_connection_message(),
-        reply_markup=confirm_connection_keybord(strings, user_data))
+        text=ip_selection_menu_message(),
+        reply_markup=ip_selection_menu_keyboard(strings, user_data))
 
 
 # ##### CALLBACKS
@@ -143,6 +142,6 @@ def add_menu_callbacks(dp):
             section_menu, pattern=departments_regex, pass_user_data=True))
     dp.add_handler(
         CallbackQueryHandler(
-            confirm_connection_menu,
+            ip_selection_menu,
             pattern=sections_regex,
             pass_user_data=True))
