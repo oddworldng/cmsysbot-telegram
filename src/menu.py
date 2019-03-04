@@ -82,21 +82,47 @@ def section_menu_keyboard(selected_option):
         strings, n_cols=2, footer_buttons=return_button("Connect"))
 
 
-def section_menu(bot, update):
+def section_menu(bot, update, user_data):
     query = update.callback_query
-    selected_option = query.data
+    user_data['department'] = query.data
 
     query.message.edit_text(
         text=section_menu_message(),
-        reply_markup=section_menu_keyboard(selected_option))
+        reply_markup=section_menu_keyboard(user_data['department']))
 
 
 # ##### CONFIRM MENU
-def confirm_connection_menu(bot, update):
-    query = update.callback_query
-    selected_option = query.data
+def confirm_connection_message():
+    return ("Select a 'bridge' computer for the local connection. " +
+            "All the commands and scripts will be issued from this computer")
 
-    query.message.edit_text(selected_option)
+
+def confirm_connection_keybord(strings, user_data):
+    button = [
+        InlineKeyboardButton("Connect to a different ip", callback_data="ip")
+    ]
+    return build_keyboard(
+        strings,
+        n_cols=1,
+        header_buttons=button,
+        footer_buttons=return_button(user_data['department']))
+
+
+def confirm_connection_menu(bot, update, user_data):
+    query = update.callback_query
+    user_data['section'] = query.data
+
+    json = helper.open_json_file('config/' + user_data['department'] + '/' +
+                                 user_data['section'] + '.json')
+
+    user_data['connection_json'] = json
+
+    strings = [(o['name'] + " - " + o['ip']) for o in json['computers']
+               if o['ip']]
+
+    query.message.edit_text(
+        text=confirm_connection_message(),
+        reply_markup=confirm_connection_keybord(strings, user_data))
 
 
 # ##### CALLBACKS
@@ -114,6 +140,10 @@ def add_menu_callbacks(dp):
     dp.add_handler(CallbackQueryHandler(main_menu, pattern="Main"))
     dp.add_handler(CallbackQueryHandler(department_menu, pattern="Connect"))
     dp.add_handler(
-        CallbackQueryHandler(section_menu, pattern=departments_regex))
+        CallbackQueryHandler(
+            section_menu, pattern=departments_regex, pass_user_data=True))
     dp.add_handler(
-        CallbackQueryHandler(confirm_connection_menu, pattern=sections_regex))
+        CallbackQueryHandler(
+            confirm_connection_menu,
+            pattern=sections_regex,
+            pass_user_data=True))
