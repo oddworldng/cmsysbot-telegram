@@ -61,19 +61,28 @@ def run_as_root(bot, update, user_data, args):
 
 
 # Connection functions
-def connect(bot, update, user_data, args):
+def connect(bot, update, user_data):
     """
     Establish a SSH connection from the bot machine to the bridge computer
     """
-    client = paramiko.SSHClient()
-    client.load_system_host_keys()
-    client.set_missing_host_key_policy(paramiko.WarningPolicy)
+    query = update.callback_query
 
-    client.connect(args[0], 22, user_data['username'], user_data['password'])
-    update.message.reply_text("Sucessfully connected to " + args[0] + "!\n" +
-                              "To run commands in remote use /rrun [command]")
+    try:
+        client = paramiko.SSHClient()
+        client.load_system_host_keys()
+        client.set_missing_host_key_policy(paramiko.WarningPolicy)
 
-    user_data['client'] = client
+        client.connect(user_data['bridge_ip'], 22, user_data['username'],
+                       user_data['password'])
+        query.message.reply_text(
+            "Sucessfully connected to " + user_data['bridge_ip'] + "!\n" +
+            "To run commands in remote use /rrun [command]")
+        user_data['client'] = client
+    except paramiko.AuthenticationException as error:
+        query.message.edit_text(
+            str(error) + " Please try to login with different credentials!")
+
+        menu.new_menu(bot, update)
 
 
 def remote_run(bot, update, user_data, args):

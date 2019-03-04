@@ -1,4 +1,4 @@
-from telegram.ext import (ConversationHandler, CommandHandler,
+from telegram.ext import (ConversationHandler,
                           CallbackQueryHandler, MessageHandler, Filters)
 
 import menu
@@ -12,7 +12,7 @@ IP, USERNAME, PASSWORD = range(3)
 def login(bot, update):
     """ENTRY POINT. Ask for the username and wait for the answer"""
     message = helper.getMessage(update)
-    message.reply_text("Please introduce your username and password")
+    message.edit_text("Please introduce your username and password")
     message.reply_text("Enter your username: ")
     return USERNAME
 
@@ -51,7 +51,7 @@ def get_ip(bot, update, user_data):
     """Get the ip from the last message. End conversation"""
     user_data['bridge_ip'] = update.message.text
 
-    update.message.reply_text("Connect to: " + user_data['bridge_ip'])
+    menu.confirm_connection_menu(bot, update, user_data)
 
     return ConversationHandler.END
 
@@ -63,8 +63,7 @@ def add_conversation_callbacks(dp):
     login_conv_handler = ConversationHandler(
         # Entry points: From InlineKeyboardButton or /login
         entry_points=[
-            CallbackQueryHandler(login, pattern="Login"),
-            CommandHandler("login", login)
+            CallbackQueryHandler(login, pattern="Login")
         ],
         states={
             USERNAME:

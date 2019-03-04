@@ -2,11 +2,13 @@ from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 from telegram.ext import CallbackQueryHandler
 
 import helper
+import main
 
 
 def new_menu(bot, update):
     """ENTRY POINT. Spawn a new menu in a new message"""
-    update.message.reply_text(
+    message = helper.getMessage(update)
+    message.reply_text(
         text=main_menu_message(), reply_markup=main_menu_keyboard())
 
 
@@ -44,8 +46,10 @@ def department_menu_keyboard():
     return build_keyboard(
         department_names,
         n_cols=2,
-        footer_buttons=[create_button("Connect to a specific Ip", "Ip"),
-                        create_button("Return", "Main")])
+        footer_buttons=[
+            create_button("Connect to a specific Ip", "Ip"),
+            create_button("Return", "Main")
+        ])
 
 
 def department_menu(bot, update):
@@ -139,6 +143,23 @@ def ip_selection_menu(bot, update, user_data):
         reply_markup=ip_selection_menu_keyboard(user_data))
 
 
+# ##### CONFIRM CONNECTION MENU
+def confirm_connection_menu_message(user_data):
+    return ("Are you sure that you want to connect to: " +
+            user_data['bridge_ip'] + "?")
+
+
+def confirm_connection_menu_keyboard():
+    answers = ["Yes", "No"]
+    return build_keyboard(answers, n_cols=2)
+
+
+def confirm_connection_menu(bot, update, user_data):
+    update.message.reply_text(
+        text=confirm_connection_menu_message(user_data),
+        reply_markup=confirm_connection_menu_keyboard())
+
+
 # ##### HELPER FUNCTIONS
 def build_keyboard(strings, n_cols=2, header_buttons=None,
                    footer_buttons=None):
@@ -203,3 +224,7 @@ def add_menu_callbacks(dp):
     dp.add_handler(
         CallbackQueryHandler(
             ip_selection_menu, pattern=sections_regex, pass_user_data=True))
+
+    dp.add_handler(
+        CallbackQueryHandler(main.connect, pattern="Yes", pass_user_data=True))
+    dp.add_handler(CallbackQueryHandler(main_menu, pattern="No"))
