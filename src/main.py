@@ -5,10 +5,11 @@ import subprocess
 
 import paramiko
 
-from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler, RegexHandler,
                           CallbackQueryHandler)
+
+import menu
 
 # Enable logging
 logging.basicConfig(
@@ -27,9 +28,7 @@ config = None
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
     """Show the main menu when the command /start is issued."""
-    update.message.reply_text(
-        "Welcome to CmSysBot. Issue your command:",
-        reply_markup=main_menu_keyboard())
+    menu.main_menu(bot, update)
 
 
 def help(bot, update):
@@ -133,21 +132,6 @@ def remote_run(bot, update, user_data, args):
         update.message.reply_text("Start a connection first with /connect")
 
 
-# ################## MENUS ###################
-def main_menu_message():
-    return "Opciones de CmSysBot:"
-
-
-def main_menu_keyboard():
-    keyboard = [[InlineKeyboardButton("Login", callback_data="login")]]
-    return InlineKeyboardMarkup(keyboard)
-
-
-def main_menu(bot, update):
-    update.message.reply_text(
-        text=main_menu_message(), reply_markup=main_menu_keyboard())
-
-
 # ################## MAIN  ###################
 def main():
     # Parse arguments from command line
@@ -203,8 +187,8 @@ def main():
         fallbacks=[RegexHandler('^Done$', login_end)])
     dp.add_handler(login_conv_handler)
 
-    # MENUS
-    dp.add_handler(CallbackQueryHandler(main_menu, pattern="main"))
+    # Add all menu callbacks
+    menu.add_menu_callbacks(dp)
 
     # log all errors
     dp.add_error_handler(error)

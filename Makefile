@@ -6,7 +6,7 @@ REQS := requirements.txt
 
 
 run:
-	$(PY) main.py -c $(CONFIG_FILE)
+	$(PY) src/main.py -c $(CONFIG_FILE)
 
 
 install:
