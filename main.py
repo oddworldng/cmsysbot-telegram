@@ -1,14 +1,16 @@
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-                          ConversationHandler, RegexHandler)
-
-import paramiko
 import logging
 import subprocess
 import sys
 
+import paramiko
+
+from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
+                          ConversationHandler, RegexHandler)
+
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
@@ -100,8 +102,8 @@ def connect(bot, update, user_data, args):
     client.set_missing_host_key_policy(paramiko.WarningPolicy)
 
     client.connect(args[0], 22, user_data['username'], user_data['password'])
-    update.message.reply_text("Sucessfully connected to " + args[0] + "!\n"
-                              + "To run commands in remote use /rrun [command]")
+    update.message.reply_text("Sucessfully connected to " + args[0] + "!\n" +
+                              "To run commands in remote use /rrun [command]")
 
     user_data['client'] = client
 
@@ -135,7 +137,6 @@ def main():
               "\nCreate a TOKEN.txt file and put your Telegram Bot Token as",
               "the first line")
         return
-
     """Start the bot."""
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(token)
@@ -146,25 +147,26 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
-    dp.add_handler(CommandHandler("connect", connect, pass_user_data=True, pass_args=True))
-    dp.add_handler(CommandHandler("sudo", run_as_root, pass_user_data=True, pass_args=True))
-    dp.add_handler(CommandHandler("rrun", remote_run, pass_user_data=True, pass_args=True))
+    dp.add_handler(
+        CommandHandler(
+            "connect", connect, pass_user_data=True, pass_args=True))
+    dp.add_handler(
+        CommandHandler(
+            "sudo", run_as_root, pass_user_data=True, pass_args=True))
+    dp.add_handler(
+        CommandHandler(
+            "rrun", remote_run, pass_user_data=True, pass_args=True))
 
     # Conv handler for /login
     login_conv_handler = ConversationHandler(
         entry_points=[CommandHandler('login', login)],
-
         states={
-            USERNAME: [MessageHandler(Filters.text,
-                                      get_username,
-                                      pass_user_data=True)],
-            PASSWORD: [MessageHandler(Filters.text,
-                                      get_password,
-                                      pass_user_data=True)],
+            USERNAME:
+            [MessageHandler(Filters.text, get_username, pass_user_data=True)],
+            PASSWORD:
+            [MessageHandler(Filters.text, get_password, pass_user_data=True)],
         },
-
-        fallbacks=[RegexHandler('^Done$', login_end)]
-    )
+        fallbacks=[RegexHandler('^Done$', login_end)])
 
     dp.add_handler(login_conv_handler)
 
