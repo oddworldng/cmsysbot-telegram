@@ -1,8 +1,6 @@
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 from telegram.ext import CallbackQueryHandler
 
-import helper
-
 
 def start(bot, update):
     """Entry point for the menu. Replies a new message"""
