@@ -1,16 +1,15 @@
 import json
 import os
 
-DEFAULT_FILEPATH = "config/config.json"
+# Default path in the filesystem where the config.json is located
+DEFAULT_CONFIG_FILEPATH = "config/config.json"
 
-# Variable holding the JSON file
+# Singleton variable holding the JSON file (config.json)
 config = None
 
 
-def open_json_file(filepath=DEFAULT_FILEPATH):
-    if not filepath:
-        filepath = DEFAULT_FILEPATH
-
+def open_json_file(filepath):
+    """Open a JSON file from a path and return its content"""
     try:
         with open(filepath) as json_file:
             return json.load(json_file)
@@ -21,6 +20,10 @@ def open_json_file(filepath=DEFAULT_FILEPATH):
 
 
 def getMessage(update):
+    """
+    Get the last message from 'update' or 'update.callback_query' Useful when a
+    callback is called from both CommandHandler and CallbackQueryHandler
+    """
     if(update.message):
         return update.message
     else:
@@ -28,13 +31,17 @@ def getMessage(update):
 
 
 def create_folders_and_files(folder, files):
+    """
+    Check if a folder exists. If not, create it. For each file, if doesn't
+    exist, create it inside the folder with a default JSON scheme
+    """
     if(not os.path.isdir(folder)):
         os.makedirs(folder)
 
     for file in files:
         filepath = folder + "/" + file + ".json"
         if(not os.path.exists(filepath)):
-            print("Created file " + filepath)
+            print("-> Created file " + filepath)
             with open(filepath, "w") as outfile:
                 json_scheme = {}
                 json_scheme['computers'] = []

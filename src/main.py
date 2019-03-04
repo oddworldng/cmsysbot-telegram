@@ -101,7 +101,10 @@ def main():
     args = parser.parse_args()
 
     # Open the config.json file
-    helper.config = helper.open_json_file(args.config)
+    if (args.config):
+        helper.config = helper.open_json_file(args.config)
+    else:
+        helper.config = helper.open_json_file(helper.DEFAULT_CONFIG_FILEPATH)
 
     # Create folders and files from config.json structure if missing
     for department in helper.config['structure']:
