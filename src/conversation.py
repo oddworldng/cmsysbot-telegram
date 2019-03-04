@@ -1,15 +1,16 @@
-# Conversation handler for /login
 from telegram.ext import (ConversationHandler, CommandHandler,
                           CallbackQueryHandler, MessageHandler, Filters)
 
 import menu
 import helper
 
+# Conversation States
 IP, USERNAME, PASSWORD = range(3)
 
 
 # ##### LOGIN CONVERSATION
 def login(bot, update):
+    """ENTRY POINT. Ask for the username and wait for the answer"""
     message = helper.getMessage(update)
     message.reply_text("Please introduce your username and password")
     message.reply_text("Enter your username: ")
@@ -17,21 +18,14 @@ def login(bot, update):
 
 
 def get_username(bot, update, user_data):
+    """Get the username from the last messge. Ask for the password and wait"""
     user_data['username'] = update.message.text
-    return ask_password(bot, update)
-
-
-def ask_password(bot, update):
     update.message.reply_text("Enter your password: ")
     return PASSWORD
 
 
 def get_password(bot, update, user_data):
-    user_data['password'] = update.message.text
-    return login_end(bot, update, user_data)
-
-
-def login_end(bot, update, user_data):
+    """Get the password from the last message. End conversation"""
     user_data['password'] = update.message.text
 
     update.message.reply_text("Your username: " + user_data['username'])
@@ -40,19 +34,21 @@ def login_end(bot, update, user_data):
                               connections.")
 
     # After user input, show menu again
-    menu.start(bot, update)
+    menu.new_menu(bot, update)
 
     return ConversationHandler.END
 
 
 # ##### IP CONVERSATION
 def ip(bot, update):
+    """ENTRY POINT. Ask the user for an ip"""
     query = update.callback_query
-    query.message.reply_text("Introduce an ip: ")
+    query.message.edit_text("Introduce an ip: ")
     return IP
 
 
 def get_ip(bot, update, user_data):
+    """Get the ip from the last message. End conversation"""
     user_data['bridge_ip'] = update.message.text
 
     update.message.reply_text("Connect to: " + user_data['bridge_ip'])
@@ -61,7 +57,11 @@ def get_ip(bot, update, user_data):
 
 
 def add_conversation_callbacks(dp):
+    """Add all the conversation handlers to the Dispatcher"""
+
+    # Login handler
     login_conv_handler = ConversationHandler(
+        # Entry points: From InlineKeyboardButton or /login
         entry_points=[CallbackQueryHandler(login, pattern="Login"),
                       CommandHandler("login", login)],
         states={
@@ -72,7 +72,9 @@ def add_conversation_callbacks(dp):
         },
         fallbacks=[])
 
+    # Ip handler
     ip_conv_handler = ConversationHandler(
+        # Entry points: From InlineKeyboardButton
         entry_points=[CallbackQueryHandler(ip, pattern="Ip")],
 
         states={
