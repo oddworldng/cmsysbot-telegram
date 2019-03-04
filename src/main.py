@@ -105,7 +105,6 @@ def main():
     dp.add_handler(CommandHandler("start", menu.start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
-    dp.add_handler(CommandHandler("connect", menu.connect_menu))
     dp.add_handler(
         CommandHandler(
             "sudo", run_as_root, pass_user_data=True, pass_args=True))
