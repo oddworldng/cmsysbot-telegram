@@ -1,12 +1,12 @@
 .PHONY: run
 
 PY := python3
-TOKEN_FILE := TOKEN.txt
+CONFIG_FILE := config/config.json
 REQS := requirements.txt
 
 
 run:
-	$(PY) main.py $(TOKEN_FILE)
+	$(PY) main.py -c $(CONFIG_FILE)
 
 
 install:

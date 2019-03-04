@@ -1,6 +1,7 @@
+import argparse
+import json
 import logging
 import subprocess
-import sys
 
 import paramiko
 
@@ -15,6 +16,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 USERNAME, PASSWORD = range(2)
+
+# Variable holding the JSON file
+config = None
 
 
 # Define a few command handlers. These usually take the two arguments bot and
@@ -122,24 +126,28 @@ def remote_run(bot, update, user_data, args):
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Use: main.py TOKEN.txt")
-        return
+    # Parse arguments from command line
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-c", "--config", help="JSON file with the Bot Configuration")
+    args = parser.parse_args()
 
-    # Read the file and get the TOKEN as first line as first line
-    token = ""
+    config_filepath = "config/config.json"  # Default config.json location
+    if args.config:
+        config_filepath = args.config
 
+    # Open the config.json file
     try:
-        with open(sys.argv[1], 'r') as my_file:
-            token = my_file.read().splitlines()[0]
+        with open(config_filepath) as json_file:
+            config = json.load(json_file)
+
     except FileNotFoundError:
-        print("File  " + sys.argv[1] + "  does not exist or can't be opened: ",
-              "\nCreate a TOKEN.txt file and put your Telegram Bot Token as",
-              "the first line")
+        print("File " + config_filepath + " doesn't exist or can't be opened!",
+              "\nCreate a config.json file and put your Bot Token in it!")
         return
-    """Start the bot."""
+
     # Create the EventHandler and pass it your bot's token.
-    updater = Updater(token)
+    updater = Updater(config['token'])
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
