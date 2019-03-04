@@ -14,3 +14,10 @@ def open_json_file(filepath=DEFAULT_FILEPATH):
     except FileNotFoundError:
         print("File " + filepath + " doesn't exist or can't be opened!",
               "\nCreate a config.json file and put your Bot Token in it!")
+
+
+def getMessage(update):
+    if(update.message):
+        return update.message
+    else:
+        return update.callback_query.message

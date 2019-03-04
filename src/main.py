@@ -1,5 +1,4 @@
 import argparse
-import json
 import logging
 import subprocess
 
@@ -10,6 +9,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler)
 
 import menu
+import helper
 
 # Enable logging
 logging.basicConfig(
@@ -47,15 +47,8 @@ def error(bot, update, error):
 
 
 # Login functions
-def getMessage(update):
-    if(update.message):
-        return update.message
-    else:
-        return update.callback_query.message
-
-
 def login(bot, update):
-    message = getMessage(update)
+    message = helper.getMessage(update)
     message.reply_text("Please introduce your username and password")
     message.reply_text("Enter your username: ")
     return USERNAME
@@ -140,20 +133,9 @@ def main():
         "-c", "--config", help="JSON file with the Bot Configuration")
     args = parser.parse_args()
 
-    config_filepath = "config/config.json"  # Default config.json location
-    if args.config:
-        config_filepath = args.config
-
     # Open the config.json file
-    try:
-        with open(config_filepath) as json_file:
-            global config
-            config = json.load(json_file)
-
-    except FileNotFoundError:
-        print("File " + config_filepath + " doesn't exist or can't be opened!",
-              "\nCreate a config.json file and put your Bot Token in it!")
-        return
+    global config
+    config = helper.open_json_file(args.config)
 
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(config['token'])
