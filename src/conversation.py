@@ -2,6 +2,7 @@
 from telegram.ext import (ConversationHandler, CommandHandler,
                           CallbackQueryHandler, MessageHandler, Filters)
 
+import menu
 import helper
 
 USERNAME, PASSWORD = range(2)
@@ -36,6 +37,9 @@ def login_end(bot, update, user_data):
     update.message.reply_text("Your password: " + user_data['password'])
     update.message.reply_text("This credentials will be used for future \
                               connections.")
+
+    # After user input, show menu again
+    menu.start(bot, update)
 
     return ConversationHandler.END
 

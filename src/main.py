@@ -24,12 +24,6 @@ config = None
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
-def start(bot, update):
-    """Show the main menu when the command /start is issued."""
-    update.message.reply_text(text=menu.main_menu_message(),
-                              reply_markup=menu.main_menu_keyboard())
-
-
 def help(bot, update):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
@@ -108,7 +102,7 @@ def main():
     dp = updater.dispatcher
 
     # Different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("start", menu.start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
     dp.add_handler(CommandHandler("connect", menu.connect_menu))

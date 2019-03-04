@@ -4,6 +4,12 @@ from telegram.ext import CallbackQueryHandler
 import helper
 
 
+def start(bot, update):
+    """Entry point for the menu. Replies a new message"""
+    update.message.reply_text(text=main_menu_message(),
+                              reply_markup=main_menu_keyboard())
+
+
 # ##### MAIN MENU
 def main_menu_message():
     return "Welcome to CmSysBot. Issue your command:"
