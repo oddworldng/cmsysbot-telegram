@@ -5,8 +5,10 @@ import subprocess
 
 import paramiko
 
+from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-                          ConversationHandler, RegexHandler)
+                          ConversationHandler, RegexHandler,
+                          CallbackQueryHandler)
 
 # Enable logging
 logging.basicConfig(
@@ -24,8 +26,10 @@ config = None
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
-    """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    """Show the main menu when the command /start is issued."""
+    update.message.reply_text(
+        "Welcome to CmSysBot. Issue your command:",
+        reply_markup=main_menu_keyboard())
 
 
 def help(bot, update):
@@ -44,13 +48,17 @@ def error(bot, update, error):
 
 
 # Login functions
+def getMessage(update):
+    if(update.message):
+        return update.message
+    else:
+        return update.callback_query.message
+
+
 def login(bot, update):
-    update.message.reply_text("Please introduce your username and password")
-    return ask_username(bot, update)
-
-
-def ask_username(bot, update):
-    update.message.reply_text("Enter your username: ")
+    message = getMessage(update)
+    message.reply_text("Please introduce your username and password")
+    message.reply_text("Enter your username: ")
     return USERNAME
 
 
@@ -125,6 +133,22 @@ def remote_run(bot, update, user_data, args):
         update.message.reply_text("Start a connection first with /connect")
 
 
+# ################## MENUS ###################
+def main_menu_message():
+    return "Opciones de CmSysBot:"
+
+
+def main_menu_keyboard():
+    keyboard = [[InlineKeyboardButton("Login", callback_data="login")]]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def main_menu(bot, update):
+    update.message.reply_text(
+        text=main_menu_message(), reply_markup=main_menu_keyboard())
+
+
+# ################## MAIN  ###################
 def main():
     # Parse arguments from command line
     parser = argparse.ArgumentParser()
@@ -139,6 +163,7 @@ def main():
     # Open the config.json file
     try:
         with open(config_filepath) as json_file:
+            global config
             config = json.load(json_file)
 
     except FileNotFoundError:
@@ -165,9 +190,10 @@ def main():
         CommandHandler(
             "rrun", remote_run, pass_user_data=True, pass_args=True))
 
-    # Conv handler for /login
+    # Conversation handler for /login
     login_conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('login', login)],
+        entry_points=[CallbackQueryHandler(login, pattern="login"),
+                      CommandHandler("login", login)],
         states={
             USERNAME:
             [MessageHandler(Filters.text, get_username, pass_user_data=True)],
@@ -175,8 +201,10 @@ def main():
             [MessageHandler(Filters.text, get_password, pass_user_data=True)],
         },
         fallbacks=[RegexHandler('^Done$', login_end)])
-
     dp.add_handler(login_conv_handler)
+
+    # MENUS
+    dp.add_handler(CallbackQueryHandler(main_menu, pattern="main"))
 
     # log all errors
     dp.add_error_handler(error)
