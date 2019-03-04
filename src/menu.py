@@ -35,7 +35,8 @@ def department_menu_message():
 def department_menu_keyboard():
     """
     Keyboard with a button for each department in the 'structures' array.
-    Also show a Return button to go back to 'main menu'
+    Also, show a button for connecting to a specific Ip
+    Also, show a Return button to go back to 'main menu'
     """
     # Iterate through the JSON 'structure' array and get all the names
     department_names = [o['name'] for o in helper.config['structure']]
@@ -43,7 +44,8 @@ def department_menu_keyboard():
     return build_keyboard(
         department_names,
         n_cols=2,
-        footer_buttons=create_button("Return", "Main"))
+        footer_buttons=[create_button("Connect to a specific Ip", "Ip"),
+                        create_button("Return", "Main")])
 
 
 def department_menu(bot, update):
@@ -77,7 +79,7 @@ def section_menu_keyboard(user_data):
     return build_keyboard(
         section_names,
         n_cols=2,
-        footer_buttons=create_button("Return", "Connect"))
+        footer_buttons=[create_button("Return", "Connect")])
 
 
 def section_menu(bot, update, user_data):
@@ -115,8 +117,7 @@ def ip_selection_menu_keyboard(user_data):
     return build_keyboard(
         strings,
         n_cols=1,
-        header_buttons=create_button("Connect to a different ip", "Ip"),
-        footer_buttons=create_button("Return", user_data['department']))
+        footer_buttons=[create_button("Return", user_data['department'])])
 
 
 def ip_selection_menu(bot, update, user_data):
@@ -160,7 +161,8 @@ def build_menu(buttons, n_cols=1, header_buttons=None, footer_buttons=None):
     if header_buttons:
         menu.insert(0, header_buttons)
     if footer_buttons:
-        menu.append(footer_buttons)
+        menu.extend(footer_buttons)
+
     return menu
 
 

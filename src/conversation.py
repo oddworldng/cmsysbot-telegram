@@ -62,8 +62,10 @@ def add_conversation_callbacks(dp):
     # Login handler
     login_conv_handler = ConversationHandler(
         # Entry points: From InlineKeyboardButton or /login
-        entry_points=[CallbackQueryHandler(login, pattern="Login"),
-                      CommandHandler("login", login)],
+        entry_points=[
+            CallbackQueryHandler(login, pattern="Login"),
+            CommandHandler("login", login)
+        ],
         states={
             USERNAME:
             [MessageHandler(Filters.text, get_username, pass_user_data=True)],
@@ -76,10 +78,8 @@ def add_conversation_callbacks(dp):
     ip_conv_handler = ConversationHandler(
         # Entry points: From InlineKeyboardButton
         entry_points=[CallbackQueryHandler(ip, pattern="Ip")],
-
         states={
-            IP:
-            [MessageHandler(Filters.text, get_ip, pass_user_data=True)]
+            IP: [MessageHandler(Filters.text, get_ip, pass_user_data=True)]
         },
         fallbacks=[])
 
