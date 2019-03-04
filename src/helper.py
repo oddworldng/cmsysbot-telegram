@@ -2,6 +2,9 @@ import json
 
 DEFAULT_FILEPATH = "config/config.json"
 
+# Variable holding the JSON file
+config = None
+
 
 def open_json_file(filepath=DEFAULT_FILEPATH):
     if not filepath:

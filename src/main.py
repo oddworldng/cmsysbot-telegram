@@ -18,10 +18,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# Variable holding the JSON file
-config = None
-
-
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def help(bot, update):
@@ -93,11 +89,10 @@ def main():
     args = parser.parse_args()
 
     # Open the config.json file
-    global config
-    config = helper.open_json_file(args.config)
+    helper.config = helper.open_json_file(args.config)
 
     # Create the EventHandler and pass it your bot's token.
-    updater = Updater(config['token'])
+    updater = Updater(helper.config['token'])
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
