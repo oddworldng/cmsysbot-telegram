@@ -10,8 +10,12 @@ def start(bot, update):
         text=main_menu_message(), reply_markup=main_menu_keyboard())
 
 
-def return_button(pattern):
-    return [InlineKeyboardButton("Return", callback_data=pattern)]
+def build_keyboard(strings, n_cols=2, header_buttons=None,
+                   footer_buttons=None):
+    keyboard = [InlineKeyboardButton(s, callback_data=s) for s in strings]
+
+    return InlineKeyboardMarkup(
+        build_menu(keyboard, n_cols, header_buttons, footer_buttons))
 
 
 def build_menu(buttons, n_cols=1, header_buttons=None, footer_buttons=None):
@@ -23,17 +27,18 @@ def build_menu(buttons, n_cols=1, header_buttons=None, footer_buttons=None):
     return menu
 
 
+def return_button(pattern):
+    return [InlineKeyboardButton("Return", callback_data=pattern)]
+
+
 # ##### MAIN MENU
 def main_menu_message():
     return "Welcome to CmSysBot. Issue your command:"
 
 
 def main_menu_keyboard():
-    keyboard = [
-        InlineKeyboardButton("Login", callback_data="login"),
-        InlineKeyboardButton("Connect", callback_data="connect")
-    ]
-    return InlineKeyboardMarkup(build_menu(keyboard, n_cols=2))
+    strings = ["Login", "Connect"]
+    return build_keyboard(strings, n_cols=2)
 
 
 def main_menu(bot, update):
@@ -43,50 +48,72 @@ def main_menu(bot, update):
 
 
 # ##### CONNECT MENU
-def connect_menu_message():
-    return "Select your connection:"
+def department_menu_message():
+    return "Select the department:"
 
 
-def connect_menu_keyboard():
-    strings = list(
-        map(lambda o: o['name'], helper.config['structure']['multiple']))
+def department_menu_keyboard():
+    strings = [o['name'] for o in helper.config['structure']]
 
-    keyboard = [
-        InlineKeyboardButton(s, callback_data="subsection") for s in strings
-    ]
-
-    return InlineKeyboardMarkup(
-        build_menu(keyboard, n_cols=2, footer_buttons=return_button("main")))
+    return build_keyboard(
+        strings, n_cols=2, footer_buttons=return_button("Main"))
 
 
-def connect_menu(bot, update):
+def department_menu(bot, update):
     query = update.callback_query
     query.message.edit_text(
-        text=connect_menu_message(), reply_markup=connect_menu_keyboard())
+        text=department_menu_message(),
+        reply_markup=department_menu_keyboard())
 
 
-# ##### SUBSECTION MENU
-def subsection_menu_message():
-    return "Select subsection:"
+# ##### SECTION MENU
+def section_menu_message():
+    return "Select your section:"
 
 
-def subsection_menu_keyboard():
-    keyboard = [InlineKeyboardButton("test", callback_data="test")]
+def section_menu_keyboard(selected_option):
+    i = 0
+    while (helper.config['structure'][i]['name'] != selected_option):
+        i += 1
 
-    return InlineKeyboardMarkup(
-        build_menu(
-            keyboard, n_cols=2, footer_buttons=return_button("connect")))
+    strings = helper.config['structure'][i]['sections']
+
+    return build_keyboard(
+        strings, n_cols=2, footer_buttons=return_button("Connect"))
 
 
-def subsection_menu(bot, update):
+def section_menu(bot, update):
     query = update.callback_query
+    selected_option = query.data
+
     query.message.edit_text(
-        text=subsection_menu_message(),
-        reply_markup=subsection_menu_keyboard())
+        text=section_menu_message(),
+        reply_markup=section_menu_keyboard(selected_option))
+
+
+# ##### CONFIRM MENU
+def confirm_connection_menu(bot, update):
+    query = update.callback_query
+    selected_option = query.data
+
+    query.message.edit_text(selected_option)
 
 
 # ##### CALLBACKS
 def add_menu_callbacks(dp):
-    dp.add_handler(CallbackQueryHandler(main_menu, pattern="main"))
-    dp.add_handler(CallbackQueryHandler(connect_menu, pattern="connect"))
-    dp.add_handler(CallbackQueryHandler(subsection_menu, pattern="subsection"))
+    departments_names = []
+    sections_names = []
+
+    for department in helper.config['structure']:
+        departments_names.append(department['name'])
+        sections_names.extend(department['sections'])
+
+    departments_regex = "|".join(departments_names)
+    sections_regex = "|".join(sections_names)
+
+    dp.add_handler(CallbackQueryHandler(main_menu, pattern="Main"))
+    dp.add_handler(CallbackQueryHandler(department_menu, pattern="Connect"))
+    dp.add_handler(
+        CallbackQueryHandler(section_menu, pattern=departments_regex))
+    dp.add_handler(
+        CallbackQueryHandler(confirm_connection_menu, pattern=sections_regex))
