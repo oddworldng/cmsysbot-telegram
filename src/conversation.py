@@ -56,6 +56,7 @@ def get_ip(bot, update, user_data):
     return ConversationHandler.END
 
 
+# ##### CONVERSATION CALLBACKS
 def add_conversation_callbacks(dp):
     """Add all the conversation handlers to the Dispatcher"""
 

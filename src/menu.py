@@ -211,6 +211,7 @@ def confirm_connection_menu(bot, update, user_data):
 
 
 def get_ip(bot, update, user_data):
+    """Get user ip (from CallbackQueryHandler)"""
     query = update.callback_query
     user_data['bridge_ip'] = query.data
     confirm_connection_menu(bot, update, user_data)
