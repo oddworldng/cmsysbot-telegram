@@ -73,8 +73,7 @@ def department_menu_keyboard():
 def department_menu(bot, update, user_data):
     query = update.callback_query
 
-    # Reset the last selected department
-    user_data.pop('department', None)
+    # Reset the selected route
     user_data.pop('temp_route', None)
 
     query.message.edit_text(
@@ -142,15 +141,19 @@ def ip_selection_menu_keyboard(user_data):
     # BUT ONLY if the entry has an ip value assigned
     keyboard = []
     for computer in user_data['temp_json']['computers']:
+        label = ""
+        if 'name' in computer:
+            label += computer['name']
+
+        # Only add entries if an Ip is specified
         if 'ip' in computer:
-            label = computer['name'] + ' (' + computer['ip'] + ')'
+            label += ' (' + computer['ip'] + ')'
             keyboard.append(
                 InlineKeyboardButton(label, callback_data=computer['ip']))
 
     # If a single was selected, return button should return to 'department
     # menu'. If a multiple was selected, return button should return to
     # 'section_menu'
-
     return InlineKeyboardMarkup(
         build_menu(
             keyboard,
@@ -167,7 +170,7 @@ def ip_selection_menu(bot, update, user_data):
     else:
         user_data['temp_route'] = query.data
 
-    # Using the department (if selected) and the section, create a path to the
+    # Using the temp_route, create a path to the
     # json for the respective section
     json_filepath = 'config/' + user_data['temp_route'] + '.json'
 
@@ -285,11 +288,12 @@ def add_menu_callbacks(dp):
         CallbackQueryHandler(
             department_menu, pattern="Connect", pass_user_data=True))
 
-    # TRIGGERED if clicked on any department in the 'department_names' array
+    # TRIGGERED if clicked on any department with multiple sections
     dp.add_handler(
         CallbackQueryHandler(
             section_menu, pattern=departments_regex, pass_user_data=True))
 
+    # TRIGGERED if clicked on any department without sections (single)
     dp.add_handler(
         CallbackQueryHandler(
             ip_selection_menu, pattern=singles_regex, pass_user_data=True))
@@ -299,11 +303,13 @@ def add_menu_callbacks(dp):
         CallbackQueryHandler(
             ip_selection_menu, pattern=sections_regex, pass_user_data=True))
 
+    # TRIGGERED by an Ip (Even if its invalid)
     dp.add_handler(
         CallbackQueryHandler(
             get_ip,
             pattern="^[\d*\.*]*$",
             pass_user_data=True))
 
+    # TRIGGERED if clicked on No in the 'confirm_connection_menu'
     dp.add_handler(CallbackQueryHandler(main_menu, pattern="^Ip-No$",
                                         pass_user_data=True))
