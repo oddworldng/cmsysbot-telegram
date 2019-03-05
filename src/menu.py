@@ -3,13 +3,15 @@ from telegram.ext import CallbackQueryHandler
 
 import helper
 import ipaddress
+import main
 
 
 def new_menu(bot, update, user_data):
     """ENTRY POINT. Spawn a new menu in a new message"""
     message = helper.getMessage(update)
     message.reply_text(
-        text=main_menu_message(user_data), reply_markup=main_menu_keyboard())
+        text=main_menu_message(user_data),
+        reply_markup=main_menu_keyboard(user_data))
 
 
 # ######################################################################
@@ -19,7 +21,8 @@ def main_menu(bot, update, user_data):
     """Show the main menu, with the most basic options for the bot"""
     query = update.callback_query
     query.message.edit_text(
-        text=main_menu_message(user_data), reply_markup=main_menu_keyboard())
+        text=main_menu_message(user_data),
+        reply_markup=main_menu_keyboard(user_data))
 
 
 def main_menu_message(user_data):
@@ -43,8 +46,13 @@ def main_menu_message(user_data):
     return message
 
 
-def main_menu_keyboard():
-    strings = ["Connect"]
+def main_menu_keyboard(user_data):
+    strings = []
+    if 'client' in user_data:
+        strings.extend(["Disconnect", "(TODO: Add more buttons)"])
+    else:
+        strings.extend(["Connect"])
+
     return build_keyboard(strings, n_cols=2)
 
 
@@ -303,6 +311,11 @@ def add_menu_callbacks(dp):
     dp.add_handler(
         CallbackQueryHandler(
             department_menu, pattern="Connect", pass_user_data=True))
+
+    # TRIGGERED if clicked on Disconnect after connecting
+    dp.add_handler(
+        CallbackQueryHandler(
+            main.disconnect, pattern="Disconnect", pass_user_data=True))
 
     # TRIGGERED if clicked on any department with multiple sections
     dp.add_handler(

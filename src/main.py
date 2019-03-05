@@ -114,6 +114,25 @@ def remote_run(bot, update, user_data, args):
         update.message.reply_text("Start a connection first with /connect")
 
 
+def disconnect(bot, update, user_data):
+    """
+    Disconnect from the current SSH connection and remove user variables
+    """
+    if 'client' in user_data:
+        # Close SSH connection
+        user_data['client'].close()
+
+        # Remove all stored values from the user
+        user_data.pop('client', None)
+        user_data.pop('username', None)
+        user_data.pop('password', None)
+        user_data.pop('hostname', None)
+        user_data.pop('route', None)
+        user_data.pop('host_json', None)
+
+    menu.main_menu(bot, update, user_data)
+
+
 # ######################################################################
 #                                MAIN
 # ######################################################################
