@@ -253,7 +253,7 @@ def build_keyboard(strings, n_cols=2, header_buttons=None,
     Return an InlineKeyboard with sane defaults. callback_data values will be
     the same value as the button labels
     """
-    keyboard = [InlineKeyboardButton(s, callback_data=s) for s in strings]
+    keyboard = [InlineKeyboardButton(s, callback_data=s) for s in strings if s]
 
     return InlineKeyboardMarkup(
         build_menu(keyboard, n_cols, header_buttons, footer_buttons))
