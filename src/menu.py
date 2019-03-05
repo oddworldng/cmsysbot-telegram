@@ -12,14 +12,28 @@ def new_menu(bot, update, user_data):
         text=main_menu_message(user_data), reply_markup=main_menu_keyboard())
 
 
-# ##### MAIN MENU
+# ######################################################################
+#                               MAIN MENU
+# ######################################################################
+def main_menu(bot, update, user_data):
+    """Show the main menu, with the most basic options for the bot"""
+    query = update.callback_query
+    query.message.edit_text(
+        text=main_menu_message(user_data), reply_markup=main_menu_keyboard())
+
+
 def main_menu_message(user_data):
+    """
+    Message with the actual status of the bot (Connnected, Not connected, Host,
+    User...)
+    """
     message = "-- CmSysBot --\n"
     if 'client' in user_data:
         message += "CONNECTED:\n"
         if 'route' in user_data:
             message += "-> Localization: " + user_data['route'] + "\n"
         message += "-> Hostname: " + user_data['hostname'] + "\n"
+        message += "-> USER: " + user_data['username'] + "\n"
 
     else:
         message += "NOT CONNECTED"
@@ -34,26 +48,35 @@ def main_menu_keyboard():
     return build_keyboard(strings, n_cols=2)
 
 
-def main_menu(bot, update, user_data):
-    """Show the main menu, with the most basic options for the bot"""
+# ######################################################################
+#                          DEPARTMENT MENU
+# ######################################################################
+def department_menu(bot, update, user_data):
+    """
+    Show a menu with all the departments in the config.json
+    """
     query = update.callback_query
+
+    # Reset the temporal selected route (department/section)
+    user_data.pop('temp_route', None)
+
     query.message.edit_text(
-        text=main_menu_message(user_data), reply_markup=main_menu_keyboard())
+        text=department_menu_message(),
+        reply_markup=department_menu_keyboard())
 
 
-# ##### CONNECT MENU
 def department_menu_message():
     message = "DEPARTMENTS - Select your department:"
-
     return message
 
 
 def department_menu_keyboard():
     """
-    Keyboard with a button for each department in the 'structures' array.
-    Also, show a button for connecting to a specific Ip
+    Keyboard with a button for each department name.
+    Also, show an additional button for connecting to a specific Ip
     Also, show a Return button to go back to 'main menu'
     """
+    # Names of all the departments (multiple and single)
     department_names = helper.get_department_names()
 
     return build_keyboard(
@@ -65,18 +88,23 @@ def department_menu_keyboard():
         ])
 
 
-def department_menu(bot, update, user_data):
+# ######################################################################
+#                            SECTION MENU
+# ######################################################################
+def section_menu(bot, update, user_data):
+    """
+    Show a menu with all the sections that a multiple department has
+    """
     query = update.callback_query
 
-    # Reset the selected route
-    user_data.pop('temp_route', None)
+    # Save the current selected department in the user_data
+    user_data['temp_route'] = query.data
 
     query.message.edit_text(
-        text=department_menu_message(),
-        reply_markup=department_menu_keyboard())
+        text=section_menu_message(user_data),
+        reply_markup=section_menu_keyboard(user_data))
 
 
-# ##### SECTION MENU
 def section_menu_message(user_data):
     message = ("Current route: " + user_data['temp_route'] +
                "\nSelect your section: ")
@@ -86,8 +114,7 @@ def section_menu_message(user_data):
 
 def section_menu_keyboard(user_data):
     """
-    Keyboard with a button for each section in the 'sections' array of
-    department.
+    Keyboard with a button for each section name for the selected department
     Also show a Return button to go back to 'department menu'
     """
     section_names = helper.get_section_names_for_department(
@@ -100,18 +127,34 @@ def section_menu_keyboard(user_data):
         footer_buttons=[create_button("Return", "Connect")])
 
 
-def section_menu(bot, update, user_data):
+# ######################################################################
+#                           IP SELECTION MENU
+# ######################################################################
+def ip_selection_menu(bot, update, user_data):
+    """
+    Show a menu with the list of the computers that have a defined 'ip' field
+    in the corresponding .json file
+    """
     query = update.callback_query
 
-    # Save the current selected department in the user_data
-    user_data['temp_route'] = query.data
+    # Update the current route to add the section
+    if 'temp_route' in user_data:  # department/section.json
+        user_data['temp_route'] += '/' + query.data
+    else:                          # section.json
+        user_data['temp_route'] = query.data
+
+    # Create a path to the .json file from the temp_route
+    json_filepath = 'config/' + user_data['temp_route'] + '.json'
+
+    # Open the .json and save it in user_data
+    json = helper.open_json_file(json_filepath)
+    user_data['temp_json'] = json
 
     query.message.edit_text(
-        text=section_menu_message(user_data),
-        reply_markup=section_menu_keyboard(user_data))
+        text=ip_selection_menu_message(user_data),
+        reply_markup=ip_selection_menu_keyboard(user_data))
 
 
-# ##### IP MENU
 def ip_selection_menu_message(user_data):
     message = ("Current route: " + user_data['temp_route'] + "\n" +
                "Now,  Select a 'bridge' computer for the local connection. " +
@@ -122,8 +165,8 @@ def ip_selection_menu_message(user_data):
 
 def ip_selection_menu_keyboard(user_data):
     """
-    Keyboard with a button for each ip in the 'computers' array for the
-    section.
+    Keyboard with a button for each computer in the 'computers' array.
+    Only add computers that have the 'ip' field defined
     Also show a Return button to go back to 'section menu'
     """
     # Get a list with the name and ip for each computers in the JSON,
@@ -150,42 +193,14 @@ def ip_selection_menu_keyboard(user_data):
             footer_buttons=[create_button("Return", "Connect")]))
 
 
-def ip_selection_menu(bot, update, user_data):
-    query = update.callback_query
-
-    # Save the current section in the user_data
-    if 'temp_route' in user_data:
-        user_data['temp_route'] += '/' + query.data
-    else:
-        user_data['temp_route'] = query.data
-
-    # Using the temp_route, create a path to the
-    # json for the respective section
-    json_filepath = 'config/' + user_data['temp_route'] + '.json'
-
-    json = helper.open_json_file(json_filepath)
-    user_data['temp_json'] = json
-
-    query.message.edit_text(
-        text=ip_selection_menu_message(user_data),
-        reply_markup=ip_selection_menu_keyboard(user_data))
-
-
-# ##### CONFIRM CONNECTION MENU
-def confirm_connection_menu_message(user_data):
-    return ("Are you sure that you want to connect to: " +
-            user_data['temp_ip'] + "?")
-
-
-def confirm_connection_menu_keyboard():
-    """Simple Yes or No promt"""
-    keyboard = [InlineKeyboardButton("Yes", callback_data="Ip-Yes"),
-                InlineKeyboardButton("No", callback_data="Ip-No")]
-
-    return InlineKeyboardMarkup(build_menu(keyboard, n_cols=2))
-
-
+# ######################################################################
+#                       CONFIRM CONNECTION MENU
+# ######################################################################
 def confirm_connection_menu(bot, update, user_data):
+    """
+    Check if the Ip is valid and show a "Yes/No" keyboard to the user.
+    If the Ip is invalid, return to the 'main_menu'
+    """
     try:
         ipaddress.ip_address(user_data['temp_ip'])
         if update.message:
@@ -207,6 +222,19 @@ def confirm_connection_menu(bot, update, user_data):
         new_menu(bot, update, user_data)
 
 
+def confirm_connection_menu_message(user_data):
+    return ("Are you sure that you want to connect to: " +
+            user_data['temp_ip'] + "?")
+
+
+def confirm_connection_menu_keyboard():
+    """Simple Yes or No promt"""
+    keyboard = [InlineKeyboardButton("Yes", callback_data="Ip-Yes"),
+                InlineKeyboardButton("No", callback_data="Ip-No")]
+
+    return InlineKeyboardMarkup(build_menu(keyboard, n_cols=2))
+
+
 def get_ip(bot, update, user_data):
     """Get user ip (from CallbackQueryHandler)"""
     query = update.callback_query
@@ -214,7 +242,9 @@ def get_ip(bot, update, user_data):
     confirm_connection_menu(bot, update, user_data)
 
 
-# ##### HELPER FUNCTIONS
+# ######################################################################
+#                          HELPER FUNCTIONS
+# ######################################################################
 def build_keyboard(strings, n_cols=2, header_buttons=None,
                    footer_buttons=None):
     """
@@ -246,7 +276,9 @@ def create_button(label, callback_data):
     return [InlineKeyboardButton(label, callback_data=callback_data)]
 
 
-# ##### CALLBACKS
+# ######################################################################
+#                              CALLBACKS
+# ######################################################################
 def add_menu_callbacks(dp):
     """Add all the callback handlers to the Dispatcher"""
     multiples = helper.get_multiple_department_names()

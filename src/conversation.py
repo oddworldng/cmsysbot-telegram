@@ -20,17 +20,17 @@ def login(bot, update):
 
 def get_username(bot, update, user_data):
     """Get the username from the last messge. Ask for the password and wait"""
-    user_data['username'] = update.message.text
+    user_data['temp_username'] = update.message.text
     update.message.reply_text("Enter your password: ")
     return PASSWORD
 
 
 def get_password(bot, update, user_data):
     """Get the password from the last message. End conversation"""
-    user_data['password'] = update.message.text
+    user_data['temp_password'] = update.message.text
 
-    update.message.reply_text("Your username: " + user_data['username'])
-    update.message.reply_text("Your password: " + user_data['password'])
+    update.message.reply_text("Your username: " + user_data['temp_username'])
+    update.message.reply_text("Your password: " + user_data['temp_password'])
     update.message.reply_text("This credentials will be used for future \
                               connections.")
 

@@ -71,10 +71,12 @@ def connect(bot, update, user_data):
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.WarningPolicy)
 
-        client.connect(user_data['temp_ip'], 22, user_data['username'],
-                       user_data['password'])
+        client.connect(user_data['temp_ip'], 22, user_data['temp_username'],
+                       user_data['temp_password'])
 
         user_data['client'] = client
+        user_data['username'] = user_data['temp_username']
+        user_data['password'] = user_data['temp_password']
         user_data['hostname'] = user_data['temp_ip']
         user_data['host_json'] = user_data['temp_json']
         if 'temp_route' in user_data:
