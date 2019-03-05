@@ -6,6 +6,7 @@
 !requirements.txt
 !config/config.json
 
-# Directory
+# Directories
 .idea/
+__pycache__
 config/
