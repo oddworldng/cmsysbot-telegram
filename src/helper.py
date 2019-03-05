@@ -8,6 +8,9 @@ DEFAULT_CONFIG_FILEPATH = "config/config.json"
 config = None
 
 
+# ######################################################################
+#                           JSON FUNCTIONS
+# ######################################################################
 def open_json_file(filepath):
     """Open a JSON file from a path and return its content"""
     try:
@@ -17,17 +20,6 @@ def open_json_file(filepath):
     except FileNotFoundError:
         print("File " + filepath + " doesn't exist or can't be opened!",
               "\nCreate a config.json file and put your Bot Token in it!")
-
-
-def getMessage(update):
-    """
-    Get the last message from 'update' or 'update.callback_query' Useful when a
-    callback is called from both CommandHandler and CallbackQueryHandler
-    """
-    if(update.message):
-        return update.message
-    else:
-        return update.callback_query.message
 
 
 def get_department_names():
@@ -53,6 +45,23 @@ def get_section_names_for_department(department):
     return section_names
 
 
+# ######################################################################
+#                         TELEGRAM FUNCTIONS
+# ######################################################################
+def getMessage(update):
+    """
+    Get the last message from 'update' or 'update.callback_query' Useful when a
+    callback is called from both CommandHandler and CallbackQueryHandler
+    """
+    if(update.message):
+        return update.message
+    else:
+        return update.callback_query.message
+
+
+# ######################################################################
+#                           MISC FUNCTIONS
+# ######################################################################
 def create_folder_structure_from_config(root, singles, multiples):
     """
     Check if a folder exists. If not, create it. For each file, if doesn't
@@ -71,11 +80,13 @@ def create_folder_structure_from_config(root, singles, multiples):
 
 
 def create_folder_if_not_exists(folder):
+    """Creat a folder if it doesn't exist"""
     if(not os.path.isdir(folder)):
         os.makedirs(folder)
 
 
 def create_json_if_not_exists(filepath):
+    """Create a JSON if doesn't exist with basic scheme"""
     if(not os.path.exists(filepath)):
         print("-> Created file " + filepath)
         with open(filepath, "w") as outfile:

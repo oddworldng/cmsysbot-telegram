@@ -61,7 +61,6 @@ def run_as_root(bot, update, user_data, args):
         update.message.reply_text(output_message)
 
 
-# Connection functions
 def connect(bot, update, user_data):
     """
     Establish a SSH connection from the bot machine to the bridge computer
@@ -110,7 +109,9 @@ def remote_run(bot, update, user_data, args):
         update.message.reply_text("Start a connection first with /connect")
 
 
-# ################## MAIN  ###################
+# ######################################################################
+#                                MAIN
+# ######################################################################
 def main():
     # Parse arguments from command line
     parser = argparse.ArgumentParser()
@@ -129,12 +130,13 @@ def main():
         'config/', helper.config['structure']['single'],
         helper.config['structure']['multiple'])
 
-    # Create the EventHandler and pass it your bot's token.
+    # Check if token is defined in the config.json
     if 'token' not in helper.config:
         print("Missing 'token' field in the config.json! Please introduce " +
               "your token bot before starting")
         return
 
+    # Create the EventHandler and pass it your bot's token.
     try:
         updater = Updater(helper.config['token'])
     except InvalidToken:

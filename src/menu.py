@@ -140,7 +140,7 @@ def ip_selection_menu(bot, update, user_data):
     # Update the current route to add the section
     if 'temp_route' in user_data:  # department/section.json
         user_data['temp_route'] += '/' + query.data
-    else:                          # section.json
+    else:  # section.json
         user_data['temp_route'] = query.data
 
     # Create a path to the .json file from the temp_route
@@ -229,8 +229,10 @@ def confirm_connection_menu_message(user_data):
 
 def confirm_connection_menu_keyboard():
     """Simple Yes or No promt"""
-    keyboard = [InlineKeyboardButton("Yes", callback_data="Ip-Yes"),
-                InlineKeyboardButton("No", callback_data="Ip-No")]
+    keyboard = [
+        InlineKeyboardButton("Yes", callback_data="Ip-Yes"),
+        InlineKeyboardButton("No", callback_data="Ip-No")
+    ]
 
     return InlineKeyboardMarkup(build_menu(keyboard, n_cols=2))
 
@@ -293,8 +295,8 @@ def add_menu_callbacks(dp):
     singles_regex = "|".join(singles)
 
     # TRIGGERED if a Return to 'main_menu' button is clicked
-    dp.add_handler(CallbackQueryHandler(main_menu, pattern="Main",
-                                        pass_user_data=True))
+    dp.add_handler(
+        CallbackQueryHandler(main_menu, pattern="Main", pass_user_data=True))
 
     # TRIGGERED if clicked on 'Connect' from 'main_menu', or Return from
     # 'section_menu'
@@ -320,10 +322,9 @@ def add_menu_callbacks(dp):
     # TRIGGERED by an Ip (Even if its invalid)
     dp.add_handler(
         CallbackQueryHandler(
-            get_ip,
-            pattern="^[\d*\.*]*$",
-            pass_user_data=True))
+            get_ip, pattern="^[\d*\.*]*$", pass_user_data=True))
 
     # TRIGGERED if clicked on No in the 'confirm_connection_menu'
-    dp.add_handler(CallbackQueryHandler(main_menu, pattern="^Ip-No$",
-                                        pass_user_data=True))
+    dp.add_handler(
+        CallbackQueryHandler(
+            main_menu, pattern="^Ip-No$", pass_user_data=True))
