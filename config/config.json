@@ -3,10 +3,12 @@
   "name": "",
   "email": "",
   "structure": {
-    "single": "",
-    "multiple": {
-      "name": "",
-      "sections": []
-    }
+    "single": [],
+    "multiple": [
+      {
+        "name": "",
+        "sections": []
+      }
+    ]
   }
 }
