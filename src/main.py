@@ -4,6 +4,7 @@ import subprocess
 
 import paramiko
 
+from telegram.error import (InvalidToken)
 from telegram.ext import (Updater, CommandHandler)
 
 import conversation
@@ -121,7 +122,17 @@ def main():
         helper.config['structure']['multiple'])
 
     # Create the EventHandler and pass it your bot's token.
-    updater = Updater(helper.config['token'])
+    if 'token' not in helper.config:
+        print("Missing 'token' field in the config.json! Please introduce " +
+              "your token bot before starting")
+        return
+
+    try:
+        updater = Updater(helper.config['token'])
+    except InvalidToken:
+        print("Invalid Token! Please check your token in the config.json file")
+        return
+
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
