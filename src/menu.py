@@ -3,6 +3,7 @@ from telegram.ext import CallbackQueryHandler
 
 import helper
 import main
+import ipaddress
 
 
 def new_menu(bot, update):
@@ -188,14 +189,25 @@ def confirm_connection_menu_keyboard():
 
 
 def confirm_connection_menu(bot, update, user_data):
-    if update.message:
-        update.message.reply_text(
-            text=confirm_connection_menu_message(user_data),
-            reply_markup=confirm_connection_menu_keyboard())
-    else:
-        update.callback_query.message.edit_text(
-            text=confirm_connection_menu_message(user_data),
-            reply_markup=confirm_connection_menu_keyboard())
+    try:
+        ipaddress.ip_address(user_data['bridge_ip'])
+        if update.message:
+            update.message.reply_text(
+                text=confirm_connection_menu_message(user_data),
+                reply_markup=confirm_connection_menu_keyboard())
+        else:
+            update.callback_query.message.edit_text(
+                text=confirm_connection_menu_message(user_data),
+                reply_markup=confirm_connection_menu_keyboard())
+
+    except ValueError:
+        text = user_data['bridge_ip'] + " is not a valid ip!"
+        if update.message:
+            update.message.reply_text(text)
+        else:
+            update.callback_query.message.edit_text(text)
+
+        new_menu(bot, update)
 
 
 def get_ip(bot, update, user_data):
@@ -283,7 +295,7 @@ def add_menu_callbacks(dp):
     dp.add_handler(
         CallbackQueryHandler(
             get_ip,
-            pattern="^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",
+            pattern="^[\d*\.*]*$",
             pass_user_data=True))
 
     dp.add_handler(
