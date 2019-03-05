@@ -71,13 +71,17 @@ def connect(bot, update, user_data):
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.WarningPolicy)
 
-        client.connect(user_data['bridge_ip'], 22, user_data['username'],
+        client.connect(user_data['temp_ip'], 22, user_data['username'],
                        user_data['password'])
 
         user_data['client'] = client
+        user_data['hostname'] = user_data['temp_ip']
+        user_data['host_json'] = user_data['temp_json']
+        if 'temp_route' in user_data:
+            user_data['route'] = user_data['temp_route']
 
         update.message.reply_text(
-            "Sucessfully connected to " + user_data['bridge_ip'] + "!\n" +
+            "Sucessfully connected to " + user_data['temp_ip'] + "!\n" +
             "To run commands in remote use /rrun [command]")
 
     except paramiko.AuthenticationException as error:

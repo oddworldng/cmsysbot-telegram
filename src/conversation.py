@@ -49,7 +49,7 @@ def ip(bot, update):
 
 def get_ip(bot, update, user_data):
     """Get the ip from the last message. End conversation"""
-    user_data['bridge_ip'] = update.message.text
+    user_data['temp_ip'] = update.message.text
 
     menu.confirm_connection_menu(bot, update, user_data)
 

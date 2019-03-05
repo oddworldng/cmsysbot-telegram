@@ -16,16 +16,13 @@ def new_menu(bot, update, user_data):
 def main_menu_message(user_data):
     message = "-- CmSysBot --\n"
     if 'client' in user_data:
-        message += "Currently connected to:"
-        message += "\t-> Localization: "
-        if 'department' in user_data:
-            message += user_data['department'] + " - "
-        if 'section' in user_data:
-            message += user_data['section']
+        message += "CONNECTED:\n"
+        if 'route' in user_data:
+            message += "-> Localization: " + user_data['route'] + "\n"
+        message += "-> Hostname: " + user_data['hostname'] + "\n"
 
-        message += "\n"
-        message += "\t-> Bridge Ip: " + user_data['bridge_ip']
-        message += "\n"
+    else:
+        message += "NOT CONNECTED"
 
     message += "\nIssue your command."
 
@@ -46,7 +43,9 @@ def main_menu(bot, update, user_data):
 
 # ##### CONNECT MENU
 def department_menu_message():
-    return "DEPARTMENTS - Select your department:"
+    message = "DEPARTMENTS - Select your department:"
+
+    return message
 
 
 def department_menu_keyboard():
@@ -76,6 +75,7 @@ def department_menu(bot, update, user_data):
 
     # Reset the last selected department
     user_data.pop('department', None)
+    user_data.pop('temp_route', None)
 
     query.message.edit_text(
         text=department_menu_message(),
@@ -84,8 +84,10 @@ def department_menu(bot, update, user_data):
 
 # ##### SECTION MENU
 def section_menu_message(user_data):
-    return ("Current department: " + user_data['department'] +
-            "\nSelect your section: ")
+    message = ("Current route: " + user_data['temp_route'] +
+               "\nSelect your section: ")
+
+    return message
 
 
 def section_menu_keyboard(user_data):
@@ -98,7 +100,7 @@ def section_menu_keyboard(user_data):
     department_names = [
         o['name'] for o in helper.config['structure']['multiple']
     ]
-    index = department_names.index(user_data['department'])
+    index = department_names.index(user_data['temp_route'])
 
     # Then, get an array with the names of all the sections in the department
     section_names = helper.config['structure']['multiple'][index]['sections']
@@ -114,7 +116,7 @@ def section_menu(bot, update, user_data):
     query = update.callback_query
 
     # Save the current selected department in the user_data
-    user_data['department'] = query.data
+    user_data['temp_route'] = query.data
 
     query.message.edit_text(
         text=section_menu_message(user_data),
@@ -123,17 +125,11 @@ def section_menu(bot, update, user_data):
 
 # ##### IP MENU
 def ip_selection_menu_message(user_data):
-    output = ""
-    if 'department' in user_data:
-        output += "Current department: " + user_data['department'] + "\n"
-
-    if 'section' in user_data:
-        output += "Current section: " + user_data['section'] + "\n"
-
-    output += ("Now,  Select a 'bridge' computer for the local connection. " +
+    message = ("Current route: " + user_data['temp_route'] + "\n" +
+               "Now,  Select a 'bridge' computer for the local connection. " +
                "All commands and scripts will be issued from this computer")
 
-    return output
+    return message
 
 
 def ip_selection_menu_keyboard(user_data):
@@ -145,7 +141,7 @@ def ip_selection_menu_keyboard(user_data):
     # Get a list with the name and ip for each computers in the JSON,
     # BUT ONLY if the entry has an ip value assigned
     keyboard = []
-    for computer in user_data['bridge_json']['computers']:
+    for computer in user_data['temp_json']['computers']:
         if 'ip' in computer:
             label = computer['name'] + ' (' + computer['ip'] + ')'
             keyboard.append(
@@ -154,36 +150,29 @@ def ip_selection_menu_keyboard(user_data):
     # If a single was selected, return button should return to 'department
     # menu'. If a multiple was selected, return button should return to
     # 'section_menu'
-    return_label = ""
-    if 'department' in user_data:
-        return_label = user_data['department']
-    else:
-        return_label = "Connect"
 
     return InlineKeyboardMarkup(
         build_menu(
             keyboard,
             n_cols=2,
-            footer_buttons=[create_button("Return", return_label)]))
+            footer_buttons=[create_button("Return", "Connect")]))
 
 
 def ip_selection_menu(bot, update, user_data):
     query = update.callback_query
 
     # Save the current section in the user_data
-    user_data['section'] = query.data
+    if 'temp_route' in user_data:
+        user_data['temp_route'] += '/' + query.data
+    else:
+        user_data['temp_route'] = query.data
 
     # Using the department (if selected) and the section, create a path to the
     # json for the respective section
-    json_filepath = 'config/'
-    if 'department' in user_data:
-        json_filepath += user_data['department'] + '/'
-    json_filepath += user_data['section'] + '.json'
+    json_filepath = 'config/' + user_data['temp_route'] + '.json'
 
     json = helper.open_json_file(json_filepath)
-
-    # Save the json file in user_data. Will be useful for future commands
-    user_data['bridge_json'] = json
+    user_data['temp_json'] = json
 
     query.message.edit_text(
         text=ip_selection_menu_message(user_data),
@@ -193,7 +182,7 @@ def ip_selection_menu(bot, update, user_data):
 # ##### CONFIRM CONNECTION MENU
 def confirm_connection_menu_message(user_data):
     return ("Are you sure that you want to connect to: " +
-            user_data['bridge_ip'] + "?")
+            user_data['temp_ip'] + "?")
 
 
 def confirm_connection_menu_keyboard():
@@ -206,7 +195,7 @@ def confirm_connection_menu_keyboard():
 
 def confirm_connection_menu(bot, update, user_data):
     try:
-        ipaddress.ip_address(user_data['bridge_ip'])
+        ipaddress.ip_address(user_data['temp_ip'])
         if update.message:
             update.message.reply_text(
                 text=confirm_connection_menu_message(user_data),
@@ -217,7 +206,7 @@ def confirm_connection_menu(bot, update, user_data):
                 reply_markup=confirm_connection_menu_keyboard())
 
     except ValueError:
-        text = user_data['bridge_ip'] + " is not a valid ip!"
+        text = user_data['temp_ip'] + " is not a valid ip!"
         if update.message:
             update.message.reply_text(text)
         else:
@@ -229,7 +218,7 @@ def confirm_connection_menu(bot, update, user_data):
 def get_ip(bot, update, user_data):
     """Get user ip (from CallbackQueryHandler)"""
     query = update.callback_query
-    user_data['bridge_ip'] = query.data
+    user_data['temp_ip'] = query.data
     confirm_connection_menu(bot, update, user_data)
 
 
