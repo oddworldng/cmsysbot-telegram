@@ -87,9 +87,12 @@ def create_folder_if_not_exists(folder):
 
 def create_json_if_not_exists(filepath):
     """Create a JSON if doesn't exist with basic scheme"""
-    if(not os.path.exists(filepath)):
+    if not os.path.exists(filepath):
         print("-> Created file " + filepath)
         with open(filepath, "w") as outfile:
-            json_scheme = {}
-            json_scheme['computers'] = []
+            json_scheme = dict()
+            json_scheme['computers'] = [dict()]
+            json_scheme['computers'][0]['name'] = ""
+            json_scheme['computers'][0]['mac'] = ""
+            json_scheme['computers'][0]['ip'] = ""
             json.dump(json_scheme, outfile)
