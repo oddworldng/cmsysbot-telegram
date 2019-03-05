@@ -41,8 +41,9 @@ def department_menu_keyboard():
     Also, show a Return button to go back to 'main menu'
     """
     # Iterate through the JSON 'multiple' array and get all the names
-    department_names = [o['name']
-                        for o in helper.config['structure']['multiple']]
+    department_names = [
+        o['name'] for o in helper.config['structure']['multiple']
+    ]
     # Also show the names of the 'singles'
     department_names.extend(helper.config['structure']['single'])
 
@@ -79,8 +80,9 @@ def section_menu_keyboard(user_data):
     Also show a Return button to go back to 'department menu'
     """
     # First, find the index of the selected department
-    department_names = [o['name']
-                        for o in helper.config['structure']['multiple']]
+    department_names = [
+        o['name'] for o in helper.config['structure']['multiple']
+    ]
     index = department_names.index(user_data['department'])
 
     # Then, get an array with the names of all the sections in the department
@@ -127,10 +129,12 @@ def ip_selection_menu_keyboard(user_data):
     """
     # Get a list with the name and ip for each computers in the JSON,
     # BUT ONLY if the entry has an ip value assigned
-    strings = []
+    keyboard = []
     for computer in user_data['bridge_json']['computers']:
-        if (computer['ip']):
-            strings.append(computer['name'] + ' (' + computer['ip'] + ')')
+        if 'ip' in computer:
+            label = computer['name'] + ' (' + computer['ip'] + ')'
+            keyboard.append(
+                InlineKeyboardButton(label, callback_data=computer['ip']))
 
     # If a single was selected, return button should return to 'department
     # menu'. If a multiple was selected, return button should return to
@@ -141,10 +145,11 @@ def ip_selection_menu_keyboard(user_data):
     else:
         return_label = "Connect"
 
-    return build_keyboard(
-        strings,
-        n_cols=1,
-        footer_buttons=[create_button("Return", return_label)])
+    return InlineKeyboardMarkup(
+        build_menu(
+            keyboard,
+            n_cols=2,
+            footer_buttons=[create_button("Return", return_label)]))
 
 
 def ip_selection_menu(bot, update, user_data):
@@ -183,9 +188,20 @@ def confirm_connection_menu_keyboard():
 
 
 def confirm_connection_menu(bot, update, user_data):
-    update.message.reply_text(
-        text=confirm_connection_menu_message(user_data),
-        reply_markup=confirm_connection_menu_keyboard())
+    if update.message:
+        update.message.reply_text(
+            text=confirm_connection_menu_message(user_data),
+            reply_markup=confirm_connection_menu_keyboard())
+    else:
+        update.callback_query.message.edit_text(
+            text=confirm_connection_menu_message(user_data),
+            reply_markup=confirm_connection_menu_keyboard())
+
+
+def get_ip(bot, update, user_data):
+    query = update.callback_query
+    user_data['bridge_ip'] = query.data
+    confirm_connection_menu(bot, update, user_data)
 
 
 # ##### HELPER FUNCTIONS
@@ -246,8 +262,9 @@ def add_menu_callbacks(dp):
 
     # TRIGGERED if clicked on 'Connect' from 'main_menu', or Return from
     # 'section_menu'
-    dp.add_handler(CallbackQueryHandler(department_menu, pattern="Connect",
-                                        pass_user_data=True))
+    dp.add_handler(
+        CallbackQueryHandler(
+            department_menu, pattern="Connect", pass_user_data=True))
 
     # TRIGGERED if clicked on any department in the 'department_names' array
     dp.add_handler(
@@ -262,6 +279,12 @@ def add_menu_callbacks(dp):
     dp.add_handler(
         CallbackQueryHandler(
             ip_selection_menu, pattern=sections_regex, pass_user_data=True))
+
+    dp.add_handler(
+        CallbackQueryHandler(
+            get_ip,
+            pattern="^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",
+            pass_user_data=True))
 
     dp.add_handler(
         CallbackQueryHandler(main.connect, pattern="Yes", pass_user_data=True))
