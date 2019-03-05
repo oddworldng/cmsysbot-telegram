@@ -54,12 +54,7 @@ def department_menu_keyboard():
     Also, show a button for connecting to a specific Ip
     Also, show a Return button to go back to 'main menu'
     """
-    # Iterate through the JSON 'multiple' array and get all the names
-    department_names = [
-        o['name'] for o in helper.config['structure']['multiple']
-    ]
-    # Also show the names of the 'singles'
-    department_names.extend(helper.config['structure']['single'])
+    department_names = helper.get_department_names()
 
     return build_keyboard(
         department_names,
@@ -95,14 +90,8 @@ def section_menu_keyboard(user_data):
     department.
     Also show a Return button to go back to 'department menu'
     """
-    # First, find the index of the selected department
-    department_names = [
-        o['name'] for o in helper.config['structure']['multiple']
-    ]
-    index = department_names.index(user_data['temp_route'])
-
-    # Then, get an array with the names of all the sections in the department
-    section_names = helper.config['structure']['multiple'][index]['sections']
+    section_names = helper.get_section_names_for_department(
+        user_data['temp_route'])
 
     # Create keyboard with a button for each section and a return button
     return build_keyboard(
@@ -260,18 +249,11 @@ def create_button(label, callback_data):
 # ##### CALLBACKS
 def add_menu_callbacks(dp):
     """Add all the callback handlers to the Dispatcher"""
-    multiples = []
+    multiples = helper.get_multiple_department_names()
+    singles = helper.get_single_department_names()
     sections = []
-    singles = []
-
-    # Iterate through all departments. Get an array with all the names and
-    # sections
-    for department in helper.config['structure']['multiple']:
-        multiples.append(department['name'])
-        sections.extend(department['sections'])
-
-    for single in helper.config['structure']['single']:
-        singles.append(single)
+    for department in multiples:
+        sections.extend(helper.get_section_names_for_department(department))
 
     # Construct a simple regex that match every name
     departments_regex = "|".join(multiples)
