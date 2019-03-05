@@ -21,9 +21,9 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
-def start(bot, update):
+def start(bot, update, user_data):
     """Open a new menu when the command /start is issued."""
-    menu.new_menu(bot, update)
+    menu.new_menu(bot, update, user_data)
 
 
 def help(bot, update):
@@ -66,8 +66,6 @@ def connect(bot, update, user_data):
     """
     Establish a SSH connection from the bot machine to the bridge computer
     """
-    query = update.callback_query
-
     try:
         client = paramiko.SSHClient()
         client.load_system_host_keys()
@@ -75,15 +73,19 @@ def connect(bot, update, user_data):
 
         client.connect(user_data['bridge_ip'], 22, user_data['username'],
                        user_data['password'])
-        query.message.reply_text(
+
+        user_data['client'] = client
+
+        update.message.reply_text(
             "Sucessfully connected to " + user_data['bridge_ip'] + "!\n" +
             "To run commands in remote use /rrun [command]")
-        user_data['client'] = client
+
     except paramiko.AuthenticationException as error:
-        query.message.edit_text(
+        update.message.reply_text(
             str(error) + " Please try to login with different credentials!")
 
-        menu.new_menu(bot, update)
+    finally:
+        menu.new_menu(bot, update, user_data)
 
 
 def remote_run(bot, update, user_data, args):
@@ -137,7 +139,7 @@ def main():
     dp = updater.dispatcher
 
     # Different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("start", start, pass_user_data=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
     dp.add_handler(

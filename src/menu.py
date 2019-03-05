@@ -2,32 +2,46 @@ from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 from telegram.ext import CallbackQueryHandler
 
 import helper
-import main
 import ipaddress
 
 
-def new_menu(bot, update):
+def new_menu(bot, update, user_data):
     """ENTRY POINT. Spawn a new menu in a new message"""
     message = helper.getMessage(update)
     message.reply_text(
-        text=main_menu_message(), reply_markup=main_menu_keyboard())
+        text=main_menu_message(user_data), reply_markup=main_menu_keyboard())
 
 
 # ##### MAIN MENU
-def main_menu_message():
-    return "Welcome to CmSysBot. Issue your command:"
+def main_menu_message(user_data):
+    message = "-- CmSysBot --\n"
+    if 'client' in user_data:
+        message += "Currently connected to:"
+        message += "\t-> Localization: "
+        if 'department' in user_data:
+            message += user_data['department'] + " - "
+        if 'section' in user_data:
+            message += user_data['section']
+
+        message += "\n"
+        message += "\t-> Bridge Ip: " + user_data['bridge_ip']
+        message += "\n"
+
+    message += "\nIssue your command."
+
+    return message
 
 
 def main_menu_keyboard():
-    strings = ["Login", "Connect"]
+    strings = ["Connect"]
     return build_keyboard(strings, n_cols=2)
 
 
-def main_menu(bot, update):
+def main_menu(bot, update, user_data):
     """Show the main menu, with the most basic options for the bot"""
     query = update.callback_query
     query.message.edit_text(
-        text=main_menu_message(), reply_markup=main_menu_keyboard())
+        text=main_menu_message(user_data), reply_markup=main_menu_keyboard())
 
 
 # ##### CONNECT MENU
@@ -52,7 +66,7 @@ def department_menu_keyboard():
         department_names,
         n_cols=2,
         footer_buttons=[
-            create_button("Connect to a specific Ip", "Ip"),
+            create_button("Connect to a specific Ip", "Ask-Ip"),
             create_button("Return", "Main")
         ])
 
@@ -184,8 +198,10 @@ def confirm_connection_menu_message(user_data):
 
 def confirm_connection_menu_keyboard():
     """Simple Yes or No promt"""
-    answers = ["Yes", "No"]
-    return build_keyboard(answers, n_cols=2)
+    keyboard = [InlineKeyboardButton("Yes", callback_data="Ip-Yes"),
+                InlineKeyboardButton("No", callback_data="Ip-No")]
+
+    return InlineKeyboardMarkup(build_menu(keyboard, n_cols=2))
 
 
 def confirm_connection_menu(bot, update, user_data):
@@ -207,7 +223,7 @@ def confirm_connection_menu(bot, update, user_data):
         else:
             update.callback_query.message.edit_text(text)
 
-        new_menu(bot, update)
+        new_menu(bot, update, user_data)
 
 
 def get_ip(bot, update, user_data):
@@ -271,7 +287,8 @@ def add_menu_callbacks(dp):
     singles_regex = "|".join(singles)
 
     # TRIGGERED if a Return to 'main_menu' button is clicked
-    dp.add_handler(CallbackQueryHandler(main_menu, pattern="Main"))
+    dp.add_handler(CallbackQueryHandler(main_menu, pattern="Main",
+                                        pass_user_data=True))
 
     # TRIGGERED if clicked on 'Connect' from 'main_menu', or Return from
     # 'section_menu'
@@ -299,6 +316,5 @@ def add_menu_callbacks(dp):
             pattern="^[\d*\.*]*$",
             pass_user_data=True))
 
-    dp.add_handler(
-        CallbackQueryHandler(main.connect, pattern="Yes", pass_user_data=True))
-    dp.add_handler(CallbackQueryHandler(main_menu, pattern="No"))
+    dp.add_handler(CallbackQueryHandler(main_menu, pattern="^Ip-No$",
+                                        pass_user_data=True))

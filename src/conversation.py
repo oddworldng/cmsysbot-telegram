@@ -3,6 +3,7 @@ from telegram.ext import (ConversationHandler,
 
 import menu
 import helper
+import main
 
 # Conversation States
 IP, USERNAME, PASSWORD = range(3)
@@ -12,7 +13,7 @@ IP, USERNAME, PASSWORD = range(3)
 def login(bot, update):
     """ENTRY POINT. Ask for the username and wait for the answer"""
     message = helper.getMessage(update)
-    message.edit_text("Please introduce your username and password")
+    message.reply_text("Please introduce your username and password")
     message.reply_text("Enter your username: ")
     return USERNAME
 
@@ -33,8 +34,7 @@ def get_password(bot, update, user_data):
     update.message.reply_text("This credentials will be used for future \
                               connections.")
 
-    # After user input, show menu again
-    menu.new_menu(bot, update)
+    main.connect(bot, update, user_data)
 
     return ConversationHandler.END
 
@@ -64,7 +64,7 @@ def add_conversation_callbacks(dp):
     login_conv_handler = ConversationHandler(
         # Entry points: From InlineKeyboardButton or /login
         entry_points=[
-            CallbackQueryHandler(login, pattern="Login")
+            CallbackQueryHandler(login, pattern="^Ip-Yes$")
         ],
         states={
             USERNAME:
@@ -77,7 +77,7 @@ def add_conversation_callbacks(dp):
     # Ip handler
     ip_conv_handler = ConversationHandler(
         # Entry points: From InlineKeyboardButton
-        entry_points=[CallbackQueryHandler(ip, pattern="Ip")],
+        entry_points=[CallbackQueryHandler(ip, pattern="^Ask-Ip$")],
         states={
             IP: [MessageHandler(Filters.text, get_ip, pass_user_data=True)]
         },
