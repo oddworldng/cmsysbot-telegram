@@ -31,7 +31,7 @@ def main_menu(bot, update):
 
 # ##### CONNECT MENU
 def department_menu_message():
-    return "DEPARTMENTS - Select the department:"
+    return "DEPARTMENTS - Select your department:"
 
 
 def department_menu_keyboard():
@@ -40,8 +40,11 @@ def department_menu_keyboard():
     Also, show a button for connecting to a specific Ip
     Also, show a Return button to go back to 'main menu'
     """
-    # Iterate through the JSON 'structure' array and get all the names
-    department_names = [o['name'] for o in helper.config['structure']]
+    # Iterate through the JSON 'multiple' array and get all the names
+    department_names = [o['name']
+                        for o in helper.config['structure']['multiple']]
+    # Also show the names of the 'singles'
+    department_names.extend(helper.config['structure']['single'])
 
     return build_keyboard(
         department_names,
@@ -52,8 +55,11 @@ def department_menu_keyboard():
         ])
 
 
-def department_menu(bot, update):
+def department_menu(bot, update, user_data):
     query = update.callback_query
+
+    # Reset the last selected department
+    user_data.pop('department', None)
 
     query.message.edit_text(
         text=department_menu_message(),
@@ -73,11 +79,12 @@ def section_menu_keyboard(user_data):
     Also show a Return button to go back to 'department menu'
     """
     # First, find the index of the selected department
-    department_names = [o['name'] for o in helper.config['structure']]
+    department_names = [o['name']
+                        for o in helper.config['structure']['multiple']]
     index = department_names.index(user_data['department'])
 
     # Then, get an array with the names of all the sections in the department
-    section_names = helper.config['structure'][index]['sections']
+    section_names = helper.config['structure']['multiple'][index]['sections']
 
     # Create keyboard with a button for each section and a return button
     return build_keyboard(
@@ -89,7 +96,7 @@ def section_menu_keyboard(user_data):
 def section_menu(bot, update, user_data):
     query = update.callback_query
 
-    # Save the current department in the user_data
+    # Save the current selected department in the user_data
     user_data['department'] = query.data
 
     query.message.edit_text(
@@ -99,10 +106,17 @@ def section_menu(bot, update, user_data):
 
 # ##### IP MENU
 def ip_selection_menu_message(user_data):
-    return ("Current department: " + user_data['department'] +
-            "\nCurrent section: " + user_data['section'] +
-            "\nNow, Select a 'bridge' computer for the local connection. " +
-            "All the commands and scripts will be issued from this computer")
+    output = ""
+    if 'department' in user_data:
+        output += "Current department: " + user_data['department'] + "\n"
+
+    if 'section' in user_data:
+        output += "Current section: " + user_data['section'] + "\n"
+
+    output += ("Now,  Select a 'bridge' computer for the local connection. " +
+               "All commands and scripts will be issued from this computer")
+
+    return output
 
 
 def ip_selection_menu_keyboard(user_data):
@@ -118,10 +132,19 @@ def ip_selection_menu_keyboard(user_data):
         if (computer['ip']):
             strings.append(computer['name'] + ' (' + computer['ip'] + ')')
 
+    # If a single was selected, return button should return to 'department
+    # menu'. If a multiple was selected, return button should return to
+    # 'section_menu'
+    return_label = ""
+    if 'department' in user_data:
+        return_label = user_data['department']
+    else:
+        return_label = "Connect"
+
     return build_keyboard(
         strings,
         n_cols=1,
-        footer_buttons=[create_button("Return", user_data['department'])])
+        footer_buttons=[create_button("Return", return_label)])
 
 
 def ip_selection_menu(bot, update, user_data):
@@ -130,10 +153,14 @@ def ip_selection_menu(bot, update, user_data):
     # Save the current section in the user_data
     user_data['section'] = query.data
 
-    # Using the department and the section, craft a path to the json for the
-    # respective section
-    json = helper.open_json_file('config/' + user_data['department'] + '/' +
-                                 user_data['section'] + '.json')
+    # Using the department (if selected) and the section, create a path to the
+    # json for the respective section
+    json_filepath = 'config/'
+    if 'department' in user_data:
+        json_filepath += user_data['department'] + '/'
+    json_filepath += user_data['section'] + '.json'
+
+    json = helper.open_json_file(json_filepath)
 
     # Save the json file in user_data. Will be useful for future commands
     user_data['bridge_json'] = json
@@ -150,6 +177,7 @@ def confirm_connection_menu_message(user_data):
 
 
 def confirm_connection_menu_keyboard():
+    """Simple Yes or No promt"""
     answers = ["Yes", "No"]
     return build_keyboard(answers, n_cols=2)
 
@@ -195,30 +223,40 @@ def create_button(label, callback_data):
 # ##### CALLBACKS
 def add_menu_callbacks(dp):
     """Add all the callback handlers to the Dispatcher"""
-    departments_names = []
-    sections_names = []
+    multiples = []
+    sections = []
+    singles = []
 
     # Iterate through all departments. Get an array with all the names and
     # sections
-    for department in helper.config['structure']:
-        departments_names.append(department['name'])
-        sections_names.extend(department['sections'])
+    for department in helper.config['structure']['multiple']:
+        multiples.append(department['name'])
+        sections.extend(department['sections'])
+
+    for single in helper.config['structure']['single']:
+        singles.append(single)
 
     # Construct a simple regex that match every name
-    departments_regex = "|".join(departments_names)
-    sections_regex = "|".join(sections_names)
+    departments_regex = "|".join(multiples)
+    sections_regex = "|".join(sections)
+    singles_regex = "|".join(singles)
 
     # TRIGGERED if a Return to 'main_menu' button is clicked
     dp.add_handler(CallbackQueryHandler(main_menu, pattern="Main"))
 
     # TRIGGERED if clicked on 'Connect' from 'main_menu', or Return from
     # 'section_menu'
-    dp.add_handler(CallbackQueryHandler(department_menu, pattern="Connect"))
+    dp.add_handler(CallbackQueryHandler(department_menu, pattern="Connect",
+                                        pass_user_data=True))
 
     # TRIGGERED if clicked on any department in the 'department_names' array
     dp.add_handler(
         CallbackQueryHandler(
             section_menu, pattern=departments_regex, pass_user_data=True))
+
+    dp.add_handler(
+        CallbackQueryHandler(
+            ip_selection_menu, pattern=singles_regex, pass_user_data=True))
 
     # TRIGGERED if clicked on any section from the 'section_names' array
     dp.add_handler(

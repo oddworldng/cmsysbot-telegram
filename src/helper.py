@@ -30,19 +30,32 @@ def getMessage(update):
         return update.callback_query.message
 
 
-def create_folders_and_files(folder, files):
+def create_folder_if_not_exists(folder):
+    if(not os.path.isdir(folder)):
+        os.makedirs(folder)
+
+
+def create_json_if_not_exists(filepath):
+    if(not os.path.exists(filepath)):
+        print("-> Created file " + filepath)
+        with open(filepath, "w") as outfile:
+            json_scheme = {}
+            json_scheme['computers'] = []
+            json.dump(json_scheme, outfile)
+
+
+def create_folder_structure_from_config(root, singles, multiples):
     """
     Check if a folder exists. If not, create it. For each file, if doesn't
     exist, create it inside the folder with a default JSON scheme
     """
-    if(not os.path.isdir(folder)):
-        os.makedirs(folder)
+    for single in singles:
+        create_json_if_not_exists(root + single + '.json')
 
-    for file in files:
-        filepath = folder + "/" + file + ".json"
-        if(not os.path.exists(filepath)):
-            print("-> Created file " + filepath)
-            with open(filepath, "w") as outfile:
-                json_scheme = {}
-                json_scheme['computers'] = []
-                json.dump(json_scheme, outfile)
+    for multiple in multiples:
+        folder = root + multiple['name'] + '/'
+        create_folder_if_not_exists(folder)
+
+        for section in multiple['sections']:
+            filepath = folder + section + '.json'
+            create_json_if_not_exists(filepath)

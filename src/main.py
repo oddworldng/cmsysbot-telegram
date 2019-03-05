@@ -116,9 +116,9 @@ def main():
         helper.config = helper.open_json_file(helper.DEFAULT_CONFIG_FILEPATH)
 
     # Create folders and files from config.json structure if missing
-    for department in helper.config['structure']:
-        helper.create_folders_and_files('config/' + department['name'],
-                                        department['sections'])
+    helper.create_folder_structure_from_config(
+        'config/', helper.config['structure']['single'],
+        helper.config['structure']['multiple'])
 
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(helper.config['token'])
