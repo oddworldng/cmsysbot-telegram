@@ -182,11 +182,11 @@ def ip_selection_menu_keyboard(user_data):
     keyboard = []
     for computer in user_data['temp_json']['computers']:
         label = ""
-        if 'name' in computer:
+        if 'name' in computer and computer['name']:
             label += computer['name']
 
         # Only add entries if an Ip is specified
-        if 'ip' in computer:
+        if 'ip' in computer and computer['ip']:
             label += ' (' + computer['ip'] + ')'
             keyboard.append(
                 InlineKeyboardButton(label, callback_data=computer['ip']))

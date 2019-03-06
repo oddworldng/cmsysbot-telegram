@@ -31,7 +31,7 @@ def get_department_names():
 
 
 def get_multiple_department_names():
-    return [o['name'] for o in config['structure']['multiple']]
+    return [o['name'] for o in config['structure']['multiple'] if o['name']]
 
 
 def get_single_department_names():
