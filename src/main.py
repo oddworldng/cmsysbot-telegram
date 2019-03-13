@@ -43,6 +43,22 @@ def wake_on_lan(bot, update, args):
         update.message.reply_text('Waking up computer (MAC: ' + mac + ') ...')
 
 
+def connect_to_client(bot, update, user_data, args):
+
+    for ip in args:
+
+        if 'client' in user_data:
+
+            # Variables
+            client = user_data['client']
+            username = user_data['username']
+            password = user_data['password']
+
+            # Run as root
+            command = " sshpass -p " + password + " ssh " + username + "@" + ip + " 'echo " + password + " | sudo -S init 0'"
+            stdin, stdout, stderr = client.exec_command(command)
+
+
 def run(bot, update, args):
     """"Execute a *nix command in the machine where the bot is hosted."""
     result = subprocess.run(list(args), stdout=subprocess.PIPE)
@@ -182,6 +198,9 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
     dp.add_handler(CommandHandler("wok", wake_on_lan, pass_args=True))
+    dp.add_handler(
+        CommandHandler(
+            "halt", connect_to_client, pass_user_data=True, pass_args=True))
     dp.add_handler(
         CommandHandler(
             "sudo", run_as_root, pass_user_data=True, pass_args=True))
