@@ -6,6 +6,7 @@ import paramiko
 
 from telegram.error import (InvalidToken)
 from telegram.ext import (Updater, CommandHandler)
+from wakeonlan import send_magic_packet
 
 import conversation
 import menu
@@ -34,6 +35,12 @@ def help(bot, update):
 def error(bot, update, error):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
+
+
+def wake_on_lan(bot, update, args):
+    for mac in args:
+        send_magic_packet(mac)
+        update.message.reply_text('Waking up computer (MAC: ' + mac + ') ...')
 
 
 def run(bot, update, args):
@@ -174,6 +181,7 @@ def main():
     dp.add_handler(CommandHandler("start", start, pass_user_data=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
+    dp.add_handler(CommandHandler("wok", wake_on_lan, pass_args=True))
     dp.add_handler(
         CommandHandler(
             "sudo", run_as_root, pass_user_data=True, pass_args=True))
