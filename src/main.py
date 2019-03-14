@@ -43,20 +43,30 @@ def wake_on_lan(bot, update, args):
         update.message.reply_text('Waking up computer (MAC: ' + mac + ') ...')
 
 
-def connect_to_client(bot, update, user_data, args):
+def send_command_to_client(bot, update, user_data, args):
 
-    for ip in args:
+    print("Entro")
+    # Get arguments
+    try:
+        ip = args[0]
+        input_command = " ".join(args[1])
+    except IndexError:
+        update.message.reply_text("Wrong command. Please use /send <ip> <command>.")
 
-        if 'client' in user_data:
+    if 'client' in user_data:
 
-            # Variables
-            client = user_data['client']
-            username = user_data['username']
-            password = user_data['password']
+        # Variables
+        client = user_data['client']
+        username = user_data['username']
+        password = user_data['password']
 
-            # Run as root
-            command = " sshpass -p " + password + " ssh " + username + "@" + ip + " 'echo " + password + " | sudo -S init 0'"
-            stdin, stdout, stderr = client.exec_command(command)
+        # Run as root
+        output_command = " sshpass -p " + password + " ssh " + username + "@" + ip + " 'echo " + password + " | sudo -S " + input_command + "'"
+        stdin, stdout, stderr = client.exec_command(output_command)
+
+        # Output
+        output_message = stdout.read().decode('utf-8')
+        update.message.reply_text(output_message)
 
 
 def run(bot, update, args):
@@ -197,10 +207,10 @@ def main():
     dp.add_handler(CommandHandler("start", start, pass_user_data=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
-    dp.add_handler(CommandHandler("wok", wake_on_lan, pass_args=True))
+    dp.add_handler(CommandHandler("wol", wake_on_lan, pass_args=True))
     dp.add_handler(
         CommandHandler(
-            "halt", connect_to_client, pass_user_data=True, pass_args=True))
+            "send", send_command_to_client, pass_user_data=True, pass_args=True))
     dp.add_handler(
         CommandHandler(
             "sudo", run_as_root, pass_user_data=True, pass_args=True))
