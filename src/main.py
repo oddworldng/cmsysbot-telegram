@@ -45,7 +45,6 @@ def wake_on_lan(bot, update, args):
 
 def send_command_to_client(bot, update, user_data, args):
 
-    print("Entro")
     # Get arguments
     try:
         ip = args[0]
