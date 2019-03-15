@@ -1,6 +1,7 @@
 import argparse
 import logging
 import subprocess
+import re
 
 import paramiko
 
@@ -37,10 +38,52 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
-def wake_on_lan(bot, update, args):
+def wake_on_lan_command(bot, update, args):
     for mac in args:
         send_magic_packet(mac)
-        update.message.reply_text('Waking up computer (MAC: ' + mac + ') ...')
+        helper.getMessage(update).reply_text(
+            'Waking up computer (MAC: ' + mac + ') ...')
+
+
+def wake_on_lan_callback(bot, update, user_data):
+    macs = helper.get_macs(user_data['host_json'])
+    wake_on_lan_command(bot, update, macs)
+
+
+def update_ips(bot, udpate, user_data):
+    if 'client' in user_data:
+        client = user_data['client']
+        password = user_data['password']
+
+        get_submask_command = "ip -o -f inet addr show | awk '/scope global/ {print $4}'"
+        print(get_submask_command)
+        stdin, stdout, stderr = client.exec_command(get_submask_command)
+        submask = stdout.read().decode('utf-8')
+        print(submask)
+
+        arp_scan_command = " echo " + password + " | sudo -S arp-scan " + submask
+        print(arp_scan_command)
+        stdin, stdout, stderr = client.exec_command(arp_scan_command)
+
+        mac_dictionary = {}
+        for line in stdout:
+            ip_and_mac = re.search(
+                '((?:\d{1,3}\.){3}\d{1,3}).*((?:\w\w:){5}\w\w)', line)
+
+            if ip_and_mac is not None:
+                ip = ip_and_mac.group(1)
+                mac = ip_and_mac.group(2)
+                mac_dictionary[mac] = ip
+
+        print(mac_dictionary)
+        for computer in user_data['host_json']['computers']:
+            mac = computer['mac']
+
+            if mac in mac_dictionary:
+                ip = computer['ip']
+                computer['ip'] = mac_dictionary[mac]
+                print('Ip for computer ' + mac + ' updated from ' + ip +
+                      ' to ' + computer['ip'])
 
 
 def connect_to_client(bot, update, user_data, args):
@@ -56,7 +99,11 @@ def connect_to_client(bot, update, user_data, args):
 
             # Run as root
             command = " sshpass -p " + password + " ssh " + username + "@" + ip + " 'echo " + password + " | sudo -S init 0'"
+            print("Executed command: " + command)
             stdin, stdout, stderr = client.exec_command(command)
+
+            error_message = stderr.read().decode('utf-8')
+            print(error_message)
 
 
 def run(bot, update, args):
@@ -197,7 +244,7 @@ def main():
     dp.add_handler(CommandHandler("start", start, pass_user_data=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
-    dp.add_handler(CommandHandler("wok", wake_on_lan, pass_args=True))
+    dp.add_handler(CommandHandler("wok", wake_on_lan_command, pass_args=True))
     dp.add_handler(
         CommandHandler(
             "halt", connect_to_client, pass_user_data=True, pass_args=True))
@@ -205,8 +252,7 @@ def main():
         CommandHandler(
             "sudo", run_as_root, pass_user_data=True, pass_args=True))
     dp.add_handler(
-        CommandHandler(
-            "rrun", remote_run, pass_user_data=True, pass_args=True))
+        CommandHandler("rrun", remote_run, pass_user_data=True, pass_args=True))
 
     # Add all conversation callbacks
     conversation.add_conversation_callbacks(dp)

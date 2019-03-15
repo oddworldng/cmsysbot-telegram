@@ -45,6 +45,11 @@ def get_section_names_for_department(department):
     return section_names
 
 
+def get_macs(host_json):
+    return [computer['mac'] for computer in host_json['computers']]
+
+
+
 # ######################################################################
 #                         TELEGRAM FUNCTIONS
 # ######################################################################

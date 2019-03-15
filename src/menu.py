@@ -49,9 +49,13 @@ def main_menu_message(user_data):
 def main_menu_keyboard(user_data):
     strings = []
     if 'client' in user_data:
-        strings.extend(["Disconnect", "(TODO: Add more buttons)"])
+        strings.extend([
+            "Update Ips", "Filter computers", "Wake computers",
+            "Shutdown computers", "Update computers", "Install software",
+            "Execute script", "Upload file"
+        ])
     else:
-        strings.extend(["Connect"])
+        strings.extend(["Connect", "Wake computers"])
 
     return build_keyboard(strings, n_cols=2)
 
@@ -69,8 +73,7 @@ def department_menu(bot, update, user_data):
     user_data.pop('temp_route', None)
 
     query.message.edit_text(
-        text=department_menu_message(),
-        reply_markup=department_menu_keyboard())
+        text=department_menu_message(), reply_markup=department_menu_keyboard())
 
 
 def department_menu_message():
@@ -114,8 +117,8 @@ def section_menu(bot, update, user_data):
 
 
 def section_menu_message(user_data):
-    message = ("Current route: " + user_data['temp_route'] +
-               "\nSelect your section: ")
+    message = (
+        "Current route: " + user_data['temp_route'] + "\nSelect your section: ")
 
     return message
 
@@ -255,8 +258,7 @@ def get_ip(bot, update, user_data):
 # ######################################################################
 #                          HELPER FUNCTIONS
 # ######################################################################
-def build_keyboard(strings, n_cols=2, header_buttons=None,
-                   footer_buttons=None):
+def build_keyboard(strings, n_cols=2, header_buttons=None, footer_buttons=None):
     """
     Return an InlineKeyboard with sane defaults. callback_data values will be
     the same value as the button labels
@@ -339,5 +341,18 @@ def add_menu_callbacks(dp):
 
     # TRIGGERED if clicked on No in the 'confirm_connection_menu'
     dp.add_handler(
+        CallbackQueryHandler(main_menu, pattern="^Ip-No$", pass_user_data=True))
+
+    # TRIGGERED if clicked on 'Wake Computers from the main menu'
+    dp.add_handler(
         CallbackQueryHandler(
-            main_menu, pattern="^Ip-No$", pass_user_data=True))
+            main.wake_on_lan_callback,
+            pattern="^Wake computers$",
+            pass_user_data=True))
+
+    # TRIGGERED if clicked on 'Update Ips' from the main menu
+    dp.add_handler(
+        CallbackQueryHandler(
+            main.update_ips,
+            pattern="^Update Ips$",
+            pass_user_data=True))
