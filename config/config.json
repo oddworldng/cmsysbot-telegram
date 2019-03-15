@@ -1,13 +1,13 @@
 {
-  "token": "",
-  "name": "",
+  "token": "601812425:AAHYoMgMbyJQnYqlr8da20LgyncuyvGdtWg",
+  "name": "CMSysBot",
   "email": "",
   "structure": {
-    "single": [],
+    "single": ["BBTK", "OSL"],
     "multiple": [
       {
-        "name": "",
-        "sections": []
+        "name": "ESIT",
+        "sections": ["Aula 3.5", "Aula 3.8"]
       }
     ]
   }
