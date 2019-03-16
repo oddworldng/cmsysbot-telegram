@@ -1,7 +1,7 @@
 import json
 
 
-class ComputersJson:
+class Computers:
     """This class provides an interface for using the .json files created on
     config/ (not config.json). Provides functions to get the names/ips/macs of
     the computers and easily save changes on the .json"""
@@ -32,13 +32,16 @@ class ComputersJson:
         avoid interacting directly with the dictionary"""
 
         def __init__(self, computer_data: dict = {}):
-            self.name = ""
-            self.ip = ""
-            self.mac = ""
+            # Initialize with N/A string to avoid having empty strings
+            self.name = "N/A"
+            self.ip = "N/A"
+            self.mac = "N/A"
 
-            # If a dictionary is passed, save the keys as attributes
+            # If a dictionary is passed, save the keys as attributes only if
+            # they're not empty
             for key in computer_data:
-                setattr(self, key, computer_data[key])
+                if (computer_data[key]):
+                    setattr(self, key, computer_data[key])
 
         def __str__(self):
             return 'Name: %s Ip: %s Mac: %s' % (self.name, self.ip, self.mac)
