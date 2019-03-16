@@ -1,7 +1,7 @@
 import json
 
 
-class HostJson:
+class ComputersJson:
     """This class provides an interface for using the .json files created on
     config/ (not config.json). Provides functions to get the names/ips/macs of
     the computers and easily save changes on the .json"""
