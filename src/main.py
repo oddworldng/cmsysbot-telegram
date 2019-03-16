@@ -158,8 +158,8 @@ def connect(bot, update, user_data):
         user_data['hostname'] = user_data['temp_ip']
         if 'temp_route' in user_data:
             user_data['route'] = user_data['temp_route']
-        if 'temp_json' in user_data:
-            user_data['host_json'] = user_data['temp_json']
+        if 'temp_computers' in user_data:
+            user_data['computers'] = user_data['temp_computers']
 
         # Return a successful connection message
         update.message.reply_text(
@@ -250,7 +250,7 @@ def main():
     dp.add_handler(CommandHandler("start", start, pass_user_data=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
-    dp.add_handler(CommandHandler("wol", wake_on_lan, pass_args=True))
+    dp.add_handler(CommandHandler("wol", wake_on_lan_command, pass_args=True))
     dp.add_handler(
         CommandHandler(
             "send", send_command_to_client, pass_user_data=True,

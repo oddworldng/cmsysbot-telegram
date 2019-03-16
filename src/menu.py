@@ -4,6 +4,7 @@ from telegram.ext import CallbackQueryHandler
 import helper
 import ipaddress
 import main
+import computers_json
 
 
 def new_menu(bot, update, user_data):
@@ -155,11 +156,9 @@ def ip_selection_menu(bot, update, user_data):
         user_data['temp_route'] = query.data
 
     # Create a path to the .json file from the temp_route
-    json_filepath = 'config/' + user_data['temp_route'] + '.json'
+    filepath = 'config/' + user_data['temp_route'] + '.json'
 
-    # Open the .json and save it in user_data
-    json = helper.open_json_file(json_filepath)
-    user_data['temp_json'] = json
+    user_data['temp_computers'] = computers_json.Computers(filepath)
 
     query.message.edit_text(
         text=ip_selection_menu_message(user_data),
@@ -183,20 +182,10 @@ def ip_selection_menu_keyboard(user_data):
     # Get a list with the name and ip for each computers in the JSON,
     # BUT ONLY if the entry has an ip value assigned
     keyboard = []
-    for computer in user_data['temp_json']['computers']:
-        label = ""
-        if 'name' in computer and computer['name']:
-            label += computer['name']
+    for computer in user_data['computers'].get_computers():
+        keyboard.append(
+            InlineKeyboardButton(text=str(computer), callback_data=computer.ip))
 
-        # Only add entries if an Ip is specified
-        if 'ip' in computer and computer['ip']:
-            label += ' (' + computer['ip'] + ')'
-            keyboard.append(
-                InlineKeyboardButton(label, callback_data=computer['ip']))
-
-    # If a single was selected, return button should return to 'department
-    # menu'. If a multiple was selected, return button should return to
-    # 'section_menu'
     return InlineKeyboardMarkup(
         build_menu(
             keyboard,
@@ -353,6 +342,4 @@ def add_menu_callbacks(dp):
     # TRIGGERED if clicked on 'Update Ips' from the main menu
     dp.add_handler(
         CallbackQueryHandler(
-            main.update_ips,
-            pattern="^Update Ips$",
-            pass_user_data=True))
+            main.update_ips, pattern="^Update Ips$", pass_user_data=True))
