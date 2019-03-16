@@ -27,6 +27,20 @@ class Computers:
         with open(self.filepath, 'w') as json_file:
             json.dump(self.data, json_file)
 
+    @staticmethod
+    def create(filepath: str):
+        """Create a .json file with the basic scheme"""
+
+        with open(filepath, "w") as outfile:
+            json_scheme = {}
+            json_scheme['computers'] = []
+            json_scheme['computers'].append({
+                'name': "N/A",
+                'ip': "N/A",
+                'mac': "N/A"
+            })
+            json.dump(json_scheme, outfile)
+
     class Computer:
         """This class represents a computer. Provides getters and setters to
         avoid interacting directly with the dictionary"""

@@ -1,5 +1,6 @@
 import json
 import os
+import computers_json
 
 # Default path in the filesystem where the config.json is located
 DEFAULT_CONFIG_FILEPATH = "config/config.json"
@@ -94,10 +95,4 @@ def create_json_if_not_exists(filepath):
     """Create a JSON if doesn't exist with basic scheme"""
     if not os.path.exists(filepath):
         print("-> Created file " + filepath)
-        with open(filepath, "w") as outfile:
-            json_scheme = dict()
-            json_scheme['computers'] = [dict()]
-            json_scheme['computers'][0]['name'] = ""
-            json_scheme['computers'][0]['mac'] = ""
-            json_scheme['computers'][0]['ip'] = ""
-            json.dump(json_scheme, outfile)
+        computers_json.Computers.create(filepath)
