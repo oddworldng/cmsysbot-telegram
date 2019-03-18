@@ -50,22 +50,19 @@ def wake_on_lan_callback(bot, update, user_data):
     wake_on_lan_command(bot, update, macs)
 
 
-def update_ips(bot, udpate, user_data):
+def update_ips(bot, update, user_data):
     if 'client' in user_data:
         client = user_data['client']
         password = user_data['password']
 
         get_submask_command = "ip -o -f inet addr show | awk '/scope global/ {print $4}'"
-        print(get_submask_command)
         stdin, stdout, stderr = client.exec_command(get_submask_command)
         submask = stdout.read().decode('utf-8')
-        print(submask)
 
         arp_scan_command = " echo " + password + " | sudo -S arp-scan " + submask
-        print(arp_scan_command)
         stdin, stdout, stderr = client.exec_command(arp_scan_command)
 
-        mac_dictionary = {}
+        dictionary = {}
         for line in stdout:
             ip_and_mac = re.search(
                 '((?:\d{1,3}\.){3}\d{1,3}).*((?:\w\w:){5}\w\w)', line)
@@ -73,17 +70,19 @@ def update_ips(bot, udpate, user_data):
             if ip_and_mac is not None:
                 ip = ip_and_mac.group(1)
                 mac = ip_and_mac.group(2)
-                mac_dictionary[mac] = ip
+                dictionary[mac] = ip
 
-        print(mac_dictionary)
-        for computer in user_data['host_json']['computers']:
-            mac = computer['mac']
+        print(dictionary)
 
-            if mac in mac_dictionary:
-                ip = computer['ip']
-                computer['ip'] = mac_dictionary[mac]
-                print('Ip for computer ' + mac + ' updated from ' + ip +
-                      ' to ' + computer['ip'])
+        for computer in user_data['computers'].get_computers():
+            if computer.mac in dictionary:
+                computer.ip = dictionary[computer.mac]
+                message = 'Ip for computer with mac %s updated to %s' % (
+                    computer.mac, computer.ip)
+                update.callback_query.message.reply_text(message)
+                print(message)
+
+        user_data['computers'].save()
 
 
 def send_command_to_client(bot, update, user_data, args):
@@ -204,7 +203,7 @@ def disconnect(bot, update, user_data):
         user_data.pop('password', None)
         user_data.pop('hostname', None)
         user_data.pop('route', None)
-        user_data.pop('host_json', None)
+        user_data.pop('computers', None)
 
     menu.main_menu(bot, update, user_data)
 

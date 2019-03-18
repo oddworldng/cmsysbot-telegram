@@ -46,11 +46,6 @@ def get_section_names_for_department(department):
     return section_names
 
 
-def get_macs(host_json):
-    return [computer['mac'] for computer in host_json['computers']]
-
-
-
 # ######################################################################
 #                         TELEGRAM FUNCTIONS
 # ######################################################################
@@ -59,7 +54,7 @@ def getMessage(update):
     Get the last message from 'update' or 'update.callback_query' Useful when a
     callback is called from both CommandHandler and CallbackQueryHandler
     """
-    if(update.message):
+    if (update.message):
         return update.message
     else:
         return update.callback_query.message
@@ -87,7 +82,7 @@ def create_folder_structure_from_config(root, singles, multiples):
 
 def create_folder_if_not_exists(folder):
     """Creat a folder if it doesn't exist"""
-    if(not os.path.isdir(folder)):
+    if (not os.path.isdir(folder)):
         os.makedirs(folder)
 
 
