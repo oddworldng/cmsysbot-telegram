@@ -53,12 +53,14 @@ def main_menu_keyboard(user_data):
         strings.extend([
             "Update Ips", "Filter computers", "Wake computers", "Shutdown",
             "Update computers", "Install software", "Execute script",
-            "Upload file"
+            "Upload file", "Disconnect"
         ])
     else:
-        strings.extend(["Connect", "Wake computers"])
+        strings.extend(["Connect"])
 
-    return build_keyboard(strings, n_cols=2)
+    return build_keyboard(
+        strings,
+        n_cols=2)
 
 
 # ######################################################################
