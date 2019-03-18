@@ -50,6 +50,18 @@ def wake_on_lan_callback(bot, update, user_data):
     wake_on_lan_command(bot, update, macs)
 
 
+def shutdown_computers_callback(bot, update, user_data):
+    if 'client' in user_data:
+        for ip in user_data['computers'].get_ips():
+            if ip == user_data['ip']:  # Don't shutdown your computer!
+                continue
+
+            message = "Shutting down computer with ip %s" % ip
+            update.callback_query.message.reply_text(message)
+
+            send_command_to_client(bot, update, user_data, [ip, ['init 0']])
+
+
 def update_ips(bot, update, user_data):
     if 'client' in user_data:
         client = user_data['client']
@@ -105,10 +117,12 @@ def send_command_to_client(bot, update, user_data, args):
         # Run as root
         output_command = " sshpass -p " + password + " ssh " + username + "@" + ip + " 'echo " + password + " | sudo -S " + input_command + "'"
         stdin, stdout, stderr = client.exec_command(output_command)
+        print(output_command)
 
         # Output
         output_message = stdout.read().decode('utf-8')
-        update.message.reply_text(output_message)
+        print(output_message)
+        # update.message.reply_text(output_message)
 
 
 def run(bot, update, args):
@@ -154,7 +168,7 @@ def connect(bot, update, user_data):
         user_data['client'] = client
         user_data['username'] = user_data['temp_username']
         user_data['password'] = user_data['temp_password']
-        user_data['hostname'] = user_data['temp_ip']
+        user_data['ip'] = user_data['temp_ip']
         if 'temp_route' in user_data:
             user_data['route'] = user_data['temp_route']
         if 'temp_computers' in user_data:
@@ -201,7 +215,7 @@ def disconnect(bot, update, user_data):
         user_data.pop('client', None)
         user_data.pop('username', None)
         user_data.pop('password', None)
-        user_data.pop('hostname', None)
+        user_data.pop('ip', None)
         user_data.pop('route', None)
         user_data.pop('computers', None)
 

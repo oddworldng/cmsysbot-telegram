@@ -36,7 +36,7 @@ def main_menu_message(user_data):
         message += "CONNECTED:\n"
         if 'route' in user_data:
             message += "-> Localization: " + user_data['route'] + "\n"
-        message += "-> Hostname: " + user_data['hostname'] + "\n"
+        message += "-> Ip: " + user_data['ip'] + "\n"
         message += "-> USER: " + user_data['username'] + "\n"
 
     else:
@@ -51,9 +51,9 @@ def main_menu_keyboard(user_data):
     strings = []
     if 'client' in user_data:
         strings.extend([
-            "Update Ips", "Filter computers", "Wake computers",
-            "Shutdown computers", "Update computers", "Install software",
-            "Execute script", "Upload file"
+            "Update Ips", "Filter computers", "Wake computers", "Shutdown",
+            "Update computers", "Install software", "Execute script",
+            "Upload file"
         ])
     else:
         strings.extend(["Connect", "Wake computers"])
@@ -335,6 +335,13 @@ def add_menu_callbacks(dp):
         CallbackQueryHandler(
             main.wake_on_lan_callback,
             pattern="^Wake computers$",
+            pass_user_data=True))
+
+    # TRIGGERED if clicked on 'Shutdown computers from the main menu'
+    dp.add_handler(
+        CallbackQueryHandler(
+            main.shutdown_computers_callback,
+            pattern="^Shutdown$",
             pass_user_data=True))
 
     # TRIGGERED if clicked on 'Update Ips' from the main menu
