@@ -46,7 +46,7 @@ def wake_on_lan_command(bot, update, args):
 
 
 def wake_on_lan_callback(bot, update, user_data):
-    macs = helper.get_macs(user_data['host_json'])
+    macs = list(user_data['computers'].get_macs())
     wake_on_lan_command(bot, update, macs)
 
 

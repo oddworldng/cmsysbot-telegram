@@ -182,15 +182,13 @@ def ip_selection_menu_keyboard(user_data):
     # Get a list with the name and ip for each computers in the JSON,
     # BUT ONLY if the entry has an ip value assigned
     keyboard = []
-    for computer in user_data['computers'].get_computers():
+    for computer in user_data['temp_computers'].get_computers():
         keyboard.append(
             InlineKeyboardButton(text=str(computer), callback_data=computer.ip))
 
     return InlineKeyboardMarkup(
         build_menu(
-            keyboard,
-            n_cols=2,
-            footer_buttons=[create_button("Return", "Connect")]))
+            keyboard, footer_buttons=[create_button("Return", "Connect")]))
 
 
 # ######################################################################
