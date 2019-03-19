@@ -16,6 +16,7 @@ def not_connected_view(message):
     Keyboard(message, text, main_buttons=main_buttons)
 
 
+# Route: ESIT/A/B/...
 # Select your department
 # ---------------- ----------------
 # |      OSL     | |     ESIT     |
@@ -25,8 +26,11 @@ def not_connected_view(message):
 # ---------------------------------
 
 
-def structure_view(message, text, sections, return_to):
-    main_buttons = [Button(sec_name) for sec_name in sections]
+def structure_view(message, route, sections, return_to):
+    text = "Select the section to connect\n"
+    text += "Route: %s" % "/".join(route)
+
+    main_buttons = [Button(section.name) for section in sections]
     footer_buttons = [Button("Return", return_to)]
 
     Keyboard(
@@ -37,6 +41,7 @@ def structure_view(message, text, sections, return_to):
         footer_buttons=footer_buttons)
 
 
+# Route: ESIT/A/B/...
 # Now, select your bridge computer
 # ---------------------------------
 # |  Name: E1. Ip: 192.168.1.10   |
@@ -46,8 +51,9 @@ def structure_view(message, text, sections, return_to):
 # ---------------------------------
 
 
-def ip_selection_view(message, computers, return_to):
-    text = "Now, select a 'bridge computer for the local connection"
+def ip_selection_view(message, route, computers, return_to):
+    text = "Route: %s" % "/".join(route)
+    text += "\nNow, select a 'bridge' computer for the local connection"
 
     main_buttons = [
         Button(str(computer), computer.ip) for computer in computers

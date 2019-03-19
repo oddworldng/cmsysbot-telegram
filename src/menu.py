@@ -22,8 +22,8 @@ def connect_menu(bot, update, user_data):
     message = helper.getMessage(update)
     views.structure_view(
         message,
-        "Select the department to connect:",
-        [section.name for section in helper.config.get_sections()],
+        user_data['temp_route'],
+        helper.config.get_sections(user_data['temp_route']),
         return_to=State.MAIN)
 
 
@@ -35,8 +35,6 @@ def structure_menu(bot, update, user_data):
     else:
         user_data['temp_route'].append(next_section)
 
-    text = "Route: %s" % "/".join(user_data['temp_route'])
-
     return_to = ""
     if len(user_data['temp_route']) <= 1:
         return_to = State.CONNECT
@@ -46,10 +44,8 @@ def structure_menu(bot, update, user_data):
     message = helper.getMessage(update)
     views.structure_view(
         message,
-        text, [
-            section.name
-            for section in helper.config.get_sections(user_data['temp_route'])
-        ],
+        user_data['temp_route'],
+        helper.config.get_sections(user_data['temp_route']),
         return_to=return_to)
 
 
@@ -58,8 +54,8 @@ def ip_selection_menu(bot, update, user_data):
     Show a menu with the list of the computers that have a defined 'ip' field
     in the corresponding .json file
     """
-    section = update.callback_query.data
-    user_data['temp_route'].append(section)
+    next_section = update.callback_query.data
+    user_data['temp_route'].append(next_section)
 
     # Create a path to the .json file from the temp_route
     filepath = "config/%s.json" % "/".join(user_data['temp_route'])
@@ -68,6 +64,7 @@ def ip_selection_menu(bot, update, user_data):
     message = helper.getMessage(update)
     views.ip_selection_view(
         message,
+        user_data['temp_route'],
         user_data['temp_computers'].get_computers(),
         return_to=State.CONNECT)
 
