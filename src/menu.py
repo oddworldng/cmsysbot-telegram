@@ -10,17 +10,17 @@ import views
 from states import State
 
 
-def new_menu(bot, update, user_data):
+def new_menu(bot, update, user_data: dict):
     message = helper.getMessage(update)
     views.not_connected_view().reply(update)
 
 
-def main_menu(bot, update, user_data):
+def main_menu(bot, update, user_data: dict):
     """Show the main menu, with the most basic options for the bot"""
     views.not_connected_view().edit(update)
 
 
-def connect_menu(bot, update, user_data):
+def connect_menu(bot, update, user_data: dict):
     user_data['temp_route'] = []
 
     views.structure_view(
@@ -29,7 +29,7 @@ def connect_menu(bot, update, user_data):
         return_to=State.MAIN).edit(update)
 
 
-def structure_menu(bot, update, user_data):
+def structure_menu(bot, update, user_data: dict):
     next_section = update.callback_query.data
 
     if user_data['temp_route'] and user_data['temp_route'][-1] == next_section:
@@ -49,7 +49,7 @@ def structure_menu(bot, update, user_data):
         return_to=return_to).edit(update)
 
 
-def ip_selection_menu(bot, update, user_data):
+def ip_selection_menu(bot, update, user_data: dict):
     """
     Show a menu with the list of the computers that have a defined 'ip' field
     in the corresponding .json file
@@ -67,10 +67,7 @@ def ip_selection_menu(bot, update, user_data):
         return_to=State.CONNECT).edit(update)
 
 
-# ######################################################################
-#                       CONFIRM CONNECTION MENU
-# ######################################################################
-def confirm_connection_menu(bot, update, user_data):
+def confirm_connection_menu(bot, update, user_data: dict):
     """
     Check if the Ip is valid and show a "Yes/No" keyboard to the user.
     If the Ip is invalid, return to the 'main_menu'
@@ -156,21 +153,21 @@ def create_button(label, callback_data):
 # ######################################################################
 def add_menu_callbacks(dp):
     """Add all the callback handlers to the Dispatcher"""
-    sections = [
-        "^%s$" % section.name
-        for section in helper.config.get_sections_with_subsections()
-    ]
 
-    nosections = [
-        "^%s$" % section.name
-        for section in helper.config.get_sections_without_subsections()
-    ]
+    with_subsections = []
+    without_subsections = []
 
-    sections_regex = "|".join(sections)
-    nosections_regex = "|".join(nosections)
+    for section in helper.config.get_all_sections():
+        if section.has_subsections():
+            with_subsections.append("^%s$" % section.name)
+        else:
+            without_subsections.append("^%s$" % section.name)
 
-    print(sections_regex)
-    print(nosections_regex)
+    with_subsections_regex = "|".join(with_subsections)
+    without_subsections_regex = "|".join(without_subsections)
+
+    print(with_subsections_regex)
+    print(without_subsections_regex)
 
     # TRIGGERED if a Return to 'main_menu' button is clicked
     dp.add_handler(
@@ -183,25 +180,18 @@ def add_menu_callbacks(dp):
         CallbackQueryHandler(
             connect_menu, pattern=State.CONNECT, pass_user_data=True))
 
-    # TRIGGERED if clicked on Disconnect after connecting
-    dp.add_handler(
-        CallbackQueryHandler(
-            main.disconnect, pattern="Disconnect", pass_user_data=True))
-
     # TRIGGERED if clicked on any department with multiple sections
     dp.add_handler(
         CallbackQueryHandler(
-            structure_menu, pattern=sections_regex, pass_user_data=True))
+            structure_menu, pattern=with_subsections_regex,
+            pass_user_data=True))
 
     # TRIGGERED if clicked on any department without sections (single)
     dp.add_handler(
         CallbackQueryHandler(
-            ip_selection_menu, pattern=nosections_regex, pass_user_data=True))
-
-    # TRIGGERED if clicked on any section from the 'section_names' array
-    dp.add_handler(
-        CallbackQueryHandler(
-            ip_selection_menu, pattern=sections_regex, pass_user_data=True))
+            ip_selection_menu,
+            pattern=without_subsections_regex,
+            pass_user_data=True))
 
     # TRIGGERED by an Ip (Even if its invalid)
     dp.add_handler(
@@ -211,6 +201,11 @@ def add_menu_callbacks(dp):
     # TRIGGERED if clicked on No in the 'confirm_connection_menu'
     dp.add_handler(
         CallbackQueryHandler(main_menu, pattern="^Ip-No$", pass_user_data=True))
+
+    # TRIGGERED if clicked on Disconnect after connecting
+    dp.add_handler(
+        CallbackQueryHandler(
+            main.disconnect, pattern="Disconnect", pass_user_data=True))
 
     # TRIGGERED if clicked on 'Wake Computers from the main menu'
     dp.add_handler(

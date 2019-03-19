@@ -64,6 +64,9 @@ class Config:
         def len(self):
             return len(self.subsections)
 
+        def __str__(self):
+            return "%s: %s" % (self.name, self.subsections)
+
     def get_sections(self, route=[]):
         sections = [self.Section(s) for s in self.data['structure']]
 
@@ -84,16 +87,6 @@ class Config:
                 route.append(section.name)
                 yield from self.get_all_sections(route)
                 route.pop()
-
-    def get_sections_with_subsections(self):
-        for section in self.get_all_sections():
-            if section.has_subsections():
-                yield section
-
-    def get_sections_without_subsections(self):
-        for section in self.get_all_sections():
-            if not section.has_subsections():
-                yield section
 
     def _create_folder_structure(self, route=[]):
         for section in self.get_sections(route):
