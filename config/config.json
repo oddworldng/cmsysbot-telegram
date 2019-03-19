@@ -2,13 +2,23 @@
   "token": "601812425:AAHYoMgMbyJQnYqlr8da20LgyncuyvGdtWg",
   "name": "CMSysBot",
   "email": "",
-  "structure": {
-    "single": ["BBTK", "OSL"],
-    "multiple": [
-      {
+  "structure": [{
+    "name": "ULL",
+    "sections": [{
         "name": "ESIT",
-        "sections": ["Aula 3.5", "Aula 3.8"]
+        "sections": [{
+            "name": "Industriales",
+            "sections": ["Aula 3.5", "Aula 3.8 "]
+          },
+          {
+            "name": "Ingeniería",
+            "sections": ["OSL", "BBTK"]
+          }
+        ]
+      },
+      {
+        "name": "MATFIS"
       }
     ]
-  }
+  }]
 }
