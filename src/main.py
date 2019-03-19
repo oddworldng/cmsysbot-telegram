@@ -13,7 +13,7 @@ from wakeonlan import send_magic_packet
 import conversation
 import menu
 import helper
-import config_json
+from utils import config_json
 import controller
 
 # Enable logging

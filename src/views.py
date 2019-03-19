@@ -1,7 +1,7 @@
 from typing import List
 
 from keyboard import Button, Keyboard
-from computers_json import Computer
+from utils.computers_json import Computer
 
 from states import State
 

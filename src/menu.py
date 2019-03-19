@@ -4,7 +4,7 @@ from telegram.ext import Updater, CallbackQueryHandler
 import helper
 import ipaddress
 import main
-import computers_json
+from utils import computers_json
 import views
 
 from states import State

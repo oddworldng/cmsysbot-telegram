@@ -2,6 +2,8 @@ import json
 
 from typing import Iterator
 
+from utils import json
+
 
 class Computer:
     """This class represents a computer. Provides getters and setters to
@@ -26,7 +28,7 @@ class Computer:
         return {'name': self.name, 'ip': self.ip, 'mac': self.mac}
 
 
-class Computers:
+class Computers(json.Json):
     """This class provides an interface for using the .json files created on
     config/ (not config.json). Provides functions to get the names/ips/macs of
     the computers and easily save changes on the .json"""
@@ -34,23 +36,7 @@ class Computers:
     def __init__(self, filepath: str):
         """Load the .json from an existent file. Throws if couldn't open/read
         the file"""
-
-        self.filepath = filepath
-        self.data = None
-        self.load(filepath)
-
-    # IO methods
-    def load(self, filepath: str):
-        """Load the .json file as a dictionary that Python can work with"""
-
-        with open(filepath) as json_file:
-            self.data = json.load(json_file)
-
-    def save(self):
-        """Write the changes made in the dictionary to the .json file"""
-
-        with open(self.filepath, 'w') as json_file:
-            json.dump(self.data, json_file)
+        super().__init__(filepath)
 
     @staticmethod
     def create(filepath: str):

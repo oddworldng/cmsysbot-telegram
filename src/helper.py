@@ -1,6 +1,5 @@
 import json
 import os
-import computers_json
 
 # Default path in the filesystem where the config.json is located
 DEFAULT_CONFIG_FILEPATH = "config/config.json"

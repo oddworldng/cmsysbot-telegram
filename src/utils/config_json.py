@@ -1,6 +1,7 @@
 import os
 import json
-import computers_json
+from utils import computers_json
+from utils import json
 
 from typing import Iterator, List, Union
 
@@ -32,31 +33,15 @@ class Section:
         return "%s: %s" % (self.name, self.subsections)
 
 
-class Config:
+class Config(json.Json):
     def __init__(self, filepath: str):
         """Load the .json from an existent file. Throws if couldn't open/read
         the file"""
 
-        self.filepath = filepath
+        super().__init__(filepath)
+
         self.root_folder = os.path.dirname(filepath) + "/"
-
-        self.data = None
-        self.load(filepath)
-
         self._create_folder_structure()
-
-    # IO methods
-    def load(self, filepath: str):
-        """Load the .json file as a dictionary that Python can work with"""
-
-        with open(filepath) as json_file:
-            self.data = json.load(json_file)
-
-    def save(self):
-        """Write the changes made in the dictionary to the .json file"""
-
-        with open(self.filepath, 'w') as json_file:
-            json.dump(self.data, json_file)
 
     @property
     def token(self) -> str:
