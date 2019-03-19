@@ -237,8 +237,6 @@ def main():
         print("Invalid Token! Please check your token in the config.json file")
         return
 
-    return
-
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 

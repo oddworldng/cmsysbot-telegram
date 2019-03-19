@@ -171,16 +171,21 @@ def create_button(label, callback_data):
 # ######################################################################
 def add_menu_callbacks(dp):
     """Add all the callback handlers to the Dispatcher"""
-    multiples = helper.get_multiple_department_names()
-    singles = helper.get_single_department_names()
-    sections = []
-    for department in multiples:
-        sections.extend(helper.get_section_names_for_department(department))
+    sections = [
+        "^%s$" % section.name
+        for section in helper.config.get_sections_with_subsections()
+    ]
 
-    # Construct a simple regex that match every name
-    departments_regex = "|".join(multiples)
+    nosections = [
+        "^%s$" % section.name
+        for section in helper.config.get_sections_without_subsections()
+    ]
+
     sections_regex = "|".join(sections)
-    singles_regex = "|".join(singles)
+    nosections_regex = "|".join(nosections)
+
+    print(sections_regex)
+    print(nosections_regex)
 
     # TRIGGERED if a Return to 'main_menu' button is clicked
     dp.add_handler(
@@ -201,12 +206,12 @@ def add_menu_callbacks(dp):
     # TRIGGERED if clicked on any department with multiple sections
     dp.add_handler(
         CallbackQueryHandler(
-            section_menu, pattern=departments_regex, pass_user_data=True))
+            section_menu, pattern=sections_regex, pass_user_data=True))
 
     # TRIGGERED if clicked on any department without sections (single)
     dp.add_handler(
         CallbackQueryHandler(
-            ip_selection_menu, pattern=singles_regex, pass_user_data=True))
+            ip_selection_menu, pattern=nosections_regex, pass_user_data=True))
 
     # TRIGGERED if clicked on any section from the 'section_names' array
     dp.add_handler(

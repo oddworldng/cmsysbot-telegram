@@ -88,12 +88,12 @@ class Config:
     def get_sections_with_subsections(self):
         for section in self.get_all_sections():
             if section.has_subsections():
-                yield section.name
+                yield section
 
     def get_sections_without_subsections(self):
         for section in self.get_all_sections():
             if not section.has_subsections():
-                yield section.name
+                yield section
 
     def _create_folder_structure(self, route=[]):
         for section in self.get_sections(route):
