@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update, user_data):
     """Open a new menu when the command /start is issued."""
-    menu.new_menu(bot, update, user_data)
+    menu.main_menu(bot, update, user_data)
 
 
 def help(bot, update):
@@ -115,7 +115,8 @@ def send_command_to_client(bot, update, user_data, args):
         password = user_data['password']
 
         # Run as root
-        output_command = " sshpass -p " + password + " ssh " + username + "@" + ip + " 'echo " + password + " | sudo -S " + input_command + "'"
+        output_command = " sshpass -p " + password + " ssh " + username + "@" + \
+            ip + " 'echo " + password + " | sudo -S " + input_command + "'"
         stdin, stdout, stderr = client.exec_command(output_command)
         print(output_command)
 
