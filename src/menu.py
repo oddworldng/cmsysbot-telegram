@@ -11,18 +11,20 @@ from states import State
 
 
 def new_menu(bot: Bot, update: Updater, user_data: dict):
-    message = helper.getMessage(update)
+    # View
     views.not_connected_view().reply(update)
 
 
 def main_menu(bot: Bot, update: Updater, user_data: dict):
     """Show the main menu, with the most basic options for the bot"""
+    # View
     views.not_connected_view().edit(update)
 
 
 def connect_menu(bot: Bot, update: Updater, user_data: dict):
     user_data['temp_route'] = []
 
+    # View
     views.structure_view(
         user_data['temp_route'],
         helper.config.get_sections(user_data['temp_route']),
@@ -30,19 +32,24 @@ def connect_menu(bot: Bot, update: Updater, user_data: dict):
 
 
 def structure_menu(bot: Bot, update: Updater, user_data: dict):
+    # Get the clicked section
     next_section = update.callback_query.data
 
+    # Remove section from the route if going backwards, otherwise append
     if user_data['temp_route'] and user_data['temp_route'][-1] == next_section:
         user_data['temp_route'].pop()
     else:
         user_data['temp_route'].append(next_section)
 
+    # Return to the last section, or to the Connect menu if its the start oits
+    # the start of the route
     return_to = ""
     if len(user_data['temp_route']) <= 1:
         return_to = State.CONNECT
     else:
         return_to = user_data['temp_route'][-1]
 
+    # View
     views.structure_view(
         user_data['temp_route'],
         helper.config.get_sections(user_data['temp_route']),
@@ -54,6 +61,7 @@ def ip_selection_menu(bot: Bot, update: Updater, user_data: dict):
     Show a menu with the list of the computers that have a defined 'ip' field
     in the corresponding .json file
     """
+    # Get the clicked section
     next_section = update.callback_query.data
     user_data['temp_route'].append(next_section)
 
@@ -61,6 +69,7 @@ def ip_selection_menu(bot: Bot, update: Updater, user_data: dict):
     filepath = "config/%s.json" % "/".join(user_data['temp_route'])
     user_data['temp_computers'] = computers_json.Computers(filepath)
 
+    # View
     views.ip_selection_view(
         user_data['temp_route'],
         user_data['temp_computers'].get_computers(),
@@ -68,11 +77,14 @@ def ip_selection_menu(bot: Bot, update: Updater, user_data: dict):
 
 
 def confirm_connect_ip_menu(bot: Bot, update: Updater, user_data: dict):
+    # Get the clicked ip
     selected_ip = update.callback_query.data
     user_data['temp_ip'] = selected_ip
 
-    text = "Do you want to connect to %s" % selected_ip
+    # Text
+    text = "Connect to %s?" % selected_ip
 
+    # View
     views.yes_no_menu(text, State.GET_CREDENTIALS, State.MAIN).edit(update)
 
 
@@ -93,9 +105,6 @@ def add_menu_callbacks(dp):
 
     with_subsections_regex = "|".join(with_subsections)
     without_subsections_regex = "|".join(without_subsections)
-
-    print(with_subsections_regex)
-    print(without_subsections_regex)
 
     # Show Main Menu
     dp.add_handler(
