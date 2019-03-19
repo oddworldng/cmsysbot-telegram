@@ -1,4 +1,7 @@
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
+from telegram.ext import Updater, CommandHandler
+
+from typing import List
 
 
 def Button(text: str, callback_data: str = None) -> InlineKeyboardButton:
@@ -12,25 +15,25 @@ def Button(text: str, callback_data: str = None) -> InlineKeyboardButton:
 class Keyboard:
     def __init__(self,
                  text: str,
-                 n_cols=1,
-                 header_buttons=None,
-                 main_buttons=None,
-                 footer_buttons=None):
+                 n_cols: int = 1,
+                 header_buttons: List[InlineKeyboardButton] = None,
+                 main_buttons: List[InlineKeyboardButton] = None,
+                 footer_buttons: List[InlineKeyboardButton] = None):
         self.text = text
         self.n_cols = n_cols
         self.header_buttons = header_buttons
         self.main_buttons = main_buttons
         self.footer_buttons = footer_buttons
 
-    def reply(self, update):
+    def reply(self, update: Updater):
         self._getMessage(update).reply_text(
             text=self.text, reply_markup=self._generate_keyboard())
 
-    def edit(self, update):
+    def edit(self, update: Updater):
         self._getMessage(update).edit_text(
             text=self.text, reply_markup=self._generate_keyboard())
 
-    def _getMessage(self, update):
+    def _getMessage(self, update: Updater) -> str:
         """
         Get the last message from 'update' or 'update.callback_query' Useful when a
         callback is called from both CommandHandler and CallbackQueryHandler
@@ -40,10 +43,10 @@ class Keyboard:
         else:
             return update.callback_query.message
 
-    def _generate_keyboard(self):
+    def _generate_keyboard(self) -> InlineKeyboardMarkup:
         return InlineKeyboardMarkup(self._build_menu())
 
-    def _build_menu(self):
+    def _build_menu(self) -> List[InlineKeyboardButton]:
         menu = []
 
         if self.main_buttons:

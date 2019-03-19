@@ -5,8 +5,9 @@ import re
 
 import paramiko
 
-from telegram.error import (InvalidToken)
-from telegram.ext import (Updater, CommandHandler)
+from telegram import Bot
+from telegram.ext import Updater, CommandHandler
+from telegram.error import InvalidToken
 from wakeonlan import send_magic_packet
 
 import conversation

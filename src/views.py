@@ -1,4 +1,7 @@
+from typing import List
+
 from keyboard import Button, Keyboard
+from computers_json import Computer
 
 from states import State
 
@@ -8,7 +11,7 @@ from states import State
 # ---------------------------------
 
 
-def not_connected_view():
+def not_connected_view() -> Keyboard:
     # Text
     text = "Status: Not Connected"
 
@@ -29,7 +32,8 @@ def not_connected_view():
 # ---------------------------------
 
 
-def structure_view(route, sections, return_to):
+def structure_view(route: List[str], sections: List[Computer],
+                   return_to: str) -> Keyboard:
     # Text
     text = "Select the section to connect\n"
     text += "Route: %s" % "/".join(route)
@@ -56,7 +60,8 @@ def structure_view(route, sections, return_to):
 # ---------------------------------
 
 
-def ip_selection_view(route, computers, return_to):
+def ip_selection_view(route: List[str], computers: List[Computer],
+                      return_to: str) -> Keyboard:
     # Text
     text = "Route: %s" % "/".join(route)
     text += "\nNow, select a 'bridge' computer for the local connection"

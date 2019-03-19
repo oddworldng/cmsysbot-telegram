@@ -1,5 +1,30 @@
 import json
 
+from typing import Iterator
+
+
+class Computer:
+    """This class represents a computer. Provides getters and setters to
+    avoid interacting directly with the dictionary"""
+
+    def __init__(self, computer_data: dict = {str, str}):
+        # Initialize with N/A string to avoid having empty strings
+        self.name = "N/A"
+        self.ip = "N/A"
+        self.mac = "N/A"
+
+        # If a dictionary is passed, save the keys as attributes only if
+        # they're not empty
+        for key in computer_data:
+            if (computer_data[key]):
+                setattr(self, key, computer_data[key])
+
+    def __str__(self) -> str:
+        return 'Name: %s Ip: %s Mac: %s' % (self.name, self.ip, self.mac)
+
+    def asdict(self) -> dict:
+        return {'name': self.name, 'ip': self.ip, 'mac': self.mac}
+
 
 class Computers:
     """This class provides an interface for using the .json files created on
@@ -41,28 +66,6 @@ class Computers:
             })
             json.dump(json_scheme, outfile)
 
-    class Computer:
-        """This class represents a computer. Provides getters and setters to
-        avoid interacting directly with the dictionary"""
-
-        def __init__(self, computer_data: dict = {}):
-            # Initialize with N/A string to avoid having empty strings
-            self.name = "N/A"
-            self.ip = "N/A"
-            self.mac = "N/A"
-
-            # If a dictionary is passed, save the keys as attributes only if
-            # they're not empty
-            for key in computer_data:
-                if (computer_data[key]):
-                    setattr(self, key, computer_data[key])
-
-        def __str__(self):
-            return 'Name: %s Ip: %s Mac: %s' % (self.name, self.ip, self.mac)
-
-        def asdict(self):
-            return {'name': self.name, 'ip': self.ip, 'mac': self.mac}
-
     # Operators
     def add(self, name: str, ip: str, mac: str):
         """Add a new computer. NOTE: Changes are only made in the dictionary. To
@@ -82,31 +85,30 @@ class Computers:
                 break
 
     # Generators
-    def get_computers(self) -> Computer:
+    def get_computers(self) -> Iterator[Computer]:
         """Yield a Computer object for each element in the .json 'computers'
         array. The element returned CAN BE MODIFIED. The changes will be
         reflected in the dictionary"""
 
         for i in range(0, len(self.data['computers'])):
             computer_data = self.data['computers'][i]
-            computer = self.Computer(computer_data)
+            computer = Computer(computer_data)
 
             yield computer
 
             self.data['computers'][i] = computer.asdict()
 
-    def get_names(self) -> str:
+    def get_names(self) -> Iterator[str]:
         """Yield the name of each computer"""
-
         for computer in self.get_computers():
             yield computer.name
 
-    def get_ips(self) -> str:
+    def get_ips(self) -> Iterator[str]:
         """Yield the ip of each computer"""
         for computer in self.get_computers():
             yield computer.ip
 
-    def get_macs(self) -> str:
+    def get_macs(self) -> Iterator[str]:
         """Yield the mac of each computer"""
         for computer in self.get_computers():
             yield computer.mac

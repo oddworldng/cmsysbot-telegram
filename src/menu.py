@@ -1,5 +1,5 @@
-from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
-from telegram.ext import CallbackQueryHandler
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CallbackQueryHandler
 
 import helper
 import ipaddress
@@ -10,17 +10,17 @@ import views
 from states import State
 
 
-def new_menu(bot, update, user_data: dict):
+def new_menu(bot: Bot, update: Updater, user_data: dict):
     message = helper.getMessage(update)
     views.not_connected_view().reply(update)
 
 
-def main_menu(bot, update, user_data: dict):
+def main_menu(bot: Bot, update: Updater, user_data: dict):
     """Show the main menu, with the most basic options for the bot"""
     views.not_connected_view().edit(update)
 
 
-def connect_menu(bot, update, user_data: dict):
+def connect_menu(bot: Bot, update: Updater, user_data: dict):
     user_data['temp_route'] = []
 
     views.structure_view(
@@ -29,7 +29,7 @@ def connect_menu(bot, update, user_data: dict):
         return_to=State.MAIN).edit(update)
 
 
-def structure_menu(bot, update, user_data: dict):
+def structure_menu(bot: Bot, update: Updater, user_data: dict):
     next_section = update.callback_query.data
 
     if user_data['temp_route'] and user_data['temp_route'][-1] == next_section:
@@ -49,7 +49,7 @@ def structure_menu(bot, update, user_data: dict):
         return_to=return_to).edit(update)
 
 
-def ip_selection_menu(bot, update, user_data: dict):
+def ip_selection_menu(bot: Bot, update: Updater, user_data: dict):
     """
     Show a menu with the list of the computers that have a defined 'ip' field
     in the corresponding .json file
@@ -67,7 +67,7 @@ def ip_selection_menu(bot, update, user_data: dict):
         return_to=State.CONNECT).edit(update)
 
 
-def confirm_connection_menu(bot, update, user_data: dict):
+def confirm_connection_menu(bot: Bot, update: Updater, user_data: dict):
     """
     Check if the Ip is valid and show a "Yes/No" keyboard to the user.
     If the Ip is invalid, return to the 'main_menu'

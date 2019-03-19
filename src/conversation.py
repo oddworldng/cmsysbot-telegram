@@ -1,5 +1,5 @@
-from telegram.ext import (ConversationHandler,
-                          CallbackQueryHandler, MessageHandler, Filters)
+from telegram.ext import (ConversationHandler, CallbackQueryHandler,
+                          MessageHandler, Filters)
 
 import menu
 import helper
@@ -69,9 +69,7 @@ def add_conversation_callbacks(dp):
     # Login handler
     login_conv_handler = ConversationHandler(
         # Entry points: From InlineKeyboardButton or /login
-        entry_points=[
-            CallbackQueryHandler(login, pattern="^Ip-Yes$")
-        ],
+        entry_points=[CallbackQueryHandler(login, pattern="^Ip-Yes$")],
         states={
             USERNAME:
             [MessageHandler(Filters.text, get_username, pass_user_data=True)],
