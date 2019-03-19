@@ -14,7 +14,7 @@ class Config:
         self.data = None
         self.load(filepath)
 
-        self.create_folder_structure()
+        self._create_folder_structure()
 
     # IO methods
     def load(self, filepath: str):
@@ -76,25 +76,44 @@ class Config:
         for section in sections:
             yield section
 
-    def create_folder_structure(self, route=[]):
+    def get_all_sections(self, route=[]):
+        for section in self.get_sections(route):
+            yield section
+
+            if section.has_subsections():
+                route.append(section.name)
+                yield from self.get_all_sections(route)
+                route.pop()
+
+    def get_sections_with_subsections(self):
+        for section in self.get_all_sections():
+            if section.has_subsections():
+                yield section.name
+
+    def get_sections_without_subsections(self):
+        for section in self.get_all_sections():
+            if not section.has_subsections():
+                yield section.name
+
+    def _create_folder_structure(self, route=[]):
         for section in self.get_sections(route):
             if section.has_subsections():
-                self.create_folder(route + [section.name])
+                self._create_folder(route + [section.name])
 
                 route.append(section.name)
-                self.create_folder_structure(route)
+                self._create_folder_structure(route)
                 route.pop()
             else:
-                self.create_file(route + [section.name])
+                self._create_file(route + [section.name])
 
-    def create_folder(self, route):
+    def _create_folder(self, route):
         folder_path = self.root_folder + "/".join(route)
 
         if not os.path.isdir(folder_path):
             print("> Create directory", folder_path)
             os.makedirs(folder_path)
 
-    def create_file(self, route):
+    def _create_file(self, route):
         file_path = self.root_folder + "/".join(route) + ".json"
 
         if not os.path.exists(file_path):
