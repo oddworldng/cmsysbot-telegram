@@ -1,4 +1,6 @@
+import os
 import json
+import computers_json
 
 
 class Config:
@@ -7,8 +9,12 @@ class Config:
         the file"""
 
         self.filepath = filepath
+        self.root_folder = os.path.dirname(filepath) + "/"
+
         self.data = None
         self.load(filepath)
+
+        self.create_folder_structure()
 
     # IO methods
     def load(self, filepath: str):
@@ -35,27 +41,62 @@ class Config:
     def email(self) -> str:
         return self.data['email']
 
-    def get_subsection_names(self, start_route=None):
-        subsections = self.data['structure']
+    class Section:
+        def __init__(self, section_data):
+            self.name = "N/A"
+            self.subsections = []
 
-        if start_route:
-            for route_var in start_route:
-                for i, subsection in enumerate(
-                    [n['name'] for n in subsections]):
-                    if subsection == route_var:
-                        subsections = subsections[i]['sections']
+            # Initialiize Section from a string
+            if type(section_data) is str:
+                self.name = section_data
 
-        if type(subsections[0]) is dict:
-            sections = [n['name'] for n in subsections]
+            # Initialize Section from a dict
+            elif type(section_data) is dict:
+                if 'name' in section_data:
+                    self.name = section_data['name']
 
-        return sections
+                if 'sections' in section_data:
+                    self.subsections = section_data['sections']
 
+        def has_subsections(self):
+            return self.subsections
 
-cf = Config("config/config.json")
+        def len(self):
+            return len(self.subsections)
 
-print(cf.token)
-print(cf.name)
-print(cf.email)
+    def get_sections(self, route=[]):
+        sections = [self.Section(s) for s in self.data['structure']]
 
-for subsection in cf.get_subsection_names(['ULL']):
-    print(subsection)
+        for part in route:
+            for section in sections:
+                if part == section.name and section.has_subsections():
+                    sections = [self.Section(s) for s in section.subsections]
+                    break
+
+        for section in sections:
+            yield section
+
+    def create_folder_structure(self, route=[]):
+        for section in self.get_sections(route):
+            if section.has_subsections():
+                self.create_folder(route + [section.name])
+
+                route.append(section.name)
+                self.create_folder_structure(route)
+                route.pop()
+            else:
+                self.create_file(route + [section.name])
+
+    def create_folder(self, route):
+        folder_path = self.root_folder + "/".join(route)
+
+        if not os.path.isdir(folder_path):
+            print("> Create directory", folder_path)
+            os.makedirs(folder_path)
+
+    def create_file(self, route):
+        file_path = self.root_folder + "/".join(route) + ".json"
+
+        if not os.path.exists(file_path):
+            print("> Create file", file_path)
+            computers_json.Computers.create(file_path)

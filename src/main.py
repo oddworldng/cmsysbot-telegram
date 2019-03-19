@@ -12,6 +12,7 @@ from wakeonlan import send_magic_packet
 import conversation
 import menu
 import helper
+import config_json
 
 # Enable logging
 logging.basicConfig(
@@ -227,35 +228,17 @@ def disconnect(bot, update, user_data):
 #                                MAIN
 # ######################################################################
 def main():
-    # Parse arguments from command line
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c", "--config", help="JSON file with the Bot Configuration")
-    args = parser.parse_args()
-
-    # Open the config.json file
-    if (args.config):
-        helper.config = helper.open_json_file(args.config)
-    else:
-        helper.config = helper.open_json_file(helper.DEFAULT_CONFIG_FILEPATH)
-
-    # Create folders and files from config.json structure if missing
-    helper.create_folder_structure_from_config(
-        'config/', helper.config['structure']['single'],
-        helper.config['structure']['multiple'])
-
-    # Check if token is defined in the config.json
-    if 'token' not in helper.config:
-        print("Missing 'token' field in the config.json! Please introduce " +
-              "your token bot before starting")
-        return
+    helper.config = config_json.Config(helper.DEFAULT_CONFIG_FILEPATH)
 
     # Create the EventHandler and pass it your bot's token.
     try:
-        updater = Updater(helper.config['token'])
+        updater = Updater(helper.config.token)
     except InvalidToken:
         print("Invalid Token! Please check your token in the config.json file")
         return
+
+
+    return
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

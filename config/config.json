@@ -3,12 +3,10 @@
   "name": "CMSysBot",
   "email": "",
   "structure": [{
-    "name": "ULL",
-    "sections": [{
         "name": "ESIT",
         "sections": [{
             "name": "Industriales",
-            "sections": ["Aula 3.5", "Aula 3.8 "]
+            "sections": ["Aula 3.5", "Aula 3.8"]
           },
           {
             "name": "Ingeniería",
@@ -20,5 +18,4 @@
         "name": "MATFIS"
       }
     ]
-  }]
 }
