@@ -24,11 +24,6 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
-def start(bot, update, user_data):
-    """Open a new menu when the command /start is issued."""
-    menu.new_menu(bot, update, user_data)
-
-
 def help(bot, update):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
@@ -241,7 +236,7 @@ def main():
     dp = updater.dispatcher
 
     # Different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", start, pass_user_data=True))
+    dp.add_handler(CommandHandler("start", menu.new_menu, pass_user_data=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
     dp.add_handler(CommandHandler("wol", wake_on_lan_command, pass_args=True))
