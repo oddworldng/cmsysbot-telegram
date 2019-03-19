@@ -1,7 +1,7 @@
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 
 
-def Button(text: str, callback_data: str=None) -> InlineKeyboardButton:
+def Button(text: str, callback_data: str = None) -> InlineKeyboardButton:
     """ Alias function for creating an InlineKeyboardButton """
     if not callback_data:
         callback_data = text
@@ -11,7 +11,6 @@ def Button(text: str, callback_data: str=None) -> InlineKeyboardButton:
 
 class Keyboard:
     def __init__(self,
-                 message,
                  text: str,
                  n_cols=1,
                  header_buttons=None,
@@ -23,8 +22,23 @@ class Keyboard:
         self.main_buttons = main_buttons
         self.footer_buttons = footer_buttons
 
-        message.reply_text(
+    def reply(self, update):
+        self._getMessage(update).reply_text(
             text=self.text, reply_markup=self._generate_keyboard())
+
+    def edit(self, update):
+        self._getMessage(update).edit_text(
+            text=self.text, reply_markup=self._generate_keyboard())
+
+    def _getMessage(self, update):
+        """
+        Get the last message from 'update' or 'update.callback_query' Useful when a
+        callback is called from both CommandHandler and CallbackQueryHandler
+        """
+        if (update.message):
+            return update.message
+        else:
+            return update.callback_query.message
 
     def _generate_keyboard(self):
         return InlineKeyboardMarkup(self._build_menu())

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update, user_data):
     """Open a new menu when the command /start is issued."""
-    menu.main_menu(bot, update, user_data)
+    menu.new_menu(bot, update, user_data)
 
 
 def help(bot, update):

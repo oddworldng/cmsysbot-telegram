@@ -8,12 +8,15 @@ from states import State
 # ---------------------------------
 
 
-def not_connected_view(message):
+def not_connected_view():
+    # Text
     text = "Status: Not Connected"
 
+    # Buttons
     main_buttons = [Button("Connect", State.CONNECT)]
 
-    Keyboard(message, text, main_buttons=main_buttons)
+    # Keyboard
+    return Keyboard(text, main_buttons=main_buttons)
 
 
 # Route: ESIT/A/B/...
@@ -26,15 +29,17 @@ def not_connected_view(message):
 # ---------------------------------
 
 
-def structure_view(message, route, sections, return_to):
+def structure_view(route, sections, return_to):
+    # Text
     text = "Select the section to connect\n"
     text += "Route: %s" % "/".join(route)
 
+    # Buttons
     main_buttons = [Button(section.name) for section in sections]
     footer_buttons = [Button("Return", return_to)]
 
-    Keyboard(
-        message,
+    # Keyboard
+    return Keyboard(
         text,
         n_cols=2,
         main_buttons=main_buttons,
@@ -51,15 +56,17 @@ def structure_view(message, route, sections, return_to):
 # ---------------------------------
 
 
-def ip_selection_view(message, route, computers, return_to):
+def ip_selection_view(route, computers, return_to):
+    # Text
     text = "Route: %s" % "/".join(route)
     text += "\nNow, select a 'bridge' computer for the local connection"
 
+    # Buttons
     main_buttons = [
         Button(str(computer), computer.ip) for computer in computers
     ]
-
     footer_buttons = [Button("Return", return_to)]
 
-    Keyboard(
-        message, text, main_buttons=main_buttons, footer_buttons=footer_buttons)
+    # Keyboard
+    return Keyboard(
+        text, main_buttons=main_buttons, footer_buttons=footer_buttons)

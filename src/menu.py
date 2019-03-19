@@ -10,21 +10,23 @@ import views
 from states import State
 
 
+def new_menu(bot, update, user_data):
+    message = helper.getMessage(update)
+    views.not_connected_view().reply(update)
+
+
 def main_menu(bot, update, user_data):
     """Show the main menu, with the most basic options for the bot"""
-    message = helper.getMessage(update)
-    views.not_connected_view(message)
+    views.not_connected_view().edit(update)
 
 
 def connect_menu(bot, update, user_data):
     user_data['temp_route'] = []
 
-    message = helper.getMessage(update)
     views.structure_view(
-        message,
         user_data['temp_route'],
         helper.config.get_sections(user_data['temp_route']),
-        return_to=State.MAIN)
+        return_to=State.MAIN).edit(update)
 
 
 def structure_menu(bot, update, user_data):
@@ -41,12 +43,10 @@ def structure_menu(bot, update, user_data):
     else:
         return_to = user_data['temp_route'][-1]
 
-    message = helper.getMessage(update)
     views.structure_view(
-        message,
         user_data['temp_route'],
         helper.config.get_sections(user_data['temp_route']),
-        return_to=return_to)
+        return_to=return_to).edit(update)
 
 
 def ip_selection_menu(bot, update, user_data):
@@ -61,12 +61,10 @@ def ip_selection_menu(bot, update, user_data):
     filepath = "config/%s.json" % "/".join(user_data['temp_route'])
     user_data['temp_computers'] = computers_json.Computers(filepath)
 
-    message = helper.getMessage(update)
     views.ip_selection_view(
-        message,
         user_data['temp_route'],
         user_data['temp_computers'].get_computers(),
-        return_to=State.CONNECT)
+        return_to=State.CONNECT).edit(update)
 
 
 # ######################################################################
