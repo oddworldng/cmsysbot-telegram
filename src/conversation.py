@@ -1,10 +1,10 @@
 from telegram.ext import (ConversationHandler, CallbackQueryHandler,
                           MessageHandler, Filters)
 
-import menu
 import helper
 import main
 
+from controller import menu
 from states import State
 
 # Conversation States

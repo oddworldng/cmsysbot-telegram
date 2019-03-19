@@ -11,10 +11,9 @@ from telegram.error import InvalidToken
 from wakeonlan import send_magic_packet
 
 import conversation
-import menu
 import helper
 from utils import config_json
-import controller
+from controller import controller, menu
 
 # Enable logging
 logging.basicConfig(

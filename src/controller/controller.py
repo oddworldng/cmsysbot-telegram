@@ -1,7 +1,7 @@
 from telegram.ext import Dispatcher, CallbackQueryHandler
 
 from states import State
-import menu
+from controller import menu
 import main
 import helper
 

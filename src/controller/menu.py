@@ -4,28 +4,28 @@ from telegram.ext import Updater, CallbackQueryHandler
 import helper
 import ipaddress
 import main
-from utils import computers_json
-import views
 
+from view import view
+from utils import computers_json
 from states import State
 
 
 def new_main(bot: Bot, update: Updater, user_data: dict):
     # View
-    views.not_connected_view().reply(update)
+    view.not_connected().reply(update)
 
 
 def main(bot: Bot, update: Updater, user_data: dict):
     """Show the main menu, with the most basic options for the bot"""
     # View
-    views.not_connected_view().edit(update)
+    view.not_connected().edit(update)
 
 
 def connect(bot: Bot, update: Updater, user_data: dict):
     user_data['temp_route'] = []
 
     # View
-    views.structure_view(
+    view.structure(
         user_data['temp_route'],
         helper.config.get_sections(user_data['temp_route']),
         return_to=State.MAIN).edit(update)
@@ -50,7 +50,7 @@ def structure(bot: Bot, update: Updater, user_data: dict):
         return_to = user_data['temp_route'][-1]
 
     # View
-    views.structure_view(
+    view.structure(
         user_data['temp_route'],
         helper.config.get_sections(user_data['temp_route']),
         return_to=return_to).edit(update)
@@ -70,7 +70,7 @@ def ip_selection(bot: Bot, update: Updater, user_data: dict):
     user_data['temp_computers'] = computers_json.Computers(filepath)
 
     # View
-    views.ip_selection_view(
+    view.ip_selection(
         user_data['temp_route'],
         user_data['temp_computers'].get_computers(),
         return_to=State.CONNECT).edit(update)
@@ -85,4 +85,4 @@ def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
     text = "Connect to %s?" % selected_ip
 
     # View
-    views.yes_no_view(text, State.GET_CREDENTIALS, State.MAIN).edit(update)
+    view.yes_no(text, State.GET_CREDENTIALS, State.MAIN).edit(update)
