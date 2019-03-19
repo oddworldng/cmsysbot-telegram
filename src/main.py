@@ -14,6 +14,7 @@ import conversation
 import menu
 import helper
 import config_json
+import controller
 
 # Enable logging
 logging.basicConfig(
@@ -217,7 +218,7 @@ def disconnect(bot, update, user_data):
         user_data.pop('route', None)
         user_data.pop('computers', None)
 
-    menu.main_menu(bot, update, user_data)
+    #menu.main_menu(bot, update, user_data)
 
 
 # ######################################################################
@@ -255,7 +256,7 @@ def main():
     conversation.add_conversation_callbacks(dp)
 
     # Add all menu callbacks
-    menu.add_menu_callbacks(dp)
+    controller.add_callbacks(dp)
 
     # log all errors
     dp.add_error_handler(error)
