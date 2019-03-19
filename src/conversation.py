@@ -5,6 +5,8 @@ import menu
 import helper
 import main
 
+from states import State
+
 # Conversation States
 IP, USERNAME, PASSWORD = range(3)
 
@@ -69,7 +71,9 @@ def add_conversation_callbacks(dp):
     # Login handler
     login_conv_handler = ConversationHandler(
         # Entry points: From InlineKeyboardButton or /login
-        entry_points=[CallbackQueryHandler(login, pattern="^Ip-Yes$")],
+        entry_points=[
+            CallbackQueryHandler(login, pattern=State.GET_CREDENTIALS)
+        ],
         states={
             USERNAME:
             [MessageHandler(Filters.text, get_username, pass_user_data=True)],

@@ -67,85 +67,13 @@ def ip_selection_menu(bot: Bot, update: Updater, user_data: dict):
         return_to=State.CONNECT).edit(update)
 
 
-def confirm_connection_menu(bot: Bot, update: Updater, user_data: dict):
-    """
-    Check if the Ip is valid and show a "Yes/No" keyboard to the user.
-    If the Ip is invalid, return to the 'main_menu'
-    """
-    try:
-        ipaddress.ip_address(user_data['temp_ip'])
-        if update.message:
-            update.message.reply_text(
-                text=confirm_connection_menu_message(user_data),
-                reply_markup=confirm_connection_menu_keyboard())
-        else:
-            update.callback_query.message.edit_text(
-                text=confirm_connection_menu_message(user_data),
-                reply_markup=confirm_connection_menu_keyboard())
+def confirm_connect_ip_menu(bot: Bot, update: Updater, user_data: dict):
+    selected_ip = update.callback_query.data
+    user_data['temp_ip'] = selected_ip
 
-    except ValueError:
-        text = user_data['temp_ip'] + " is not a valid ip!"
-        if update.message:
-            update.message.reply_text(text)
-        else:
-            update.callback_query.message.edit_text(text)
+    text = "Do you want to connect to %s" % selected_ip
 
-        # new_menu(bot, update, user_data)
-
-
-def confirm_connection_menu_message(user_data):
-    return ("Are you sure that you want to connect to: " +
-            user_data['temp_ip'] + "?")
-
-
-def confirm_connection_menu_keyboard():
-    """Simple Yes or No promt"""
-    keyboard = [
-        InlineKeyboardButton("Yes", callback_data="Ip-Yes"),
-        InlineKeyboardButton("No", callback_data="Ip-No")
-    ]
-
-    return InlineKeyboardMarkup(build_menu(keyboard, n_cols=2))
-
-
-def get_ip(bot, update, user_data):
-    """Get user ip (from CallbackQueryHandler)"""
-    query = update.callback_query
-    user_data['temp_ip'] = query.data
-    confirm_connection_menu(bot, update, user_data)
-
-
-# ######################################################################
-#                          HELPER FUNCTIONS
-# ######################################################################
-def build_keyboard(strings, n_cols=2, header_buttons=None, footer_buttons=None):
-    """
-    Return an InlineKeyboard with sane defaults. callback_data values will be
-    the same value as the button labels
-    """
-    keyboard = [InlineKeyboardButton(s, callback_data=s) for s in strings if s]
-
-    return InlineKeyboardMarkup(
-        build_menu(keyboard, n_cols, header_buttons, footer_buttons))
-
-
-def build_menu(buttons, n_cols=1, header_buttons=None, footer_buttons=None):
-    """
-    Build a menu from a list of InlineButtons (With multiple columns, extra
-    buttons on top/botton...)
-    """
-    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
-    if header_buttons:
-        menu.insert(0, header_buttons)
-    if footer_buttons:
-        menu.extend(footer_buttons)
-
-    return menu
-
-
-def create_button(label, callback_data):
-    """ Alias function for creating an InlineKeyboardButton """
-    return [InlineKeyboardButton(label, callback_data=callback_data)]
+    views.yes_no_menu(text, State.GET_CREDENTIALS, State.MAIN).edit(update)
 
 
 # ######################################################################
@@ -169,38 +97,36 @@ def add_menu_callbacks(dp):
     print(with_subsections_regex)
     print(without_subsections_regex)
 
-    # TRIGGERED if a Return to 'main_menu' button is clicked
+    # Show Main Menu
     dp.add_handler(
         CallbackQueryHandler(
             main_menu, pattern=State.MAIN, pass_user_data=True))
 
-    # TRIGGERED if clicked on 'Connect' from 'main_menu', or Return from
-    # 'section_menu'
+    # Show Connect Menu
     dp.add_handler(
         CallbackQueryHandler(
             connect_menu, pattern=State.CONNECT, pass_user_data=True))
 
-    # TRIGGERED if clicked on any department with multiple sections
+    # Show structure of department (and subdepartments)
     dp.add_handler(
         CallbackQueryHandler(
             structure_menu, pattern=with_subsections_regex,
             pass_user_data=True))
 
-    # TRIGGERED if clicked on any department without sections (single)
+    # When clicked in a section without subsections, show ip list
     dp.add_handler(
         CallbackQueryHandler(
             ip_selection_menu,
             pattern=without_subsections_regex,
             pass_user_data=True))
 
-    # TRIGGERED by an Ip (Even if its invalid)
+    # When clicked on an ip, show the menu asking if continuing the the
+    # connection
     dp.add_handler(
         CallbackQueryHandler(
-            get_ip, pattern="^[\d*\.*]*$", pass_user_data=True))
-
-    # TRIGGERED if clicked on No in the 'confirm_connection_menu'
-    dp.add_handler(
-        CallbackQueryHandler(main_menu, pattern="^Ip-No$", pass_user_data=True))
+            confirm_connect_ip_menu,
+            pattern=State.CONFIRM_CONNECT,
+            pass_user_data=True))
 
     # TRIGGERED if clicked on Disconnect after connecting
     dp.add_handler(

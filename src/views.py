@@ -75,3 +75,15 @@ def ip_selection_view(route: List[str], computers: List[Computer],
     # Keyboard
     return Keyboard(
         text, main_buttons=main_buttons, footer_buttons=footer_buttons)
+
+
+def yes_no_menu(text: str, yes_callback_data: str, no_callback_data: str):
+
+    # Buttons
+    main_buttons = [
+        Button("Yes", yes_callback_data),
+        Button("No", no_callback_data)
+    ]
+
+    # Keyboard
+    return Keyboard(text, n_cols=2, main_buttons=main_buttons)
