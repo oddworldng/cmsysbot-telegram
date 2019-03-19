@@ -1,3 +1,3 @@
 class State():
     MAIN = "Main"
-    DEPARTMENTS = "Departments"
+    CONNECT = "Connect"

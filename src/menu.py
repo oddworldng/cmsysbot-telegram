@@ -16,70 +16,60 @@ def main_menu(bot, update, user_data):
     views.not_connected_view(message)
 
 
-def department_menu(bot, update, user_data):
-    """
-    Show a menu with all the departments in the config.json
-    """
-    # Reset the temporal selected route (department/section)
+def connect_menu(bot, update, user_data):
     user_data['temp_route'] = []
-    print(user_data['temp_route'])
 
     message = helper.getMessage(update)
     views.structure_view(
         message,
-        "Select your department",
-        helper.get_department_names(),
+        "Select the department to connect:",
+        [section.name for section in helper.config.get_sections()],
         return_to=State.MAIN)
 
 
-def section_menu(bot, update, user_data):
-    # Save the current selected department in the user_data
-    department = update.callback_query.data
+def structure_menu(bot, update, user_data):
+    next_section = update.callback_query.data
 
-    if not user_data['temp_route']:
-        user_data['temp_route'].append(department)
-
-    if department is not user_data['temp_route'][-1]:
+    if user_data['temp_route'] and user_data['temp_route'][-1] == next_section:
         user_data['temp_route'].pop()
+    else:
+        user_data['temp_route'].append(next_section)
 
-    print(user_data['temp_route'])
+    text = "Route: %s" % "/".join(user_data['temp_route'])
+
+    return_to = ""
+    if len(user_data['temp_route']) <= 1:
+        return_to = State.CONNECT
+    else:
+        return_to = user_data['temp_route'][-1]
 
     message = helper.getMessage(update)
     views.structure_view(
         message,
-        "Select your section",
-        helper.get_section_names_for_department(department),
-        return_to=State.DEPARTMENTS)
+        text, [
+            section.name
+            for section in helper.config.get_sections(user_data['temp_route'])
+        ],
+        return_to=return_to)
 
 
-# ######################################################################
-#                           IP SELECTION MENU
-# ######################################################################
 def ip_selection_menu(bot, update, user_data):
     """
     Show a menu with the list of the computers that have a defined 'ip' field
     in the corresponding .json file
     """
-    return_to = ""
-    if not user_data['temp_route']:
-        return_to = State.DEPARTMENTS
-    else:
-        return_to = user_data['temp_route'][-1]
-
     section = update.callback_query.data
     user_data['temp_route'].append(section)
 
-    print(user_data['temp_route'])
-
     # Create a path to the .json file from the temp_route
-    filepath = 'config/' + '/'.join(user_data['temp_route']) + '.json'
+    filepath = "config/%s.json" % "/".join(user_data['temp_route'])
     user_data['temp_computers'] = computers_json.Computers(filepath)
 
     message = helper.getMessage(update)
     views.ip_selection_view(
         message,
         user_data['temp_computers'].get_computers(),
-        return_to=return_to)
+        return_to=State.CONNECT)
 
 
 # ######################################################################
@@ -196,7 +186,7 @@ def add_menu_callbacks(dp):
     # 'section_menu'
     dp.add_handler(
         CallbackQueryHandler(
-            department_menu, pattern=State.DEPARTMENTS, pass_user_data=True))
+            connect_menu, pattern=State.CONNECT, pass_user_data=True))
 
     # TRIGGERED if clicked on Disconnect after connecting
     dp.add_handler(
@@ -206,7 +196,7 @@ def add_menu_callbacks(dp):
     # TRIGGERED if clicked on any department with multiple sections
     dp.add_handler(
         CallbackQueryHandler(
-            section_menu, pattern=sections_regex, pass_user_data=True))
+            structure_menu, pattern=sections_regex, pass_user_data=True))
 
     # TRIGGERED if clicked on any department without sections (single)
     dp.add_handler(
