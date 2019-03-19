@@ -83,7 +83,7 @@ def ip_selection_view(route: List[str], computers: List[Computer],
 # ---------------- ----------------
 
 
-def yes_no_menu(text: str, yes_callback_data: str, no_callback_data: str):
+def yes_no_view(text: str, yes_callback_data: str, no_callback_data: str):
 
     # Buttons
     main_buttons = [

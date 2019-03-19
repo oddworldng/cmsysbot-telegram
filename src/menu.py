@@ -10,18 +10,18 @@ import views
 from states import State
 
 
-def new_menu(bot: Bot, update: Updater, user_data: dict):
+def new_main(bot: Bot, update: Updater, user_data: dict):
     # View
     views.not_connected_view().reply(update)
 
 
-def main_menu(bot: Bot, update: Updater, user_data: dict):
+def main(bot: Bot, update: Updater, user_data: dict):
     """Show the main menu, with the most basic options for the bot"""
     # View
     views.not_connected_view().edit(update)
 
 
-def connect_menu(bot: Bot, update: Updater, user_data: dict):
+def connect(bot: Bot, update: Updater, user_data: dict):
     user_data['temp_route'] = []
 
     # View
@@ -31,7 +31,7 @@ def connect_menu(bot: Bot, update: Updater, user_data: dict):
         return_to=State.MAIN).edit(update)
 
 
-def structure_menu(bot: Bot, update: Updater, user_data: dict):
+def structure(bot: Bot, update: Updater, user_data: dict):
     # Get the clicked section
     next_section = update.callback_query.data
 
@@ -56,7 +56,7 @@ def structure_menu(bot: Bot, update: Updater, user_data: dict):
         return_to=return_to).edit(update)
 
 
-def ip_selection_menu(bot: Bot, update: Updater, user_data: dict):
+def ip_selection(bot: Bot, update: Updater, user_data: dict):
     """
     Show a menu with the list of the computers that have a defined 'ip' field
     in the corresponding .json file
@@ -76,7 +76,7 @@ def ip_selection_menu(bot: Bot, update: Updater, user_data: dict):
         return_to=State.CONNECT).edit(update)
 
 
-def confirm_connect_ip_menu(bot: Bot, update: Updater, user_data: dict):
+def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
     # Get the clicked ip
     selected_ip = update.callback_query.data
     user_data['temp_ip'] = selected_ip
@@ -85,4 +85,4 @@ def confirm_connect_ip_menu(bot: Bot, update: Updater, user_data: dict):
     text = "Connect to %s?" % selected_ip
 
     # View
-    views.yes_no_menu(text, State.GET_CREDENTIALS, State.MAIN).edit(update)
+    views.yes_no_view(text, State.GET_CREDENTIALS, State.MAIN).edit(update)

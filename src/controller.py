@@ -22,24 +22,23 @@ def add_callbacks(dp: Dispatcher):
     # Show Main Menu
     dp.add_handler(
         CallbackQueryHandler(
-            menu.main_menu, pattern=State.MAIN, pass_user_data=True))
+            menu.main, pattern=State.MAIN, pass_user_data=True))
 
     # Show Connect Menu
     dp.add_handler(
         CallbackQueryHandler(
-            menu.connect_menu, pattern=State.CONNECT, pass_user_data=True))
+            menu.connect, pattern=State.CONNECT, pass_user_data=True))
 
     # Show structure of department (and subdepartments)
     dp.add_handler(
         CallbackQueryHandler(
-            menu.structure_menu,
-            pattern=with_subsections_regex,
+            menu.structure, pattern=with_subsections_regex,
             pass_user_data=True))
 
     # When clicked in a section without subsections, show ip list
     dp.add_handler(
         CallbackQueryHandler(
-            menu.ip_selection_menu,
+            menu.ip_selection,
             pattern=without_subsections_regex,
             pass_user_data=True))
 
@@ -47,7 +46,7 @@ def add_callbacks(dp: Dispatcher):
     # connection
     dp.add_handler(
         CallbackQueryHandler(
-            menu.confirm_connect_ip_menu,
+            menu.confirm_connect_ip,
             pattern=State.CONFIRM_CONNECT,
             pass_user_data=True))
 

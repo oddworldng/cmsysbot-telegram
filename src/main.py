@@ -183,7 +183,7 @@ def connect(bot, update, user_data):
             str(error) + " Please try to login with different credentials!")
 
     finally:
-        menu.new_menu(bot, update, user_data)
+        menu.new_main(bot, update, user_data)
 
 
 def remote_run(bot, update, user_data, args):
@@ -238,7 +238,7 @@ def main():
     dp = updater.dispatcher
 
     # Different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", menu.new_menu, pass_user_data=True))
+    dp.add_handler(CommandHandler("start", menu.new_main, pass_user_data=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("run", run, pass_args=True))
     dp.add_handler(CommandHandler("wol", wake_on_lan_command, pass_args=True))
