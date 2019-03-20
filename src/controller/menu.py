@@ -1,9 +1,7 @@
-from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CallbackQueryHandler
+from telegram import Bot
+from telegram.ext import Updater
 
 import helper
-import ipaddress
-import main
 
 from view import view
 from utils import computers_json, session
@@ -34,7 +32,7 @@ def main(bot: Bot, update: Updater, user_data: dict):
         view.connected(s.route, s.username, s.bridge_ip).edit(update)
 
 
-def connect(bot: Bot, update: Updater, user_data: dict):
+def select_department(bot: Bot, update: Updater, user_data: dict):
     # TODO: Document route
     user_data['session'].route = []  # Reset route
     route = user_data['session'].route
@@ -111,12 +109,3 @@ def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
 
     # View
     view.yes_no(text, State.GET_CREDENTIALS, State.MAIN).edit(update)
-
-
-def disconnect(bot: Bot, update: Updater, user_data: dict):
-    user_data['session'].end_connetion()
-
-    message = helper.getMessage(update)
-    message.edit_text(view.disconnect())
-
-    new_main(bot, update, user_data)

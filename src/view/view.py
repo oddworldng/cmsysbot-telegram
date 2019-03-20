@@ -140,4 +140,4 @@ def yes_no(text: str, yes_callback_data: str, no_callback_data: str):
 
 
 def disconnect() -> str:
-    return "Disconnected"
+    return "Disconnected."

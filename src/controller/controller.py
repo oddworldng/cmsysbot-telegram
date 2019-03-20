@@ -1,7 +1,7 @@
 from telegram.ext import Dispatcher, CallbackQueryHandler
 
 from states import State
-from controller import menu
+from controller import menu, callback
 import main
 import helper
 
@@ -27,7 +27,7 @@ def add_callbacks(dp: Dispatcher):
     # Show Connect Menu
     dp.add_handler(
         CallbackQueryHandler(
-            menu.connect, pattern=State.CONNECT, pass_user_data=True))
+            menu.select_department, pattern=State.CONNECT, pass_user_data=True))
 
     # Show structure of department (and subdepartments)
     dp.add_handler(
@@ -53,7 +53,7 @@ def add_callbacks(dp: Dispatcher):
     # TRIGGERED if clicked on Disconnect after connecting
     dp.add_handler(
         CallbackQueryHandler(
-            menu.disconnect, pattern=State.DISCONNECT, pass_user_data=True))
+            callback.disconnect, pattern=State.DISCONNECT, pass_user_data=True))
 
     # TRIGGERED if clicked on 'Wake Computers from the main menu'
     dp.add_handler(

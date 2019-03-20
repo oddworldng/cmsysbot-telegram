@@ -2,9 +2,8 @@ from telegram.ext import (ConversationHandler, CallbackQueryHandler,
                           MessageHandler, Filters)
 
 import helper
-import main
 
-from controller import menu
+from controller import menu, callback
 from states import State
 
 # Conversation States
@@ -39,7 +38,7 @@ def get_password(bot, update, user_data):
     update.message.reply_text("This credentials will be used for future \
                               commands.")
 
-    main.connect(bot, update, user_data)
+    callback.connect(bot, update, user_data)
 
     return ConversationHandler.END
 
