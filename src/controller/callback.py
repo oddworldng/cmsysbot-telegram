@@ -8,10 +8,11 @@ from controller import menu
 import helper
 
 
-def connect(bot, update, user_data):
+def connect(bot: Bot, update: Updater, user_data: dict):
     """
     Establish a SSH connection from the bot machine to the bridge computer
     """
+
     try:
         session = user_data['session']
 

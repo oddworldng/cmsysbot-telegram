@@ -1,13 +1,13 @@
 from telegram.ext import (Dispatcher, CallbackQueryHandler, MessageHandler,
-                          ConversationHandler, Filters)
+                          ConversationHandler, Filters, CommandHandler)
 
 from states import State
-from controller import menu, callback, conversation
-import main
+from controller import menu, callback, conversation, command
 import helper
 
 
 def add_callbacks(dp: Dispatcher):
+
     with_subsections = []
     without_subsections = []
 
@@ -75,6 +75,10 @@ def add_callbacks(dp: Dispatcher):
     #dp.add_handler(
     #    CallbackQueryHandler(
     #        main.update_ips, pattern="^Update Ips$", pass_user_data=True))
+
+
+def add_command_callbacks(dp):
+    dp.add_handler(CommandHandler("start", command.start, pass_user_data=True))
 
 
 def add_conversation_callbacks(dp):

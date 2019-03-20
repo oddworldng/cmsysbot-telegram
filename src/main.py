@@ -1,18 +1,12 @@
-import argparse
 import logging
-import subprocess
-import re
 
-import paramiko
-
-from telegram import Bot
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater
 from telegram.error import InvalidToken
-from wakeonlan import send_magic_packet
+
+from utils import config_json
+from controller import controller
 
 import helper
-from utils import config_json
-from controller import controller, menu
 
 # Enable logging
 logging.basicConfig(
@@ -24,149 +18,13 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
-def help(bot, update):
-    """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
-
-
 def error(bot, update, error):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
-def wake_on_lan_command(bot, update, args):
-    for mac in args:
-        send_magic_packet(mac)
-        helper.getMessage(update).reply_text(
-            'Waking up computer (MAC: ' + mac + ') ...')
-
-
-def wake_on_lan_callback(bot, update, user_data):
-    macs = list(user_data['computers'].get_macs())
-    wake_on_lan_command(bot, update, macs)
-
-
-def shutdown_computers_callback(bot, update, user_data):
-    if 'client' in user_data:
-        for ip in user_data['computers'].get_ips():
-            if ip == user_data['ip']:  # Don't shutdown your computer!
-                continue
-
-            message = "Shutting down computer with ip %s" % ip
-            update.callback_query.message.reply_text(message)
-
-            send_command_to_client(bot, update, user_data, [ip, ['init 0']])
-
-
-def update_ips(bot, update, user_data):
-    if 'client' in user_data:
-        client = user_data['client']
-        password = user_data['password']
-
-        get_submask_command = "ip -o -f inet addr show | awk '/scope global/ {print $4}'"
-        stdin, stdout, stderr = client.exec_command(get_submask_command)
-        submask = stdout.read().decode('utf-8')
-
-        arp_scan_command = " echo " + password + " | sudo -S arp-scan " + submask
-        stdin, stdout, stderr = client.exec_command(arp_scan_command)
-
-        dictionary = {}
-        for line in stdout:
-            ip_and_mac = re.search(
-                '((?:\d{1,3}\.){3}\d{1,3}).*((?:\w\w:){5}\w\w)', line)
-
-            if ip_and_mac is not None:
-                ip = ip_and_mac.group(1)
-                mac = ip_and_mac.group(2)
-                dictionary[mac] = ip
-
-        print(dictionary)
-
-        for computer in user_data['computers'].get_computers():
-            if computer.mac in dictionary:
-                computer.ip = dictionary[computer.mac]
-                message = 'Ip for computer with mac %s updated to %s' % (
-                    computer.mac, computer.ip)
-                update.callback_query.message.reply_text(message)
-                print(message)
-
-        user_data['computers'].save()
-
-
-def send_command_to_client(bot, update, user_data, args):
-
-    # Get arguments
-    try:
-        ip = args[0]
-        input_command = " ".join(args[1])
-    except IndexError:
-        update.message.reply_text(
-            "Wrong command. Please use /send <ip> <command>.")
-
-    if 'client' in user_data:
-
-        # Variables
-        client = user_data['client']
-        username = user_data['username']
-        password = user_data['password']
-
-        # Run as root
-        output_command = " sshpass -p " + password + " ssh " + username + "@" + \
-            ip + " 'echo " + password + " | sudo -S " + input_command + "'"
-        stdin, stdout, stderr = client.exec_command(output_command)
-        print(output_command)
-
-        # Output
-        output_message = stdout.read().decode('utf-8')
-        print(output_message)
-        # update.message.reply_text(output_message)
-
-
-def run(bot, update, args):
-    """"Execute a *nix command in the machine where the bot is hosted."""
-    result = subprocess.run(list(args), stdout=subprocess.PIPE)
-    update.message.reply_text(result.stdout.decode('utf-8'))
-
-
-def run_as_root(bot, update, user_data, args):
-    """Promote user to root and execute command"""
-
-    if 'client' in user_data:
-
-        # Variables
-        client = user_data['client']
-        password = user_data['password']
-
-        # Run as root
-        arguments = " ".join(args)
-        command = ' printf "' + password + '\\n" | sudo --stdin ' + arguments
-        stdin, stdout, stderr = client.exec_command(command)
-
-        # Output
-        output_message = stdout.read().decode('utf-8')
-        update.message.reply_text(output_message)
-
-
-def remote_run(bot, update, user_data, args):
-    """
-    Run a *nix command in the bridge computer
-    """
-    if 'client' in user_data:
-        print("Executing: " + " ".join(args))
-
-        client = user_data['client']
-        stdin, stdout, stderr = client.exec_command(" ".join(args))
-
-        output_message = stdout.read().decode('utf-8')
-        update.message.reply_text(output_message)
-    else:
-        update.message.reply_text("Start a connection first with /connect")
-
-
-# ######################################################################
-#                                MAIN
-# ######################################################################
 def main():
+    # Load the config file
     helper.config = config_json.Config(helper.DEFAULT_CONFIG_FILEPATH)
 
     # Create the EventHandler and pass it your bot's token.
@@ -179,31 +37,16 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    controller.add_conversation_callbacks(dp)
-    # Different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", menu.new_main, pass_user_data=True))
-    dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler("run", run, pass_args=True))
-    dp.add_handler(CommandHandler("wol", wake_on_lan_command, pass_args=True))
-    dp.add_handler(
-        CommandHandler(
-            "send", send_command_to_client, pass_user_data=True,
-            pass_args=True))
-    dp.add_handler(
-        CommandHandler(
-            "sudo", run_as_root, pass_user_data=True, pass_args=True))
-    dp.add_handler(
-        CommandHandler("rrun", remote_run, pass_user_data=True, pass_args=True))
-
     # Add all callbacks
     controller.add_callbacks(dp)
+    controller.add_command_callbacks(dp)
     controller.add_conversation_callbacks(dp)
 
-    # log all errors
+    # Enable error loggin
     dp.add_error_handler(error)
 
-    # Start the Bot
-    print("Bot started! Running...")
+    # Start the bot!!
+    print("%s started! Running..." % helper.config.name)
     updater.start_polling()
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,

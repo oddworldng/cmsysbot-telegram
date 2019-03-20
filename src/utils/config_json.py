@@ -1,7 +1,6 @@
 import os
 import json
-from utils import computers_json
-from utils import json
+from utils import computers_json, json
 
 from typing import Iterator, List, Union
 

@@ -86,15 +86,18 @@ class Computers(json.Json):
 
     def get_names(self) -> Iterator[str]:
         """Yield the name of each computer"""
+
         for computer in self.get_computers():
             yield computer.name
 
     def get_ips(self) -> Iterator[str]:
         """Yield the ip of each computer"""
+
         for computer in self.get_computers():
             yield computer.ip
 
     def get_macs(self) -> Iterator[str]:
         """Yield the mac of each computer"""
+
         for computer in self.get_computers():
             yield computer.mac

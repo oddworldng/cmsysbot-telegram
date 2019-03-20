@@ -9,6 +9,7 @@ from states import State
 
 
 def new_main(bot: Bot, update: Updater, user_data: dict):
+
     if not 'session' in user_data:
         user_data['session'] = session.Session()
 
@@ -23,6 +24,7 @@ def new_main(bot: Bot, update: Updater, user_data: dict):
 
 def main(bot: Bot, update: Updater, user_data: dict):
     """Show the main menu, with the most basic options for the bot"""
+
     s = user_data['session']
 
     # View
@@ -33,6 +35,7 @@ def main(bot: Bot, update: Updater, user_data: dict):
 
 
 def select_department(bot: Bot, update: Updater, user_data: dict):
+
     # TODO: Document route
     user_data['session'].route = []  # Reset route
     route = user_data['session'].route
@@ -46,6 +49,7 @@ def select_department(bot: Bot, update: Updater, user_data: dict):
 
 
 def structure(bot: Bot, update: Updater, user_data: dict):
+
     # Get the clicked section
     next_section = update.callback_query.data
 
@@ -81,6 +85,7 @@ def ip_selection(bot: Bot, update: Updater, user_data: dict):
     Show a menu with the list of the computers that have a defined 'ip' field
     in the corresponding .json file
     """
+
     route = user_data['session'].route
 
     # Get the clicked section
@@ -101,6 +106,7 @@ def ip_selection(bot: Bot, update: Updater, user_data: dict):
 
 
 def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
+
     # Get the clicked ip
     user_data['session'].bridge_ip = update.callback_query.data
 

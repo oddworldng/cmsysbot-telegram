@@ -1,11 +1,12 @@
-from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
-from telegram.ext import Updater, CommandHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater
 
 from typing import List
 
 
 def Button(text: str, callback_data: str = None) -> InlineKeyboardButton:
     """ Alias function for creating an InlineKeyboardButton """
+
     if not callback_data:
         callback_data = text
 
@@ -38,6 +39,7 @@ class Keyboard:
         Get the last message from 'update' or 'update.callback_query' Useful when a
         callback is called from both CommandHandler and CallbackQueryHandler
         """
+
         if (update.message):
             return update.message
         else:

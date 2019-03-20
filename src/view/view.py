@@ -1,10 +1,8 @@
 from typing import List
 
-from utils.computers_json import Computer
-
 from states import State
 from view.keyboard import Button, Keyboard
-from utils.session import Session
+from utils.computers_json import Computer
 
 # Status: Not Connected
 # ---------------------------------
@@ -78,6 +76,7 @@ def connected(route: List[str], username: str, bridge_ip: str) -> Keyboard:
 
 def structure(route: List[str], sections: List[Computer],
               return_to: str) -> Keyboard:
+
     # Text
     text = "Select the section to connect\n"
     text += "Route: %s" % "/".join(route)
@@ -106,6 +105,7 @@ def structure(route: List[str], sections: List[Computer],
 
 def ip_selection(route: List[str], computers: List[Computer],
                  return_to: str) -> Keyboard:
+
     # Text
     text = "Route: %s" % "/".join(route)
     text += "\nNow, select a 'bridge' computer for the local connection"
@@ -127,7 +127,8 @@ def ip_selection(route: List[str], computers: List[Computer],
 # ---------------- ----------------
 
 
-def yes_no(text: str, yes_callback_data: str, no_callback_data: str):
+def yes_no(text: str, yes_callback_data: str,
+           no_callback_data: str) -> Keyboard:
 
     # Buttons
     main_buttons = [
@@ -140,4 +141,5 @@ def yes_no(text: str, yes_callback_data: str, no_callback_data: str):
 
 
 def disconnect() -> str:
+
     return "Disconnected."
