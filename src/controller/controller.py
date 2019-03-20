@@ -1,7 +1,8 @@
-from telegram.ext import Dispatcher, CallbackQueryHandler
+from telegram.ext import (Dispatcher, CallbackQueryHandler, MessageHandler,
+                          ConversationHandler, Filters)
 
 from states import State
-from controller import menu, callback
+from controller import menu, callback, conversation
 import main
 import helper
 
@@ -50,26 +51,57 @@ def add_callbacks(dp: Dispatcher):
             pattern=State.CONFIRM_CONNECT,
             pass_user_data=True))
 
-    # TRIGGERED if clicked on Disconnect after connecting
+    # Triggered when clicking on Disconnect button
     dp.add_handler(
         CallbackQueryHandler(
             callback.disconnect, pattern=State.DISCONNECT, pass_user_data=True))
 
+    # TODO: Reimplement
     # TRIGGERED if clicked on 'Wake Computers from the main menu'
-    dp.add_handler(
-        CallbackQueryHandler(
-            main.wake_on_lan_callback,
-            pattern="^Wake computers$",
-            pass_user_data=True))
+    #dp.add_handler(
+    #    CallbackQueryHandler(
+    #        main.wake_on_lan_callback,
+    #        pattern="^Wake computers$",
+    #        pass_user_data=True))
 
-    # TRIGGERED if clicked on 'Shutdown computers from the main menu'
-    dp.add_handler(
-        CallbackQueryHandler(
-            main.shutdown_computers_callback,
-            pattern="^Shutdown$",
-            pass_user_data=True))
+    ## TRIGGERED if clicked on 'Shutdown computers from the main menu'
+    #dp.add_handler(
+    #    CallbackQueryHandler(
+    #        main.shutdown_computers_callback,
+    #        pattern="^Shutdown$",
+    #        pass_user_data=True))
 
-    # TRIGGERED if clicked on 'Update Ips' from the main menu
-    dp.add_handler(
-        CallbackQueryHandler(
-            main.update_ips, pattern="^Update Ips$", pass_user_data=True))
+    ## TRIGGERED if clicked on 'Update Ips' from the main menu
+    #dp.add_handler(
+    #    CallbackQueryHandler(
+    #        main.update_ips, pattern="^Update Ips$", pass_user_data=True))
+
+
+def add_conversation_callbacks(dp):
+    """Add all the conversation handlers to the Dispatcher"""
+
+    # Login handler
+    login_conv_handler = ConversationHandler(
+        # Entry points: From InlineKeyboardButton or /login
+        entry_points=[
+            CallbackQueryHandler(
+                conversation.login, pattern=State.GET_CREDENTIALS)
+        ],
+        states={
+            conversation.USERNAME: [
+                MessageHandler(
+                    Filters.text,
+                    conversation.get_username,
+                    pass_user_data=True)
+            ],
+            conversation.PASSWORD: [
+                MessageHandler(
+                    Filters.text,
+                    conversation.get_password,
+                    pass_user_data=True)
+            ],
+        },
+        fallbacks=[])
+
+    # Add to dispatcher
+    dp.add_handler(login_conv_handler)

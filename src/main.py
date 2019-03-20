@@ -10,7 +10,6 @@ from telegram.ext import Updater, CommandHandler
 from telegram.error import InvalidToken
 from wakeonlan import send_magic_packet
 
-import conversation
 import helper
 from utils import config_json
 from controller import controller, menu
@@ -148,27 +147,6 @@ def run_as_root(bot, update, user_data, args):
         update.message.reply_text(output_message)
 
 
-def connect(bot, update, user_data):
-    """
-    Establish a SSH connection from the bot machine to the bridge computer
-    """
-    try:
-        # Try to connect to the client
-        user_data['session'].start_connection()
-
-        # Return a successful connection message
-        update.message.reply_text(
-            "Sucessfully connected to " + user_data['session'].bridge_ip +
-            "!\n" + "To run commands in remote use /rrun [command]")
-
-    except paramiko.AuthenticationException as error:
-        update.message.reply_text(
-            str(error) + " Please try to login with different credentials!")
-
-    finally:
-        menu.new_main(bot, update, user_data)
-
-
 def remote_run(bot, update, user_data, args):
     """
     Run a *nix command in the bridge computer
@@ -183,25 +161,6 @@ def remote_run(bot, update, user_data, args):
         update.message.reply_text(output_message)
     else:
         update.message.reply_text("Start a connection first with /connect")
-
-
-def disconnect(bot, update, user_data):
-    """
-    Disconnect from the current SSH connection and remove user variables
-    """
-    if 'client' in user_data:
-        # Close SSH connection
-        user_data['client'].close()
-
-        # Remove all stored values from the user
-        user_data.pop('client', None)
-        user_data.pop('username', None)
-        user_data.pop('password', None)
-        user_data.pop('ip', None)
-        user_data.pop('route', None)
-        user_data.pop('computers', None)
-
-    #menu.main_menu(bot, update, user_data)
 
 
 # ######################################################################
@@ -220,6 +179,7 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
+    controller.add_conversation_callbacks(dp)
     # Different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", menu.new_main, pass_user_data=True))
     dp.add_handler(CommandHandler("help", help))
@@ -235,11 +195,9 @@ def main():
     dp.add_handler(
         CommandHandler("rrun", remote_run, pass_user_data=True, pass_args=True))
 
-    # Add all conversation callbacks
-    conversation.add_conversation_callbacks(dp)
-
-    # Add all menu callbacks
+    # Add all callbacks
     controller.add_callbacks(dp)
+    controller.add_conversation_callbacks(dp)
 
     # log all errors
     dp.add_error_handler(error)
