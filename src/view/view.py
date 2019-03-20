@@ -4,6 +4,7 @@ from utils.computers_json import Computer
 
 from states import State
 from view.keyboard import Button, Keyboard
+from utils.session import Session
 
 # Status: Not Connected
 # ---------------------------------
@@ -20,6 +21,49 @@ def not_connected() -> Keyboard:
 
     # Keyboard
     return Keyboard(text, main_buttons=main_buttons)
+
+
+# Status: Connected
+# Route: [route]
+# Username: [username]
+# Bridge ip: [bridge_ip]
+# ---------------- ----------------
+# |  Update Ips  | | Filter comp. |
+# ---------------- ----------------
+# ---------------- ----------------
+# |  Wake comp.  | | Shutd. comp. |
+# ---------------- ----------------
+#               . . .
+# ---------------------------------
+# |          Disconnect           |
+# ---------------------------------
+def connected(route: List[str], username: str, bridge_ip: str) -> Keyboard:
+    # Text
+    text = "Status: Connected\n"
+    text += "Route: %s\n" % "/".join(route)
+    text += "Username: %s\n" % username
+    text += "Bridge ip: %s\n" % bridge_ip
+
+    # Buttons
+    main_buttons = [
+        Button("Update Ips"),
+        Button("Filter computers"),
+        Button("Wake computers"),
+        Button("Shutdown computers"),
+        Button("Update computers"),
+        Button("Install software"),
+        Button("Execute script"),
+        Button("Upload file")
+    ]
+
+    footer_buttons = [Button("Disconnect", State.DISCONNECT)]
+
+    # Keyboard
+    return Keyboard(
+        text,
+        n_cols=2,
+        main_buttons=main_buttons,
+        footer_buttons=footer_buttons)
 
 
 # Route: ESIT/A/B/...
@@ -93,3 +137,7 @@ def yes_no(text: str, yes_callback_data: str, no_callback_data: str):
 
     # Keyboard
     return Keyboard(text, n_cols=2, main_buttons=main_buttons)
+
+
+def disconnect() -> str:
+    return "Disconnected"

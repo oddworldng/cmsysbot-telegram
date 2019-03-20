@@ -19,24 +19,25 @@ def login(bot, update):
     message = helper.getMessage(update)
     message.reply_text("Please introduce your username and password")
     message.reply_text("Enter your username: ")
+
     return USERNAME
 
 
 def get_username(bot, update, user_data):
     """Get the username from the last messge. Ask for the password and wait"""
-    user_data['temp_username'] = update.message.text
+    user_data['session'].username = update.message.text
+
     update.message.reply_text("Enter your password: ")
+
     return PASSWORD
 
 
 def get_password(bot, update, user_data):
     """Get the password from the last message. End conversation"""
-    user_data['temp_password'] = update.message.text
+    user_data['session'].password = update.message.text
 
-    update.message.reply_text("Your username: " + user_data['temp_username'])
-    update.message.reply_text("Your password: " + user_data['temp_password'])
     update.message.reply_text("This credentials will be used for future \
-                              connections.")
+                              commands.")
 
     main.connect(bot, update, user_data)
 
@@ -55,7 +56,7 @@ def ip(bot, update):
 
 def get_ip(bot, update, user_data):
     """Get the ip from the last message. End conversation"""
-    user_data['temp_ip'] = update.message.text
+    user_data['session'].bridge_ip = update.message.text
 
     menu.confirm_connection_menu(bot, update, user_data)
 

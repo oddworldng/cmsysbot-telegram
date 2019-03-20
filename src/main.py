@@ -153,29 +153,13 @@ def connect(bot, update, user_data):
     Establish a SSH connection from the bot machine to the bridge computer
     """
     try:
-        # Start Paramiko and setup SSH configuration
-        client = paramiko.SSHClient()
-        client.load_system_host_keys()
-        client.set_missing_host_key_policy(paramiko.WarningPolicy)
-
         # Try to connect to the client
-        client.connect(user_data['temp_ip'], 22, user_data['temp_username'],
-                       user_data['temp_password'])
-
-        # Success!! Save all the temporal user paramenters
-        user_data['client'] = client
-        user_data['username'] = user_data['temp_username']
-        user_data['password'] = user_data['temp_password']
-        user_data['ip'] = user_data['temp_ip']
-        if 'temp_route' in user_data:
-            user_data['route'] = user_data['temp_route']
-        if 'temp_computers' in user_data:
-            user_data['computers'] = user_data['temp_computers']
+        user_data['session'].start_connection()
 
         # Return a successful connection message
         update.message.reply_text(
-            "Sucessfully connected to " + user_data['temp_ip'] + "!\n" +
-            "To run commands in remote use /rrun [command]")
+            "Sucessfully connected to " + user_data['session'].bridge_ip +
+            "!\n" + "To run commands in remote use /rrun [command]")
 
     except paramiko.AuthenticationException as error:
         update.message.reply_text(

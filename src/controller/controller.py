@@ -53,7 +53,7 @@ def add_callbacks(dp: Dispatcher):
     # TRIGGERED if clicked on Disconnect after connecting
     dp.add_handler(
         CallbackQueryHandler(
-            main.disconnect, pattern="Disconnect", pass_user_data=True))
+            menu.disconnect, pattern=State.DISCONNECT, pass_user_data=True))
 
     # TRIGGERED if clicked on 'Wake Computers from the main menu'
     dp.add_handler(
