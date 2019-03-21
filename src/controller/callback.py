@@ -50,3 +50,18 @@ def wake_computers(bot: Bot, update: Updater, user_data: dict):
     for mac in computers.get_macs():
         action.wake_on_lan(mac)
         query.message.reply_text("Waking up computer with mac %s..." % mac)
+
+
+# TODO: Filter computers (¿Maybe ask if turn down own computer?)
+def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
+    query = update.callback_query
+
+    client = user_data['session'].client
+    computers = user_data['session'].computers
+    bridge_ip = user_data['session'].bridge_ip
+    username = user_data['session'].username
+    password = user_data['session'].password
+
+    for target_ip in computers.get_ips():
+        if target_ip != bridge_ip:  # Don't shutdown bridge ip
+            action.shutdown_computer(client, target_ip, username, password)

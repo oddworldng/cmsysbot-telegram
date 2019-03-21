@@ -1,7 +1,8 @@
 class State():
-    MAIN = "Main"
-    CONNECT = "Connect"
+    MAIN = "main"
+    CONNECT = "connect"
     CONFIRM_CONNECT = "^[\d*\.*]*$"  # TODO: Make a better regex
-    GET_CREDENTIALS = "Get_Credentials"
-    DISCONNECT = "Disconnect"
-    WAKE_COMPUTERS = "WOL"
+    GET_CREDENTIALS = "get-credentials"
+    DISCONNECT = "disconnect"
+    WAKE_COMPUTERS = "wake-computers"
+    SHUTDOWN_COMPUTERS = "shutdown-computers"

@@ -63,12 +63,11 @@ def add_callbacks(dp: Dispatcher):
             pattern=State.WAKE_COMPUTERS,
             pass_user_data=True))
 
-    ## TRIGGERED if clicked on 'Shutdown computers from the main menu'
-    #dp.add_handler(
-    #    CallbackQueryHandler(
-    #        main.shutdown_computers_callback,
-    #        pattern="^Shutdown$",
-    #        pass_user_data=True))
+    dp.add_handler(
+        CallbackQueryHandler(
+            callback.shutdown_computers,
+            pattern=State.SHUTDOWN_COMPUTERS,
+            pass_user_data=True))
 
     ## TRIGGERED if clicked on 'Update Ips' from the main menu
     #dp.add_handler(
