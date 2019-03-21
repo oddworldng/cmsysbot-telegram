@@ -56,13 +56,12 @@ def add_callbacks(dp: Dispatcher):
         CallbackQueryHandler(
             callback.disconnect, pattern=State.DISCONNECT, pass_user_data=True))
 
-    # TODO: Reimplement
     # TRIGGERED if clicked on 'Wake Computers from the main menu'
-    #dp.add_handler(
-    #    CallbackQueryHandler(
-    #        main.wake_on_lan_callback,
-    #        pattern="^Wake computers$",
-    #        pass_user_data=True))
+    dp.add_handler(
+        CallbackQueryHandler(
+            callback.wake_computers,
+            pattern=State.WAKE_COMPUTERS,
+            pass_user_data=True))
 
     ## TRIGGERED if clicked on 'Shutdown computers from the main menu'
     #dp.add_handler(

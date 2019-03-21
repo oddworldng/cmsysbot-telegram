@@ -46,7 +46,7 @@ def connected(route: List[str], username: str, bridge_ip: str) -> Keyboard:
     main_buttons = [
         Button("Update Ips"),
         Button("Filter computers"),
-        Button("Wake computers"),
+        Button("Wake computers", State.WAKE_COMPUTERS),
         Button("Shutdown computers"),
         Button("Update computers"),
         Button("Install software"),

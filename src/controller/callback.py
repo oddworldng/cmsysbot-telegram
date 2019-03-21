@@ -5,6 +5,7 @@ import paramiko
 
 from view import view
 from controller import menu
+from cmsys import action
 import helper
 
 
@@ -38,3 +39,14 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
     message.edit_text(view.disconnect())
 
     menu.new_main(bot, update, user_data)
+
+
+# TODO: Filter computers
+def wake_computers(bot: Bot, update: Updater, user_data: dict):
+    query = update.callback_query
+
+    computers = user_data['session'].computers
+
+    for mac in computers.get_macs():
+        action.wake_on_lan(mac)
+        query.message.reply_text("Waking up computer with mac %s..." % mac)
