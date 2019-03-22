@@ -43,7 +43,7 @@ def connected(route: List[str], username: str, bridge_ip: str) -> Keyboard:
 
     # Buttons
     main_buttons = [
-        Button("Update Ips"),
+        Button("Update Ips", State.UPDATE_IPS),
         Button("Filter computers", State.FILTER_COMPUTERS),
         Button("Wake computers", State.WAKE_COMPUTERS),
         Button("Shutdown computers", State.SHUTDOWN_COMPUTERS),
@@ -162,9 +162,9 @@ def filter_computers(computers: List[Computer]):
         main_buttons.append(Button(str(computer)))
 
         if computer.included:
-            main_buttons.append(Button("E", "exclude-%s" % computer.mac))
+            main_buttons.append(Button("Included", "exclude-%s" % computer.mac))
         else:
-            main_buttons.append(Button("I", "include-%s" % computer.mac))
+            main_buttons.append(Button("Excluded", "include-%s" % computer.mac))
 
 
     footer_buttons = [ Button("Return", State.MAIN) ]

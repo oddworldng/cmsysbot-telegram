@@ -74,7 +74,6 @@ def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
 
 
 def include_computers(bot: Bot, update: Updater, user_data: dict):
-    print("I")
     query = update.callback_query
 
     # Get target ( 'all' or a computer mac)
@@ -93,7 +92,6 @@ def include_computers(bot: Bot, update: Updater, user_data: dict):
 
 
 def exclude_computers(bot: Bot, update: Updater, user_data: dict):
-    print("E")
     query = update.callback_query
 
     # Get target ( 'all' or a computer mac)
@@ -109,3 +107,7 @@ def exclude_computers(bot: Bot, update: Updater, user_data: dict):
 
     # Redraw view
     view.filter_computers(computers).edit(update)
+
+
+def update_ips(bot: Bot, update: Updater, user_data: dict):
+    print("TODO: update_ips menu")
