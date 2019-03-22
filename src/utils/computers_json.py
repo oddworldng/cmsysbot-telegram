@@ -83,6 +83,11 @@ class Computers(base_json.Json):
         for computer in self.computers:
             yield computer
 
+    def get_included_computers(self) -> Iterator[Computer]:
+        for computer in self.computers:
+            if computer.included:
+                yield computer
+
     def get_names(self) -> Iterator[str]:
         """Yield the name of each computer"""
 

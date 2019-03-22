@@ -64,3 +64,15 @@ def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
     for target_ip in computers.get_ips():
         if target_ip != bridge_ip:  # Don't shutdown bridge ip
             action.shutdown_computer(client, target_ip, username, password)
+
+
+def include_computers(bot: Bot, update: Updater, user_data: dict):
+    query = update.callback_query
+
+    print(query.data)
+
+
+def exclude_computers(bot: Bot, update: Updater, user_data: dict):
+    query = update.callback_query
+
+    print(query.data)

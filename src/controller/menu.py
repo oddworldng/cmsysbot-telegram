@@ -120,4 +120,6 @@ def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
 
 def filter_computers(bot: Bot, update: Updater, user_data: dict):
     # View
-    print("TODO: Filter computers menu")
+    computers = user_data['session'].computers
+
+    view.filter_computers(computers).edit(update)

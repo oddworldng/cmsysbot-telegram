@@ -133,4 +133,41 @@ def yes_no(text: str, yes_callback_data: str,
     return Keyboard(text, n_cols=2, main_buttons=main_buttons)
 
 
-#
+# Select the computers that will be
+# included in future operations
+# ---------------- ----------------
+# |   Inc. All   | |  Excl. All   |
+# ---------------- ----------------
+# --------------------------- -----
+# |   Name: E1. Ip: 191...  | | V |
+# --------------------------- -----
+# --------------------------- -----
+# |   Name: E2. Ip: 191...  | | X |
+# --------------------------- -----
+# --------------------------- -----
+# |   Name: E3. Ip: 191...  | | X |
+# --------------------------- -----
+# ---------------------------------
+# |       "Return" -> (Main)      |
+# ---------------------------------
+def filter_computers(computers: List[Computer]):
+
+    # Text
+    text = "Select the computers that will be included in future operations"
+
+    main_buttons = [ Button("Include All", "include-all"), Button("Exclude All",
+                                                                  "exclude-all") ]
+
+    for computer in computers.get_computers():
+        main_buttons.append(Button(str(computer)))
+
+        if computer.included:
+            main_buttons.append(Button("E", "exclude-%s" % computer.mac))
+        else:
+            main_buttons.append(Button("I", "include-%s" % computer.mac))
+
+
+    footer_buttons = [ Button("Return", State.MAIN) ]
+
+    # Keyboard
+    return Keyboard(text, n_cols=2, main_buttons=main_buttons, footer_buttons=footer_buttons)
