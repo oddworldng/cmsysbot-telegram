@@ -4,12 +4,11 @@ from states import State
 from view.keyboard import Button, Keyboard
 from utils.computers_json import Computer
 
+
 # Status: Not Connected
 # ---------------------------------
 # |  "Connnect" -> (Departments)  |
 # ---------------------------------
-
-
 def not_connected() -> Keyboard:
     # Text
     text = "Status: Not Connected"
@@ -45,7 +44,7 @@ def connected(route: List[str], username: str, bridge_ip: str) -> Keyboard:
     # Buttons
     main_buttons = [
         Button("Update Ips"),
-        Button("Filter computers"),
+        Button("Filter computers", State.FILTER_COMPUTERS),
         Button("Wake computers", State.WAKE_COMPUTERS),
         Button("Shutdown computers", State.SHUTDOWN_COMPUTERS),
         Button("Update computers"),
@@ -72,8 +71,6 @@ def connected(route: List[str], username: str, bridge_ip: str) -> Keyboard:
 # ---------------------------------
 # |       "Return" -> (Main)      |
 # ---------------------------------
-
-
 def structure(route: List[str], sections: List[Computer],
               return_to: str) -> Keyboard:
 
@@ -101,8 +98,6 @@ def structure(route: List[str], sections: List[Computer],
 # ---------------------------------
 # |  Name: E2. Ip: 192.168.1.13   |
 # ---------------------------------
-
-
 def ip_selection(route: List[str], computers: List[Computer],
                  return_to: str) -> Keyboard:
 
@@ -125,8 +120,6 @@ def ip_selection(route: List[str], computers: List[Computer],
 # ---------------- ----------------
 # |      Yes     | |      No      |
 # ---------------- ----------------
-
-
 def yes_no(text: str, yes_callback_data: str,
            no_callback_data: str) -> Keyboard:
 
@@ -138,8 +131,3 @@ def yes_no(text: str, yes_callback_data: str,
 
     # Keyboard
     return Keyboard(text, n_cols=2, main_buttons=main_buttons)
-
-
-def disconnect() -> str:
-
-    return "Disconnected."

@@ -110,8 +110,14 @@ def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
     # Get the clicked ip
     user_data['session'].bridge_ip = update.callback_query.data
 
-    # Text
-    text = "Connect to %s?" % user_data['session'].bridge_ip
-
     # View
-    view.yes_no(text, State.GET_CREDENTIALS, State.MAIN).edit(update)
+    text = "Connect to %s?" % user_data['session'].bridge_ip
+    view.yes_no(
+        text,
+        yes_callback_data=State.GET_CREDENTIALS,
+        no_callback_data=State.MAIN).edit(update)
+
+
+def filter_computers(bot: Bot, update: Updater, user_data: dict):
+    # View
+    print("TODO: Filter computers menu")

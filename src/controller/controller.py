@@ -69,17 +69,23 @@ def add_callbacks(dp: Dispatcher):
             pattern=State.SHUTDOWN_COMPUTERS,
             pass_user_data=True))
 
+    dp.add_handler(
+        CallbackQueryHandler(
+            menu.filter_computers,
+            pattern=State.FILTER_COMPUTERS,
+            pass_user_data=True))
+
     ## TRIGGERED if clicked on 'Update Ips' from the main menu
     #dp.add_handler(
     #    CallbackQueryHandler(
     #        main.update_ips, pattern="^Update Ips$", pass_user_data=True))
 
 
-def add_command_callbacks(dp):
+def add_command_callbacks(dp: Dispatcher):
     dp.add_handler(CommandHandler("start", command.start, pass_user_data=True))
 
 
-def add_conversation_callbacks(dp):
+def add_conversation_callbacks(dp: Dispatcher):
     """Add all the conversation handlers to the Dispatcher"""
 
     # Login handler

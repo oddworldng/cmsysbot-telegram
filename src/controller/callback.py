@@ -3,7 +3,6 @@ from telegram.ext import Updater
 
 import paramiko
 
-from view import view
 from controller import menu
 from cmsys import action
 import helper
@@ -36,7 +35,7 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
     user_data['session'].end_connetion()
 
     message = helper.getMessage(update)
-    message.edit_text(view.disconnect())
+    message.edit_text("Disconnect...")
 
     menu.new_main(bot, update, user_data)
 

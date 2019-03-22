@@ -6,3 +6,4 @@ class State():
     DISCONNECT = "disconnect"
     WAKE_COMPUTERS = "wake-computers"
     SHUTDOWN_COMPUTERS = "shutdown-computers"
+    FILTER_COMPUTERS = "filter-computers"
