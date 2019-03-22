@@ -1,8 +1,7 @@
-import json
-
 from typing import Iterator
+from utils import base_json
 
-from utils import json
+import json
 
 
 class Computer:
@@ -14,6 +13,7 @@ class Computer:
         self.name = "N/A"
         self.ip = "N/A"
         self.mac = "N/A"
+        self.included = True
 
         # If a dictionary is passed, save the keys as attributes only if
         # they're not empty
@@ -28,7 +28,7 @@ class Computer:
         return {'name': self.name, 'ip': self.ip, 'mac': self.mac}
 
 
-class Computers(json.Json):
+class Computers(base_json.Json):
     """This class provides an interface for using the .json files created on
     config/ (not config.json). Provides functions to get the names/ips/macs of
     the computers and easily save changes on the .json"""
@@ -37,6 +37,14 @@ class Computers(json.Json):
         """Load the .json from an existent file. Throws if couldn't open/read
         the file"""
         super().__init__(filepath)
+
+        # Transform dict to array of Computer objects
+        self.computers = [Computer(entry) for entry in self.data['computers']]
+
+    def save(self):
+        self.data['computers'] = [computer.asdict() for computer in self.computers]
+
+        super().save()
 
     @staticmethod
     def create(filepath: str):
@@ -72,17 +80,8 @@ class Computers(json.Json):
 
     # Generators
     def get_computers(self) -> Iterator[Computer]:
-        """Yield a Computer object for each element in the .json 'computers'
-        array. The element returned CAN BE MODIFIED. The changes will be
-        reflected in the dictionary"""
-
-        for i in range(0, len(self.data['computers'])):
-            computer_data = self.data['computers'][i]
-            computer = Computer(computer_data)
-
+        for computer in self.computers:
             yield computer
-
-            self.data['computers'][i] = computer.asdict()
 
     def get_names(self) -> Iterator[str]:
         """Yield the name of each computer"""

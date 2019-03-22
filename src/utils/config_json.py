@@ -1,6 +1,6 @@
 import os
 import json
-from utils import computers_json, json
+from utils import computers_json, base_json
 
 from typing import Iterator, List, Union
 
@@ -32,7 +32,7 @@ class Section:
         return "%s: %s" % (self.name, self.subsections)
 
 
-class Config(json.Json):
+class Config(base_json.Json):
     def __init__(self, filepath: str):
         """Load the .json from an existent file. Throws if couldn't open/read
         the file"""
