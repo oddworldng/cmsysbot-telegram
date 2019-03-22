@@ -44,33 +44,17 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
     menu.new_main(bot, update, user_data)
 
 
-def wake_computers(bot: Bot, update: Updater, user_data: dict):
-    query = update.callback_query
-
-    computers = user_data['session'].computers
-
-    for computer in computers.get_included_computers():
-        mac = computer.mac
-
-        action.wake_on_lan(mac)
-        query.message.reply_text("Waking up computer with mac %s..." % mac)
-
-
-# TODO: ¿Maybe ask if turn down bridge computer too?
-def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
-    query = update.callback_query
+def update_ips(bot: Bot, update: Updater, user_data: dict):
 
     client = user_data['session'].client
-    computers = user_data['session'].computers
-    bridge_ip = user_data['session'].bridge_ip
-    username = user_data['session'].username
+    macs = user_data['session'].computers.get_macs()
     password = user_data['session'].password
 
-    for computer in computers.get_included_computers():
-        target_ip = computer.ip
+    result_macs, result_ips = action.get_associated_ips(client, password, macs)
 
-        if target_ip != bridge_ip:  # Don't shutdown bridge ip
-            action.shutdown_computer(client, target_ip, username, password)
+    print(result_macs)
+    print(result_ips)t 
+
 
 
 def include_computers(bot: Bot, update: Updater, user_data: dict):
@@ -109,5 +93,30 @@ def exclude_computers(bot: Bot, update: Updater, user_data: dict):
     view.filter_computers(computers).edit(update)
 
 
-def update_ips(bot: Bot, update: Updater, user_data: dict):
-    print("TODO: update_ips menu")
+def wake_computers(bot: Bot, update: Updater, user_data: dict):
+    query = update.callback_query
+
+    computers = user_data['session'].computers
+
+    for computer in computers.get_included_computers():
+        mac = computer.mac
+
+        action.wake_on_lan(mac)
+        query.message.reply_text("Waking up computer with mac %s..." % mac)
+
+
+# TODO: ¿Maybe ask if turn down bridge computer too?
+def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
+    query = update.callback_query
+
+    client = user_data['session'].client
+    computers = user_data['session'].computers
+    bridge_ip = user_data['session'].bridge_ip
+    username = user_data['session'].username
+    password = user_data['session'].password
+
+    for computer in computers.get_included_computers():
+        target_ip = computer.ip
+
+        if target_ip != bridge_ip:  # Don't shutdown bridge ip
+            action.shutdown_computer(client, target_ip, username, password)
