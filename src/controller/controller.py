@@ -94,6 +94,12 @@ def add_callbacks(dp: Dispatcher):
             pattern=State.UPDATE_IPS,
             pass_user_data=True))
 
+    dp.add_handler(
+        CallbackQueryHandler(
+            callback.update_computers,
+            pattern=State.UPDATE_COMPUTERS,
+            pass_user_data=True))
+
 
     ## TRIGGERED if clicked on 'Update Ips' from the main menu
     #dp.add_handler(

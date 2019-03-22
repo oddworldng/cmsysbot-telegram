@@ -9,4 +9,5 @@ class State():
     FILTER_COMPUTERS = "filter-computers"
     INCLUDE_COMPUTERS = "include-(.*)"
     EXCLUDE_COMPUTERS = "exclude-(.*)"
-    UPDATE_IPS = "update-computer-ips"
+    UPDATE_IPS = "update-ips"
+    UPDATE_COMPUTERS = "update-computers"

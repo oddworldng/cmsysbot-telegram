@@ -42,6 +42,17 @@ def get_submask(client: paramiko.SSHClient):
     return run_in_bridge(client, command)
 
 
+
+def update_computer(client: paramiko.SSHClient, target_ip: str, username: str,
+                      password: str):
+
+    update = 'apt update';
+    upgrade = 'screen -d -m apt upgrade -y'
+
+    print(send_command_as_root(client, target_ip, username, password, update))
+    print(send_command_as_root(client, target_ip, username, password, upgrade))
+
+
 def run_in_bridge(client: paramiko.SSHClient, command: str):
 
     stdin, stdout, stderr = client.exec_command(command)

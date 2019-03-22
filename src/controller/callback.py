@@ -44,6 +44,7 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
     menu.new_main(bot, update, user_data)
 
 
+# TODO: WIP. Iterate through the computer macs and change the ips
 def update_ips(bot: Bot, update: Updater, user_data: dict):
 
     client = user_data['session'].client
@@ -53,8 +54,7 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
     result_macs, result_ips = action.get_associated_ips(client, password, macs)
 
     print(result_macs)
-    print(result_ips)t 
-
+    print(result_ips)
 
 
 def include_computers(bot: Bot, update: Updater, user_data: dict):
@@ -120,3 +120,20 @@ def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
 
         if target_ip != bridge_ip:  # Don't shutdown bridge ip
             action.shutdown_computer(client, target_ip, username, password)
+
+
+# TODO: Improve the returned message. Tell if the computer is already updated,
+# or the number of packages to update.
+def update_computers(bot: Bot, update: Updater, user_data: dict):
+    query = update.callback_query
+
+    client = user_data['session'].client
+    computers = user_data['session'].computers
+    username = user_data['session'].username
+    password = user_data['session'].password
+
+    for computer in computers.get_included_computers():
+        target_ip = computer.ip
+
+        action.update_computer(client, target_ip, username, password)
+        query.message.reply_text("Updated computer with ip %s" % target_ip)
