@@ -5,6 +5,7 @@ from telegram.error import InvalidToken
 
 from utils import config_json
 from controller import controller
+import re
 
 import helper
 
@@ -26,6 +27,9 @@ def error(bot, update, error):
 def main():
     # Load the config file
     helper.config = config_json.Config(helper.DEFAULT_CONFIG_FILEPATH)
+
+    content = re.search("include-(.*)", "include-all").group(1)
+    print(content)
 
     # Create the EventHandler and pass it your bot's token.
     try:

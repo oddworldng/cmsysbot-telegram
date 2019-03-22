@@ -7,5 +7,5 @@ class State():
     WAKE_COMPUTERS = "wake-computers"
     SHUTDOWN_COMPUTERS = "shutdown-computers"
     FILTER_COMPUTERS = "filter-computers"
-    INCLUDE_COMPUTERS = "include-*"
-    EXCLUDE_COMPUTERS = "exclude-*"
+    INCLUDE_COMPUTERS = "^include-(.*)$"
+    EXCLUDE_COMPUTERS = "^exclude-(.*)$"

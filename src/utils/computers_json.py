@@ -78,6 +78,12 @@ class Computers(base_json.Json):
                 del self.data['computers'][i]
                 break
 
+    def find(self, mac: str):
+        for computer in self.get_computers():
+            if computer.mac == mac:
+                return computer
+
+
     # Generators
     def get_computers(self) -> Iterator[Computer]:
         for computer in self.computers:

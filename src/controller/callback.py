@@ -3,8 +3,12 @@ from telegram.ext import Updater
 
 import paramiko
 
+import re
+
 from controller import menu
 from cmsys import action
+from states import State
+from view import view
 import helper
 
 
@@ -67,12 +71,38 @@ def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
 
 
 def include_computers(bot: Bot, update: Updater, user_data: dict):
+    print("I")
     query = update.callback_query
 
-    print(query.data)
+    # Get target ( 'all' or a computer mac)
+    target = re.search(State.INCLUDE_COMPUTERS, query.data).group(1)
+
+    computers = user_data['session'].computers
+
+    if target == 'all':
+        for computer in computers.get_computers():
+            computer.included = True
+    else:
+        computers.find(target).included = True
+
+    # Redraw view
+    view.filter_computers(computers).edit(update)
 
 
 def exclude_computers(bot: Bot, update: Updater, user_data: dict):
+    print("E")
     query = update.callback_query
 
-    print(query.data)
+    # Get target ( 'all' or a computer mac)
+    target = re.search(State.EXCLUDE_COMPUTERS, query.data).group(1)
+
+    computers = user_data['session'].computers
+
+    if target == 'all':
+        for computer in computers.get_computers():
+            computer.included = False
+    else:
+        computers.find(target).included = False
+
+    # Redraw view
+    view.filter_computers(computers).edit(update)
