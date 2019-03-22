@@ -19,7 +19,7 @@ def shutdown_computer(client: paramiko.SSHClient, target_ip: str, username: str,
 def send_command_as_root(client: paramiko.SSHClient, target_ip: str,
                          username: str, password: str, command: str):
 
-    full_command = " sshpass -p %(password)s ssh %(username)s@%(target_ip)s 'echo %(password)s | sudo -S %(command)s'" % {
+    full_command = " sshpass -p %(password)s ssh -o ConnectTimeout=3 %(username)s@%(target_ip)s 'echo %(password)s | sudo -S %(command)s'" % {
         'password': password,
         'username': username,
         'target_ip': target_ip,

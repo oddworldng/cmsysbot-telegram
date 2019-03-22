@@ -44,18 +44,19 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
     menu.new_main(bot, update, user_data)
 
 
-# TODO: Filter computers
 def wake_computers(bot: Bot, update: Updater, user_data: dict):
     query = update.callback_query
 
     computers = user_data['session'].computers
 
-    for mac in computers.get_macs():
+    for computer in computers.get_included_computers():
+        mac = computer.mac
+
         action.wake_on_lan(mac)
         query.message.reply_text("Waking up computer with mac %s..." % mac)
 
 
-# TODO: Filter computers (¿Maybe ask if turn down own computer?)
+# TODO: ¿Maybe ask if turn down bridge computer too?
 def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
     query = update.callback_query
 
@@ -65,7 +66,9 @@ def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
     username = user_data['session'].username
     password = user_data['session'].password
 
-    for target_ip in computers.get_ips():
+    for computer in computers.get_included_computers():
+        target_ip = computer.ip
+
         if target_ip != bridge_ip:  # Don't shutdown bridge ip
             action.shutdown_computer(client, target_ip, username, password)
 
