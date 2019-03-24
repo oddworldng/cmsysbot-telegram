@@ -1,5 +1,7 @@
 # CMSysBot (Telegram bot)
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/84f263db2a964e39a24a352772e9c8aa)](https://app.codacy.com/app/Dibad/cmsysbot-telegram?utm_source=github.com&utm_medium=referral&utm_content=oddworldng/cmsysbot-telegram&utm_campaign=Badge_Grade_Settings)
+
 ## Description
 
 Centralized Management for Systems Administration (CMSysBot) it is a Telegram bot that allows you to manage computers in a local network from the bot itself, for example, execute a series of commands on all computers automatically, or perform updates and collect information from computers, all in a centralized way.
