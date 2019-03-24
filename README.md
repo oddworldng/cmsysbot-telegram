@@ -1,6 +1,7 @@
 # CMSysBot (Telegram bot)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/84f263db2a964e39a24a352772e9c8aa)](https://app.codacy.com/app/Dibad/cmsysbot-telegram?utm_source=github.com&utm_medium=referral&utm_content=oddworldng/cmsysbot-telegram&utm_campaign=Badge_Grade_Settings)
+[![Documentation Status](https://readthedocs.org/projects/cmsysbot-telegram/badge/?version=latest)](https://cmsysbot-telegram.readthedocs.io/en/latest/?badge=latest)
 
 ## Description
 
