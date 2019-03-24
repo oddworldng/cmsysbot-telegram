@@ -4,9 +4,11 @@ PY := python3
 CONFIG_FILE := config/config.json
 REQS := requirements.txt
 
+MAIN := cmsysbot/main.py
+
 
 run:
-	$(PY) src/main.py -c $(CONFIG_FILE)
+	$(PY) $(MAIN) -c $(CONFIG_FILE)
 
 
 install:
