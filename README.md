@@ -9,13 +9,13 @@ Centralized Management for Systems Administration (CMSysBot) it is a Telegram bo
 
 ## Python3 libraries
 
-* [python-telegram-bot](https://pypi.org/project/python-telegram-bot/)
-* [paramiko](https://pypi.org/project/paramiko/)
-* [wakeonlan](https://pypi.org/project/wakeonlan/)
+  * [python-telegram-bot](https://pypi.org/project/python-telegram-bot/)
+  * [paramiko](https://pypi.org/project/paramiko/)
+  * [wakeonlan](https://pypi.org/project/wakeonlan/)
 
 ## System dependencies
 
-* [sshpass](https://linux.die.net/man/1/sshpass)
+  * [sshpass](https://linux.die.net/man/1/sshpass)
 
 ## How to install
 
@@ -23,24 +23,23 @@ First of all, you need a server with any GNU/Linux distribution, we have tested 
 
 Once you have installed your server operating system, you have to download the bot from GitHub, install Python3 libraries and system dependencies:
 
+### Download bot
 
-#### Download bot
-
-```
+```console
 git clone https://github.com/oddworldng/cmsysbot-telegram.git
 ```
 
-#### Install Python3 libraries
+### Install Python3 libraries
 
 Go into cloned folder `cmsysbot-telegram` and execute: 
 
-```
+```console
 make install
 ```
 
-#### Install system dependencies
+### Install system dependencies
 
-```
+```console
 sudo apt install -y sshpass
 ```
 
@@ -48,7 +47,7 @@ sudo apt install -y sshpass
 
 To run this bot in your server, go to your git cloned folder `cmsysbot-telegram` (by default) and execute this command:
 
-```
+```console
 make run
 ```
 
@@ -66,9 +65,9 @@ That's all! now you can open your Telegram client and get into your created bot 
 
 ## Social media
 
-* Blog: [CMSysBot](https://cmsysbot.wordpress.com/) 
-* Twitter: [@CMSysBot](https://twitter.com/cmsysbot)
+  * Blog: [CMSysBot](https://cmsysbot.wordpress.com/) 
+  * Twitter: [@CMSysBot](https://twitter.com/cmsysbot)
 
 ## Authors
-* **Andrés Nacimiento García**, computer engineer at [University of La Laguna](https://ull.es/).
-* **David Afonso Dorta**, computer engineer at [University of La Laguna](https://ull.es/).
+  * **Andrés Nacimiento García**, computer engineer at [University of La Laguna](https://ull.es/).
+  * **David Afonso Dorta**, computer engineer at [University of La Laguna](https://ull.es/).
