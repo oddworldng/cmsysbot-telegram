@@ -11,11 +11,11 @@ class Section:
         self.subsections = []
 
         # Initialiize Section from a string
-        if type(section_data) is str:
+        if isinstance(section_data, str):
             self.name = section_data
 
         # Initialize Section from a dict
-        elif type(section_data) is dict:
+        elif isinstance(section_data, dict):
             if 'name' in section_data:
                 self.name = section_data['name']
 
@@ -54,7 +54,9 @@ class Config(Json):
     def email(self) -> str:
         return self.data['email']
 
-    def get_sections(self, route: List[str] = []) -> Iterator[Section]:
+    def get_sections(self, route: List[str] = None) -> Iterator[Section]:
+        route = route or []
+
         sections = [Section(s) for s in self.data['structure']]
 
         for part in route:
@@ -66,7 +68,9 @@ class Config(Json):
         for section in sections:
             yield section
 
-    def get_all_sections(self, route: List[str] = []) -> Iterator[Section]:
+    def get_all_sections(self, route: List[str] = None) -> Iterator[Section]:
+        route = route or []
+
         for section in self.get_sections(route):
             yield section
 
@@ -75,7 +79,9 @@ class Config(Json):
                 yield from self.get_all_sections(route)
                 route.pop()
 
-    def _create_folder_structure(self, route: List[str] = []):
+    def _create_folder_structure(self, route: List[str] = None):
+        route = route or []
+
         for section in self.get_sections(route):
             if section.has_subsections():
                 self._create_folder(route + [section.name])

@@ -8,7 +8,9 @@ class Computer:
     """This class represents a computer. Provides getters and setters to
     avoid interacting directly with the dictionary"""
 
-    def __init__(self, computer_data: dict = {str, str}):
+    def __init__(self, computer_data: dict = None):
+        computer_data = computer_data or {}
+
         # Initialize with N/A string to avoid having empty strings
         self.name = "N/A"
         self.ip = "N/A"
@@ -17,9 +19,10 @@ class Computer:
 
         # If a dictionary is passed, save the keys as attributes only if
         # they're not empty
-        for key in computer_data:
-            if (computer_data[key]):
-                setattr(self, key, computer_data[key])
+        if computer_data:
+            for key in computer_data:
+                if (computer_data[key]):
+                    setattr(self, key, computer_data[key])
 
     def __str__(self) -> str:
         return 'Name: %s Ip: %s Mac: %s' % (self.name, self.ip, self.mac)

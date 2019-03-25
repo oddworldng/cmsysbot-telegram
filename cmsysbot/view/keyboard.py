@@ -34,7 +34,8 @@ class Keyboard:
         self._getMessage(update).edit_text(
             text=self.text, reply_markup=self._generate_keyboard())
 
-    def _getMessage(self, update: Updater) -> str:
+    @staticmethod
+    def _getMessage(update: Updater) -> str:
         """
         Get the last message from 'update' or 'update.callback_query' Useful when a
         callback is called from both CommandHandler and CallbackQueryHandler
