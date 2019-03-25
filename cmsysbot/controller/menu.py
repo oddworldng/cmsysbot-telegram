@@ -2,13 +2,10 @@ from telegram import Bot
 from telegram.ext import Updater
 
 import view
-from utils import Computers, Session, State, glob
+from utils import Computers, State, glob
 
 
 def new_main(bot: Bot, update: Updater, user_data: dict):
-
-    if not 'session' in user_data:
-        user_data['session'] = Session()
 
     s = user_data['session']
 

@@ -4,7 +4,6 @@ import paramiko
 from telegram import Bot
 from telegram.ext import Updater
 
-import helper
 import view
 from cmsys import action
 from utils import State
@@ -36,9 +35,10 @@ def connect(bot: Bot, update: Updater, user_data: dict):
 
 
 def disconnect(bot: Bot, update: Updater, user_data: dict):
+
     user_data['session'].end_connetion()
 
-    message = helper.getMessage(update)
+    message = update.callback_query.message
     message.edit_text("Disconnect...")
 
     menu.new_main(bot, update, user_data)

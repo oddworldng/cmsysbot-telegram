@@ -1,8 +1,6 @@
 from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
-import helper
-
 from . import callback, menu
 
 # Conversation States
@@ -15,7 +13,7 @@ USERNAME, PASSWORD = range(2)
 def login(bot: Bot, update: Updater) -> int:
     """ENTRY POINT. Ask for the username and wait for the answer"""
 
-    message = helper.getMessage(update)
+    message = update.callback_query.message
     message.reply_text("Please introduce your username and password")
     message.reply_text("Enter your username: ")
 
