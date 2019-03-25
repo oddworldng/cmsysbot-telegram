@@ -2,16 +2,14 @@ from telegram import Bot
 from telegram.ext import Updater
 
 import helper
-
-from view import view
-from utils import computers_json, session
-from states import State
+import view
+from utils import Computers, Session, State
 
 
 def new_main(bot: Bot, update: Updater, user_data: dict):
 
     if not 'session' in user_data:
-        user_data['session'] = session.Session()
+        user_data['session'] = Session()
 
     s = user_data['session']
 
@@ -94,7 +92,7 @@ def ip_selection(bot: Bot, update: Updater, user_data: dict):
 
     # Create a path to the .json file from the route
     filepath = "config/%s.json" % "/".join(route)
-    user_data['session'].computers = computers_json.Computers(filepath)
+    user_data['session'].computers = Computers(filepath)
 
     user_data['session'].route = route
 

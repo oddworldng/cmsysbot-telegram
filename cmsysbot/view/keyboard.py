@@ -1,7 +1,7 @@
+from typing import List
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater
-
-from typing import List
 
 
 def Button(text: str, callback_data: str = None) -> InlineKeyboardButton:

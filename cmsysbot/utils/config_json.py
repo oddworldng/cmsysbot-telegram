@@ -1,8 +1,8 @@
 import os
-import json
-from utils import computers_json, base_json
-
 from typing import Iterator, List, Union
+
+from .base_json import Json
+from .computers_json import Computers
 
 
 class Section:
@@ -32,7 +32,7 @@ class Section:
         return "%s: %s" % (self.name, self.subsections)
 
 
-class Config(base_json.Json):
+class Config(Json):
     def __init__(self, filepath: str):
         """Load the .json from an existent file. Throws if couldn't open/read
         the file"""
@@ -98,4 +98,4 @@ class Config(base_json.Json):
 
         if not os.path.exists(file_path):
             print("> Create file", file_path)
-            computers_json.Computers.create(file_path)
+            Computers.create(file_path)

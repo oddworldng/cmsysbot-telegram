@@ -1,13 +1,12 @@
 import logging
-
-from telegram.ext import Updater
-from telegram.error import InvalidToken
-
-from utils import config_json
-from controller import controller
 import re
 
+from telegram.error import InvalidToken
+from telegram.ext import Updater
+
+import controller
 import helper
+from utils import Config
 
 # Enable logging
 logging.basicConfig(
@@ -26,7 +25,7 @@ def error(bot, update, error):
 
 def main():
     # Load the config file
-    helper.config = config_json.Config(helper.DEFAULT_CONFIG_FILEPATH)
+    helper.config = Config(helper.DEFAULT_CONFIG_FILEPATH)
 
     content = re.search("include-(.*)", "include-all").group(1)
     print(content)

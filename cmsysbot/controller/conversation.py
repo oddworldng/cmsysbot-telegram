@@ -1,10 +1,10 @@
 from telegram import Bot
-from telegram.ext import Updater, ConversationHandler
+from telegram.ext import ConversationHandler, Updater
 
 import helper
+from utils import State
 
-from controller import menu, callback
-from states import State
+from . import callback, menu
 
 # Conversation States
 USERNAME, PASSWORD = range(2)
@@ -45,8 +45,3 @@ def get_password(bot: Bot, update: Updater,
     callback.connect(bot, update, user_data)
 
     return ConversationHandler.END
-
-
-# ######################################################################
-#                            CALLBACKS
-# ######################################################################

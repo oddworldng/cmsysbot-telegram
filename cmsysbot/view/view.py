@@ -1,8 +1,8 @@
 from typing import List
 
-from states import State
-from view.keyboard import Button, Keyboard
-from utils.computers_json import Computer
+from utils import Computer, State
+
+from .keyboard import Button, Keyboard
 
 
 # Status: Not Connected
@@ -155,19 +155,26 @@ def filter_computers(computers: List[Computer]):
     # Text
     text = "Select the computers that will be included in future operations"
 
-    main_buttons = [ Button("Include All", "include-all"), Button("Exclude All",
-                                                                  "exclude-all") ]
+    main_buttons = [
+        Button("Include All", "include-all"),
+        Button("Exclude All", "exclude-all")
+    ]
 
     for computer in computers.get_computers():
         main_buttons.append(Button(str(computer)))
 
         if computer.included:
-            main_buttons.append(Button("Included", "exclude-%s" % computer.mac))
+            main_buttons.append(
+                Button("Included", "exclude-%s" % computer.mac))
         else:
-            main_buttons.append(Button("Excluded", "include-%s" % computer.mac))
+            main_buttons.append(
+                Button("Excluded", "include-%s" % computer.mac))
 
-
-    footer_buttons = [ Button("Return", State.MAIN) ]
+    footer_buttons = [Button("Return", State.MAIN)]
 
     # Keyboard
-    return Keyboard(text, n_cols=2, main_buttons=main_buttons, footer_buttons=footer_buttons)
+    return Keyboard(
+        text,
+        n_cols=2,
+        main_buttons=main_buttons,
+        footer_buttons=footer_buttons)

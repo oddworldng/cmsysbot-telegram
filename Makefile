@@ -4,7 +4,7 @@ PY := python3
 CONFIG_FILE := config/config.json
 REQS := requirements.txt
 
-MAIN := cmsysbot/main.py
+MAIN := cmsysbot
 
 
 run:

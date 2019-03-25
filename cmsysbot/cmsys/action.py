@@ -1,32 +1,35 @@
-from wakeonlan import send_magic_packet
-import paramiko
-
-from typing import List
 import re
+from typing import List
+
+import paramiko
+from wakeonlan import send_magic_packet
 
 
 def wake_on_lan(target_mac: str):
     send_magic_packet(target_mac)
 
 
-def shutdown_computer(client: paramiko.SSHClient, target_ip: str, username: str,
-                      password: str):
+def shutdown_computer(client: paramiko.SSHClient, target_ip: str,
+                      username: str, password: str):
 
     command = 'init 0'
     send_command_as_root(client, target_ip, username, password, command)
 
 
-def get_associated_ips(client: paramiko.SSHClient, password: str, macs: List[str]):
+def get_associated_ips(client: paramiko.SSHClient, password: str,
+                       macs: List[str]):
 
     submask = get_submask(client)
 
-    arp_scan_output = run_in_bridge_as_root(client, password, 'arp-scan %s' % submask)
+    arp_scan_output = run_in_bridge_as_root(client, password,
+                                            'arp-scan %s' % submask)
 
     macs = []
     ips = []
 
     for line in arp_scan_output.splitlines():
-        match = re.search('((?:\d{1,3}\.){3}\d{1,3}).*((?:\w\w:){5}\w\w)', line)
+        match = re.search('((?:\d{1,3}\.){3}\d{1,3}).*((?:\w\w:){5}\w\w)',
+                          line)
 
         if match:
             macs.append(match.group(1))
@@ -42,11 +45,10 @@ def get_submask(client: paramiko.SSHClient):
     return run_in_bridge(client, command)
 
 
-
 def update_computer(client: paramiko.SSHClient, target_ip: str, username: str,
-                      password: str):
+                    password: str):
 
-    update = 'apt update';
+    update = 'apt update'
     upgrade = 'screen -d -m apt upgrade -y'
 
     print(send_command_as_root(client, target_ip, username, password, update))
@@ -59,7 +61,8 @@ def run_in_bridge(client: paramiko.SSHClient, command: str):
     return stdout.read().decode('utf-8')
 
 
-def run_in_bridge_as_root(client: paramiko.SSHClient, password: str, command: str):
+def run_in_bridge_as_root(client: paramiko.SSHClient, password: str,
+                          command: str):
 
     root_command = ' echo %s | sudo -S %s' % (password, command)
 

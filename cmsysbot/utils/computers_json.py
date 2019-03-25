@@ -1,7 +1,7 @@
-from typing import Iterator
-from utils import base_json
-
 import json
+from typing import Iterator
+
+from .base_json import Json
 
 
 class Computer:
@@ -28,7 +28,7 @@ class Computer:
         return {'name': self.name, 'ip': self.ip, 'mac': self.mac}
 
 
-class Computers(base_json.Json):
+class Computers(Json):
     """This class provides an interface for using the .json files created on
     config/ (not config.json). Provides functions to get the names/ips/macs of
     the computers and easily save changes on the .json"""
@@ -42,7 +42,9 @@ class Computers(base_json.Json):
         self.computers = [Computer(entry) for entry in self.data['computers']]
 
     def save(self):
-        self.data['computers'] = [computer.asdict() for computer in self.computers]
+        self.data['computers'] = [
+            computer.asdict() for computer in self.computers
+        ]
 
         super().save()
 
@@ -82,7 +84,6 @@ class Computers(base_json.Json):
         for computer in self.get_computers():
             if computer.mac == mac:
                 return computer
-
 
     # Generators
     def get_computers(self) -> Iterator[Computer]:

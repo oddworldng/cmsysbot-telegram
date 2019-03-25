@@ -1,7 +1,7 @@
 from telegram import Bot
 from telegram.ext import Updater
 
-from controller import menu
+from . import menu
 
 
 def start(bot: Bot, update: Updater, user_data: dict):
