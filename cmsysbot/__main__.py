@@ -1,5 +1,4 @@
 import logging
-import re
 
 from telegram.error import InvalidToken
 from telegram.ext import Updater

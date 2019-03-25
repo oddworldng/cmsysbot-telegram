@@ -57,7 +57,7 @@ def update_computer(client: paramiko.SSHClient, target_ip: str, username: str,
 
 def run_in_bridge(client: paramiko.SSHClient, command: str):
 
-    stdin, stdout, stderr = client.exec_command(command)
+    _, stdout, _ = client.exec_command(command)
     return stdout.read().decode('utf-8')
 
 
@@ -66,7 +66,7 @@ def run_in_bridge_as_root(client: paramiko.SSHClient, password: str,
 
     root_command = ' echo %s | sudo -S %s' % (password, command)
 
-    stdin, stdout, stderr = client.exec_command(root_command)
+    _, stdout, _ = client.exec_command(root_command)
     return stdout.read().decode('utf-8')
 
 
@@ -74,14 +74,16 @@ def run_in_bridge_as_root(client: paramiko.SSHClient, password: str,
 def send_command_as_root(client: paramiko.SSHClient, target_ip: str,
                          username: str, password: str, command: str):
 
-    full_command = " sshpass -p %(password)s ssh -o ConnectTimeout=3 %(username)s@%(target_ip)s 'echo %(password)s | sudo -S %(command)s'" % {
+    full_command = (" sshpass -p %(password)s ssh -o ConnectTimeout=3 \
+                    %(username)s@%(target_ip)s 'echo %(password)s \
+                    | sudo -S %(command)s'" % {
         'password': password,
         'username': username,
         'target_ip': target_ip,
         'command': command
-    }
+    })
 
-    stdin, stdout, stderr = client.exec_command(full_command)
+    _, stdout, _ = client.exec_command(full_command)
 
     # Log command on console
     print("User %s executed %s on %s" % (username, command, target_ip))

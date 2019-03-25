@@ -118,6 +118,8 @@ def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
     for computer in computers.get_included_computers():
         target_ip = computer.ip
 
+        query.message.reply_text("Shutdown computer with ip %s" % target_ip)
+
         if target_ip != bridge_ip:  # Don't shutdown bridge ip
             action.shutdown_computer(client, target_ip, username, password)
 

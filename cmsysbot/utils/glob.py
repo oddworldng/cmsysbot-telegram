@@ -1,5 +1,3 @@
-from .config_json import Config
-
 config_file = None
 
 class State():

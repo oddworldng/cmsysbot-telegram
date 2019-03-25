@@ -1,7 +1,7 @@
 from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
-from . import callback, menu
+from . import callback
 
 # Conversation States
 USERNAME, PASSWORD = range(2)
