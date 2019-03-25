@@ -1,9 +1,8 @@
 from telegram import Bot
 from telegram.ext import Updater
 
-import helper
 import view
-from utils import Computers, Session, State
+from utils import Computers, Session, State, glob
 
 
 def new_main(bot: Bot, update: Updater, user_data: dict):
@@ -42,7 +41,7 @@ def select_department(bot: Bot, update: Updater, user_data: dict):
 
     # View
     view.structure(
-        route, helper.config.get_sections(route),
+        route, glob.config_file.get_sections(route),
         return_to=State.MAIN).edit(update)
 
 
@@ -74,7 +73,7 @@ def structure(bot: Bot, update: Updater, user_data: dict):
 
     # View
     view.structure(
-        route, helper.config.get_sections(route),
+        route, glob.config_file.get_sections(route),
         return_to=return_to).edit(update)
 
 

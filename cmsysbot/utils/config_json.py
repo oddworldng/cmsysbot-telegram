@@ -47,7 +47,7 @@ class Config(Json):
         return self.data['token']
 
     @property
-    def name(self) -> str:
+    def bot_name(self) -> str:
         return self.data['name']
 
     @property

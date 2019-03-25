@@ -5,8 +5,7 @@ from telegram.error import InvalidToken
 from telegram.ext import Updater
 
 import controller
-import helper
-from utils import Config
+from utils import Config, glob
 
 # Enable logging
 logging.basicConfig(
@@ -25,14 +24,11 @@ def error(bot, update, error):
 
 def main():
     # Load the config file
-    helper.config = Config(helper.DEFAULT_CONFIG_FILEPATH)
-
-    content = re.search("include-(.*)", "include-all").group(1)
-    print(content)
+    glob.config_file = Config("config/config.json")
 
     # Create the EventHandler and pass it your bot's token.
     try:
-        updater = Updater(helper.config.token)
+        updater = Updater(glob.config_file.token)
     except InvalidToken:
         print("Invalid Token! Please check your token in the config.json file")
         return
@@ -49,7 +45,7 @@ def main():
     dp.add_error_handler(error)
 
     # Start the bot!!
-    print("%s started! Running..." % helper.config.name)
+    print("%s started! Running..." % glob.config_file.bot_name)
     updater.start_polling()
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,

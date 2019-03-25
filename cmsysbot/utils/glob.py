@@ -1,3 +1,7 @@
+from .config_json import Config
+
+config_file = None
+
 class State():
     MAIN = "main"
     CONNECT = "connect"

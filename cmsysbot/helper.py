@@ -1,15 +1,6 @@
 from telegram.ext import Updater
 
-# Default path in the filesystem where the config.json is located
-DEFAULT_CONFIG_FILEPATH = "config/config.json"
-
-# Singleton variable holding the JSON file (config.json)
-config = None
-
-
-# ######################################################################
-#                         TELEGRAM FUNCTIONS
-# ######################################################################
+# TODO: Remove
 def getMessage(update: Updater):
     """
     Get the last message from 'update' or 'update.callback_query' Useful when a

@@ -2,7 +2,6 @@ from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
 import helper
-from utils import State
 
 from . import callback, menu
 
