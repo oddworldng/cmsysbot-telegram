@@ -1,3 +1,15 @@
+"""
+In this module are defined all the :obj:`callbacks` used by the bot.
+
+Note:
+    A :obj:`callback` is any function that is called when pressing a button on
+    a :obj:`Keyboard`. For example, when pressing on ``Connect``, ``Wake
+    computers``, ``Disconnect``...
+
+The :obj:`callback` must handle the bot logic, like sending chat messages,
+rendering new menus (:obj:`Keyboards`), etc.
+"""
+
 import re
 
 import paramiko
