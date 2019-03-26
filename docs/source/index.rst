@@ -1,10 +1,10 @@
 Welcome to CMSysBot's documentation!
 ====================================
 
+Below you can find the documentation for the CMSysBot telegram bot.
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-   cmsysbot/__main__.py
+   cmsysbot
 
 
 Indices and tables
