@@ -8,6 +8,9 @@
 
 # Directories
 .idea/
-__pycache__
 config/
+docs/build/
+
+__pycache__
 .mypy_cache/
+
