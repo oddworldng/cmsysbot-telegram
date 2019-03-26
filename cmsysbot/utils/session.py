@@ -1,5 +1,7 @@
 import paramiko
 
+from paramiko import ssh_exception
+
 
 class Session:
     def __init__(self,
@@ -22,9 +24,16 @@ class Session:
         self.client.set_missing_host_key_policy(paramiko.WarningPolicy)
 
         # Try to connect to the client
-        self.client.connect(self.bridge_ip, 22, self.username, self.password)
+        try:
+            self.client.connect(self.bridge_ip, 22, self.username,
+                                self.password)
 
-        self.connected = True
+            self.connected = True
+
+        except (ssh_exception.NoValidConnectionsError,
+                ssh_exception.AuthenticationException) as error:
+            # TODO: Rethrow the error
+            self.connected = False
 
     def end_connetion(self):
         self.username = ""

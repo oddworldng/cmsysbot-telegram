@@ -4,7 +4,7 @@ from telegram.ext import (CallbackQueryHandler, CommandHandler,
 
 from utils import State, glob
 
-from . import callback, command, conversation, menu
+from . import general, command, conversation, menu
 
 
 def add_callbacks(dp: Dispatcher):
@@ -55,18 +55,18 @@ def add_callbacks(dp: Dispatcher):
     # Triggered when clicking on Disconnect button
     dp.add_handler(
         CallbackQueryHandler(
-            callback.disconnect, pattern=State.DISCONNECT, pass_user_data=True))
+            menu.disconnect, pattern=State.DISCONNECT, pass_user_data=True))
 
     # TRIGGERED if clicked on 'Wake Computers from the main menu'
     dp.add_handler(
         CallbackQueryHandler(
-            callback.wake_computers,
+            general.wake_computers,
             pattern=State.WAKE_COMPUTERS,
             pass_user_data=True))
 
     dp.add_handler(
         CallbackQueryHandler(
-            callback.shutdown_computers,
+            general.shutdown_computers,
             pattern=State.SHUTDOWN_COMPUTERS,
             pass_user_data=True))
 
@@ -78,30 +78,25 @@ def add_callbacks(dp: Dispatcher):
 
     dp.add_handler(
         CallbackQueryHandler(
-            callback.exclude_computers,
+            general.exclude_computers,
             pattern=State.EXCLUDE_COMPUTERS,
             pass_user_data=True))
 
     dp.add_handler(
         CallbackQueryHandler(
-            callback.include_computers,
+            general.include_computers,
             pattern=State.INCLUDE_COMPUTERS,
             pass_user_data=True))
 
     dp.add_handler(
         CallbackQueryHandler(
-            callback.update_ips, pattern=State.UPDATE_IPS, pass_user_data=True))
+            general.update_ips, pattern=State.UPDATE_IPS, pass_user_data=True))
 
     dp.add_handler(
         CallbackQueryHandler(
-            callback.update_computers,
+            general.update_computers,
             pattern=State.UPDATE_COMPUTERS,
             pass_user_data=True))
-
-    ## TRIGGERED if clicked on 'Update Ips' from the main menu
-    #dp.add_handler(
-    #    CallbackQueryHandler(
-    #        main.update_ips, pattern="^Update Ips$", pass_user_data=True))
 
 
 def add_command_callbacks(dp: Dispatcher):

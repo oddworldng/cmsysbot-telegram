@@ -1,84 +1,28 @@
 """
-In this module are defined all the :obj:`callbacks` used by the bot.
+In this module are defined all the ``general`` :obj:`callbacks` used by the
+bot.
 
 Note:
     A :obj:`callback` is any function that is called when pressing a button on
     a :obj:`Keyboard`. For example, when pressing on ``Connect``, ``Wake
     computers``, ``Disconnect``...
 
-The :obj:`callback` must handle the bot logic, like sending chat messages,
-rendering new menus (:obj:`Keyboards`), etc.
+``general`` :obj:`callbacks` are the ones that perform any action, like
+connecting, disconnecting, sending commands, sending messages, etc.
+
+``general`` :obj:`callbacks` DON'T show/create new menus, only perform actions.
+The callbacks used to move between menus must be defined inside the :obj:`menu`
+module.
 """
 
 import re
 
-import paramiko
 from telegram import Bot
 from telegram.ext import Updater
 
 import view
 from cmsys import action
 from utils import State
-
-from . import menu
-
-
-def connect(bot: Bot, update: Updater, user_data: dict):
-    """
-    Tries to open a SSH connection from the bot server to the bridge computer.
-
-    After that, sends a message to the chat with the result of the connection
-    (successed or failed) and returns to the main menu.
-
-    Args:
-        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
-        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
-            the bot.
-        user_data (:obj:`dict`): The dictionary with user variables.
-    """
-
-    try:
-        session = user_data['session']
-
-        # Try to connect to the client
-        session.start_connection()
-
-        # Return a successful connection message
-        update.message.reply_text(
-            "Successfully connected to %s!\n" % session.bridge_ip)
-
-    except paramiko.AuthenticationException as error:
-        # Return a failed connection message
-        update.message.reply_text(
-            str(error) + " Please try to login with different credentials!")
-
-    finally:
-        # Show the main menu again
-        menu.new_main(bot, update, user_data)
-
-
-def disconnect(bot: Bot, update: Updater, user_data: dict):
-    """
-    Closes the open SSH connection to the bridge computer.
-
-    After that, sends a 'Disconnected' message to the chat and returns to the
-    main menu.
-
-    Args:
-        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
-        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
-            the bot.
-        user_data (:obj:`dict`): The dictionary with user variables.
-    """
-
-    # Close the connection
-    user_data['session'].end_connetion()
-
-    message = update.callback_query.message
-    message.edit_text("Disconnect...")
-
-    # Show the main menu again
-    menu.new_main(bot, update, user_data)
 
 
 def update_ips(bot: Bot, update: Updater, user_data: dict):
@@ -238,8 +182,7 @@ def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
             # Send the shutdown command
             action.shutdown_computer(client, target_ip, username, password)
 
-            query.message.reply_text(
-                "Shutdown computer with ip %s" % target_ip)
+            query.message.reply_text("Shutdown computer with ip %s" % target_ip)
 
 
 def update_computers(bot: Bot, update: Updater, user_data: dict):

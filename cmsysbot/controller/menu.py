@@ -112,6 +112,63 @@ def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
         no_callback_data=State.MAIN).edit(update)
 
 
+def connect(bot: Bot, update: Updater, user_data: dict):
+    """
+    Tries to open a SSH connection from the bot server to the bridge computer.
+
+    After that, sends a message to the chat with the result of the connection
+    (successed or failed) and returns to the main menu.
+
+    Args:
+        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
+        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
+            the bot.
+        user_data (:obj:`dict`): The dictionary with user variables.
+    """
+
+    session = user_data['session']
+
+    # Try to connect to the client
+    session.start_connection()
+
+    text = ""
+    if session.connected:
+        text = "Successfully connected to %s!" % session.bridge_ip
+    else:
+        text = "Unable to connect to %s.\n\
+Please try to login with different credentials!" % session.bridge_ip
+
+    # Send the status message
+    update.message.reply_text(text)
+
+    # Show the main menu again
+    new_main(bot, update, user_data)
+
+
+def disconnect(bot: Bot, update: Updater, user_data: dict):
+    """
+    Closes the open SSH connection to the bridge computer.
+
+    After that, sends a 'Disconnected' message to the chat and returns to the
+    main menu.
+
+    Args:
+        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
+        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
+            the bot.
+        user_data (:obj:`dict`): The dictionary with user variables.
+    """
+
+    # Close the connection
+    user_data['session'].end_connetion()
+
+    message = update.callback_query.message
+    message.edit_text("Disconnect...")
+
+    # Show the main menu again
+    new_main(bot, update, user_data)
+
+
 def filter_computers(bot: Bot, update: Updater, user_data: dict):
     # View
     computers = user_data['session'].computers

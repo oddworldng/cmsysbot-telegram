@@ -1,7 +1,7 @@
 from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
-from . import callback
+from . import menu
 
 # Conversation States
 USERNAME, PASSWORD = range(2)
@@ -39,6 +39,6 @@ def get_password(bot: Bot, update: Updater,
     update.message.reply_text("This credentials will be used for future \
                               commands.")
 
-    callback.connect(bot, update, user_data)
+    menu.connect(bot, update, user_data)
 
     return ConversationHandler.END
