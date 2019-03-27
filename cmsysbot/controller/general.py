@@ -21,7 +21,7 @@ from telegram import Bot, Document, File
 from telegram.ext import Updater
 
 import view
-from system import remote
+from system import remote, bridge
 from utils import State
 
 
@@ -226,10 +226,31 @@ def update_computers(bot: Bot, update: Updater, user_data: dict):
 
 def download_script(bot: Bot, update: Updater, user_data: dict):
 
+    session = user_data['session']
     message = update.message
 
+    if not session.connected:
+        message.reply_text("You must be connected to a bridge computer before sending files!")
+        return
+
+    # Download the file
     file_object = message.document.get_file()
+    download_path = "/tmp/%s" % message.document.file_name
+    file_object.download(download_path)
 
-    file_object.download("tmp/%s" % message.document.file_name)
+    computers = user_data['session'].computers
+    client = user_data['session'].client
+    username = user_data['session'].username
+    password = user_data['session'].password
 
-    print(file_object)
+    # Copiar al bridge
+    bridge.send_file(client, download_path, "/tmp/")
+
+    # Ejecutar desde el bridge
+    for computer in computers.get_included_computers():
+        message.reply_text("Sending script to computer %s" % computer.mac);
+
+        target_ip = computer.ip
+
+
+        # TODO: Send script

@@ -103,3 +103,5 @@ def install_software(client: paramiko.SSHClient, target_ip: str, username: str,
 
     # Execute command
     send_command_as_root(client, target_ip, username, password, command)
+    _, stdout, _ = client.exec_command(full_command)
+
