@@ -40,15 +40,21 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
     """
     # TODO: WIP. Iterate through the computer macs and change the ips
 
-    client = user_data['session'].client
-    macs = user_data['session'].computers.get_macs()
-    password = user_data['session'].password
+    session: Session = user_data['session']
 
-    # Get all the local macs and ips
-    result_macs, result_ips = action.get_associated_ips(client, password, macs)
+    # Get all the local ips for every mac
+    local_ips = action.get_local_ips(session.client, session.password,
+                                     session.computers.get_macs())
 
-    print(result_macs)
-    print(result_ips)
+    query = update.callback_query
+
+    for computer in session.computers.get_included_computers():
+        print(computer.mac)
+        if computer.mac in local_ips:
+            computer.ip = local_ips[computer.mac]
+
+            query.message.reply_text("Computer %s with mac [%s] now has the \
+ip %s" % (computer.name, computer.mac, computer.ip))
 
 
 def include_computers(bot: Bot, update: Updater, user_data: dict):
@@ -182,7 +188,8 @@ def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
             # Send the shutdown command
             action.shutdown_computer(client, target_ip, username, password)
 
-            query.message.reply_text("Shutdown computer with ip %s" % target_ip)
+            query.message.reply_text(
+                "Shutdown computer with ip %s" % target_ip)
 
 
 def update_computers(bot: Bot, update: Updater, user_data: dict):
