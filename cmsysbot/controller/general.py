@@ -17,7 +17,7 @@ module.
 
 import re
 
-from telegram import Bot
+from telegram import Bot, Document, File
 from telegram.ext import Updater
 
 import view
@@ -222,3 +222,14 @@ def update_computers(bot: Bot, update: Updater, user_data: dict):
         action.update_computer(client, target_ip, username, password)
 
         query.message.reply_text("Updated computer with ip %s" % target_ip)
+
+
+def download_script(bot: Bot, update: Updater, user_data: dict):
+
+    message = update.message
+
+    file_object = message.document.get_file()
+
+    file_object.download("tmp/%s" % message.document.file_name)
+
+    print(file_object)

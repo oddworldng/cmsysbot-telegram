@@ -4,7 +4,7 @@ from telegram.ext import (CallbackQueryHandler, CommandHandler,
 
 from utils import State, glob
 
-from . import general, command, conversation, menu
+from . import command, conversation, general, menu
 
 
 def add_callbacks(dp: Dispatcher):
@@ -29,12 +29,14 @@ def add_callbacks(dp: Dispatcher):
     # Show Connect Menu
     dp.add_handler(
         CallbackQueryHandler(
-            menu.select_department, pattern=State.CONNECT, pass_user_data=True))
+            menu.select_department, pattern=State.CONNECT,
+            pass_user_data=True))
 
     # Show structure of department (and subdepartments)
     dp.add_handler(
         CallbackQueryHandler(
-            menu.structure, pattern=with_subsections_regex,
+            menu.structure,
+            pattern=with_subsections_regex,
             pass_user_data=True))
 
     # When clicked in a section without subsections, show ip list
@@ -97,6 +99,10 @@ def add_callbacks(dp: Dispatcher):
             general.update_computers,
             pattern=State.UPDATE_COMPUTERS,
             pass_user_data=True))
+
+    dp.add_handler(
+        MessageHandler(
+            Filters.document, general.download_script, pass_user_data=True))
 
 
 def add_command_callbacks(dp: Dispatcher):
