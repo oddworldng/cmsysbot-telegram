@@ -21,7 +21,7 @@ from telegram import Bot, Document, File
 from telegram.ext import Updater
 
 import view
-from cmsys import action
+from system import remote
 from utils import State
 
 
@@ -43,7 +43,7 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
     session: Session = user_data['session']
 
     # Get all the local ips for every mac
-    local_ips = action.get_local_ips(session.client, session.password,
+    local_ips = remote.get_local_ips(session.client, session.password,
                                      session.computers.get_macs())
 
     query = update.callback_query
@@ -153,7 +153,7 @@ def wake_computers(bot: Bot, update: Updater, user_data: dict):
         mac = computer.mac
 
         # Send the wake-on-lan command
-        action.wake_on_lan(mac)
+        remote.wake_on_lan(mac)
 
         query.message.reply_text("Waking up computer with mac %s..." % mac)
 
@@ -186,7 +186,7 @@ def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
 
         if target_ip != bridge_ip:  # Don't shutdown bridge computer
             # Send the shutdown command
-            action.shutdown_computer(client, target_ip, username, password)
+            remote.shutdown_computer(client, target_ip, username, password)
 
             query.message.reply_text(
                 "Shutdown computer with ip %s" % target_ip)
@@ -219,7 +219,7 @@ def update_computers(bot: Bot, update: Updater, user_data: dict):
         target_ip = computer.ip
 
         # Send the update command
-        action.update_computer(client, target_ip, username, password)
+        remote.update_computer(client, target_ip, username, password)
 
         query.message.reply_text("Updated computer with ip %s" % target_ip)
 

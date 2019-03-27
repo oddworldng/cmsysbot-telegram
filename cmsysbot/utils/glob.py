@@ -13,3 +13,4 @@ class State():
     EXCLUDE_COMPUTERS = "exclude-(.*)"
     UPDATE_IPS = "update-ips"
     UPDATE_COMPUTERS = "update-computers"
+    INSTALL_SOFTWARE = "install-software"

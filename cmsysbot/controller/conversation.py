@@ -2,9 +2,10 @@ from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
 from . import menu
+from system import remote
 
 # Conversation States
-USERNAME, PASSWORD = range(2)
+USERNAME, PASSWORD, SOFTWARE = range(3)
 
 
 # ######################################################################
@@ -40,5 +41,42 @@ def get_password(bot: Bot, update: Updater,
                               commands.")
 
     menu.connect(bot, update, user_data)
+
+    return ConversationHandler.END
+
+
+def software(bot: Bot, update: Updater) -> int:
+    """ENTRY POINT. Ask for the software to install"""
+
+    message = update.callback_query.message
+    message.reply_text("Please type software name to install")
+
+    return SOFTWARE
+
+
+def get_software(bot: Bot, update: Updater,
+                 user_data: dict) -> ConversationHandler:
+    """Get the software to install from user input"""
+
+    input_software = update.message.text
+    message = update.message
+
+    # Get all necessary data for sending the command
+    client = user_data['session'].client
+    computers = user_data['session'].computers
+    username = user_data['session'].username
+    password = user_data['session'].password
+
+    for computer in computers.get_included_computers():
+        target_ip = computer.ip
+
+        # Send the shutdown command
+        remote.install_software(client, target_ip, username, password,
+                                input_software)
+
+        message.reply_text(
+            "Software %s installed successfully" % input_software)
+
+    menu.new_main(bot, update, user_data)
 
     return ConversationHandler.END

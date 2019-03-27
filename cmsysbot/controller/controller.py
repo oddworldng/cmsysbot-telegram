@@ -135,5 +135,23 @@ def add_conversation_callbacks(dp: Dispatcher):
         },
         fallbacks=[])
 
+    # Install software handler
+    install_software_handler = ConversationHandler(
+        # Entry points: From InlineKeyboardButton or /login
+        entry_points=[
+            CallbackQueryHandler(
+                conversation.software, pattern=State.INSTALL_SOFTWARE)
+        ],
+        states={
+            conversation.SOFTWARE: [
+                MessageHandler(
+                    Filters.text,
+                    conversation.get_software,
+                    pass_user_data=True)
+            ]
+        },
+        fallbacks=[])
+
     # Add to dispatcher
     dp.add_handler(login_conv_handler)
+    dp.add_handler(install_software_handler)
