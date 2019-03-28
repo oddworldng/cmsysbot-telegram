@@ -1,0 +1,8 @@
+#!/bin/bash
+
+sudo apt-get update
+sudo dpkg --configure -a
+sudo apt-get -f install -y
+sudo apt-get upgrade -y
+sudo apt-get dist-upgrade -y
+sudo apt-get autoremove -y
