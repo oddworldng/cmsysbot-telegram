@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Variables = arguments
+IP=$1
+USER=$2
+PASSWD=$3
+SCRIPT=$4
+
+# Copy script to target IP:/path/
+sshpass -p $(PASSWD) scp /tmp/$(SCRIPT) $(IP):/tmp/
+
+# Execute script in target IP as root
+sshpass -p $(PASSWD) ssh $(USER)@$(IP) "echo $(PASSWD) | sudo -S /tmp/$(SCRIPT)"
