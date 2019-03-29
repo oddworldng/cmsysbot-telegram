@@ -12,6 +12,6 @@ def get_local_plugins():
     files = glob.glob(path)
 
     # Filter file names by basename and capitalize
-    names = [os.path.basename(x).capitalize() for x in files]
+    names = [os.path.basename(x).capitalize().replace("_", " ") for x in files]
 
     return names
