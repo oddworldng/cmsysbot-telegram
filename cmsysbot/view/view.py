@@ -34,24 +34,18 @@ def not_connected() -> Keyboard:
 # ---------------------------------
 # |          Disconnect           |
 # ---------------------------------
-def connected(route: List[str], username: str, bridge_ip: str) -> Keyboard:
+def connected(route: List[str], plugins: dict, username: str,
+              bridge_ip: str) -> Keyboard:
     # Text
     text = "Status: Connected\n"
     text += "Route: %s\n" % "/".join(route)
     text += "Username: %s\n" % username
     text += "Bridge ip: %s\n" % bridge_ip
 
+    print(plugins)
+
     # Buttons
-    main_buttons = [
-        Button("Update Ips", State.UPDATE_IPS),
-        Button("Filter computers", State.FILTER_COMPUTERS),
-        Button("Wake computers", State.WAKE_COMPUTERS),
-        Button("Shutdown computers", State.SHUTDOWN_COMPUTERS),
-        Button("Update computers", State.UPDATE_COMPUTERS),
-        Button("Install software", State.INSTALL_SOFTWARE),
-        Button("Execute script"),
-        Button("Upload file")
-    ]
+    main_buttons = [Button(value, key) for key, value in plugins.items()]
 
     footer_buttons = [Button("Disconnect", State.DISCONNECT)]
 

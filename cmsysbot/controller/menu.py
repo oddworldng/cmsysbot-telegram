@@ -22,7 +22,7 @@ from telegram import Bot
 from telegram.ext import Updater
 
 import view
-from utils import Computers, State, states
+from utils import Computers, State, states, plugins
 
 
 def new_main(bot: Bot, update: Updater, user_data: dict):
@@ -43,7 +43,7 @@ def new_main(bot: Bot, update: Updater, user_data: dict):
     if not s.connected:
         view.not_connected().reply(update)
     else:
-        view.connected(s.route, s.username, s.bridge_ip).reply(update)
+        view.connected(s.route, plugins.get_local_plugins(), s.username, s.bridge_ip).reply(update)
 
 
 def main(bot: Bot, update: Updater, user_data: dict):
@@ -64,7 +64,7 @@ def main(bot: Bot, update: Updater, user_data: dict):
     if not s.connected:
         view.not_connected().edit(update)
     else:
-        view.connected(s.route, s.username, s.bridge_ip).edit(update)
+        view.connected(s.route, plugins.get_local_plugins(), s.username, s.bridge_ip).edit(update)
 
 
 def select_department(bot: Bot, update: Updater, user_data: dict):

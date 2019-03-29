@@ -22,7 +22,7 @@ from telegram.ext import Updater
 
 import view
 from system import bridge, remote
-from utils import State
+from utils import State, plugins
 
 
 def update_ips(bot: Bot, update: Updater, user_data: dict):
@@ -192,6 +192,8 @@ def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
                 "Shutdown computer with ip %s" % target_ip)
 
 
+
+
 def update_computers(bot: Bot, update: Updater, user_data: dict):
     """
     Iterate through the ``included`` computers and send an update command.
@@ -222,6 +224,19 @@ def update_computers(bot: Bot, update: Updater, user_data: dict):
         remote.update_computer(client, target_ip, username, password)
 
         query.message.reply_text("Updated computer with ip %s" % target_ip)
+
+
+def execute_plugin(bot: Bot, update: Updater, user_data: dict):
+    query = update.callback_query
+
+    session = user_data['session']
+
+    plugin_name = re.search(State.EXECUTE_PLUGIN, query.data).group(1)
+    arguments = plugins.get_plugin_arguments(plugin_name)
+
+    # TODO: Cambiar valores de variables
+
+    # TODO: Completar funcion
 
 
 def download_script(bot: Bot, update: Updater, user_data: dict):

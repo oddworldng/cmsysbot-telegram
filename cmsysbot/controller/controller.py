@@ -101,6 +101,12 @@ def add_callbacks(dp: Dispatcher):
             pass_user_data=True))
 
     dp.add_handler(
+        CallbackQueryHandler(
+            general.execute_plugin,
+            pattern=State.EXECUTE_PLUGIN,
+            pass_user_data=True))
+
+    dp.add_handler(
         MessageHandler(
             Filters.document, general.download_script, pass_user_data=True))
 
