@@ -21,7 +21,7 @@ from telegram import Bot, Document, File
 from telegram.ext import Updater
 
 import view
-from system import remote, bridge
+from system import bridge, remote
 from utils import State
 
 
@@ -248,9 +248,12 @@ def download_script(bot: Bot, update: Updater, user_data: dict):
 
     # Ejecutar desde el bridge
     for computer in computers.get_included_computers():
-        message.reply_text("Sending script to computer %s" % computer.mac);
-
         target_ip = computer.ip
 
+        output = remote.execute_script_as_root(user_data['session'], target_ip, download_path)
 
-        # TODO: Send script
+        if output:
+            message.reply_text("[Executed %s on Computer %s]:\n %s" % (download_path, target_ip, output))
+        else:
+            message.reply_text("[Executed %s on Computer %s]:\n No output" %
+                               (download_path, target_ip))

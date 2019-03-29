@@ -4,6 +4,8 @@ from typing import List
 import paramiko
 from wakeonlan import send_magic_packet
 
+from utils import Session
+
 
 def wake_on_lan(target_mac: str):
     send_magic_packet(target_mac)
@@ -16,8 +18,7 @@ def shutdown_computer(client: paramiko.SSHClient, target_ip: str,
     send_command_as_root(client, target_ip, username, password, command)
 
 
-def get_local_ips(client: paramiko.SSHClient, password: str,
-                       macs: List[str]):
+def get_local_ips(client: paramiko.SSHClient, password: str, macs: List[str]):
 
     submask = get_submask(client)
 
@@ -55,7 +56,8 @@ def update_computer(client: paramiko.SSHClient, target_ip: str, username: str,
 
     print(send_command_as_root(client, target_ip, username, password, update))
     print(send_command_as_root(client, target_ip, username, password, upgrade))
-    print(send_command_as_root(client, target_ip, username, password, dist_upgrade))
+    print(send_command_as_root(client, target_ip, username, password,
+                               dist_upgrade))
 
 
 def run_in_bridge(client: paramiko.SSHClient, command: str):
@@ -77,14 +79,14 @@ def run_in_bridge_as_root(client: paramiko.SSHClient, password: str,
 def send_command_as_root(client: paramiko.SSHClient, target_ip: str,
                          username: str, password: str, command: str):
 
-    full_command = (" sshpass -p %(password)s ssh -o ConnectTimeout=3 %(username)s@%(target_ip)s 'echo %(password)s | sudo -S %(command)s'" % {
-        'password': password,
-        'username': username,
-        'target_ip': target_ip,
-        'command': command
-    })
-
-    print(full_command)
+    full_command = (
+        " sshpass -p %(password)s ssh -o ConnectTimeout=3 %(username)s@%(target_ip)s 'echo %(password)s | sudo -S %(command)s'"
+        % {
+            'password': password,
+            'username': username,
+            'target_ip': target_ip,
+            'command': command
+        })
 
     _, stdout, _ = client.exec_command(full_command)
 
@@ -95,8 +97,33 @@ def send_command_as_root(client: paramiko.SSHClient, target_ip: str,
     return stdout.read().decode('utf-8')
 
 
+def execute_script_as_root(session: Session, target_ip: str, script: str):
+
+    send_file(session, target_ip, script, "/tmp/")
+
+    output = send_command_as_root(session.client, target_ip, session.username,
+                                  session.password, script)
+
+    return output
+
+
+def send_file(session: Session, target_ip: str, file: str, remote_path: str):
+
+    full_command = " sshpass -p %(password)s scp %(file)s %(target_ip)s:%(remote_path)s" % {
+        'password': session.password,
+        'target_ip': target_ip,
+        'file': file,
+        'remote_path': remote_path
+    }
+
+    _, stdout, _ = session.client.exec_command(full_command)
+
+    print("User %s sent file %s from %s to %s" %
+          (session.username, file, session.bridge_ip, target_ip))
+
+
 def install_software(client: paramiko.SSHClient, target_ip: str, username: str,
-                    password: str, software: str):
+                     password: str, software: str):
 
     # Generating command
     command = 'apt install -y %s' % software
@@ -104,4 +131,3 @@ def install_software(client: paramiko.SSHClient, target_ip: str, username: str,
     # Execute command
     send_command_as_root(client, target_ip, username, password, command)
     _, stdout, _ = client.exec_command(full_command)
-
