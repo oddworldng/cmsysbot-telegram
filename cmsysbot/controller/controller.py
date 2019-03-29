@@ -2,7 +2,7 @@ from telegram.ext import (CallbackQueryHandler, CommandHandler,
                           ConversationHandler, Dispatcher, Filters,
                           MessageHandler)
 
-from utils import State, glob
+from utils import State, states
 
 from . import command, conversation, general, menu
 
@@ -12,7 +12,7 @@ def add_callbacks(dp: Dispatcher):
     with_subsections = []
     without_subsections = []
 
-    for section in glob.config_file.get_all_sections():
+    for section in states.config_file.get_all_sections():
         if section.has_subsections():
             with_subsections.append("^%s$" % section.name)
         else:
