@@ -2,7 +2,7 @@
 
 # CMSysBot: {
 # "root": "True",
-# "source": "bridge-once",
+# "source": "bridge",
 # }
 
 dpkg -s arp-scan &> /dev/null

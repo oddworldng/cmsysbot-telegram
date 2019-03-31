@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# CMSysBot: {
+# "root": "True",
+# "source": "remote",
+# "arguments": ["$BRIDGE_IP"]
+# }
+
+BRIDGE_IP=$1
+LOCAL_IP=$(hostname -I)
+
+if [ $BRIDGE_IP == $LOCAL_IP ] ; then
+  echo "Don't shut down the bridge computer!"
+else
+  sudo init 0
+fi
+
