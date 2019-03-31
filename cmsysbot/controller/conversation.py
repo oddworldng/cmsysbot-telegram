@@ -63,9 +63,8 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
     print(plugin.path)
 
     for computer in session.computers.get_included_computers():
-        # TODO: Add stderr
-        stdout, stderr = plugin.run(session, computer)
 
+        stdout, stderr = plugin.run(session, computer)
         view.plugin_output(computer, plugin.name, stdout, stderr).reply(update)
 
     menu.new_main(bot, update, user_data)

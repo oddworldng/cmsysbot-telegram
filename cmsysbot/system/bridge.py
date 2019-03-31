@@ -57,6 +57,7 @@ def run(session: Session, command: str):
 
 def run_as_root(session: Session, command: str):
 
+    print("Running as root!!!")
     root_command = ' echo %s | sudo -S %s' % (session.password, command)
     return _execute_command_bridge(session, root_command)
 

@@ -16,11 +16,13 @@ class PluginVar:
     TARGET_MAC = "$TARGET_MAC"
     SOURCE_BRIDGE = "bridge"
     SOURCE_REMOTE = "remote"
+    ROOT = False
 
 
 class Plugin:
     BODY_REGEX = re.compile(r"CMSysBot:\s*{(.*)}",
                             re.IGNORECASE | re.MULTILINE | re.DOTALL)
+    ROOT_REGEX = re.compile(r"\"root\"\s*:\s*\"(.*)\"\s*,?", re.IGNORECASE)
     SOURCE_REGEX = re.compile(r"\"source\"\s*:\s*\"(.*)\"\s*,?", re.IGNORECASE)
     ARGUMENTS_REGEX = re.compile(r"\"arguments\"\s*:\s*\[(.*)\]",
                                  re.MULTILINE | re.DOTALL)
@@ -47,8 +49,19 @@ class Plugin:
             if body_match:
                 body = body_match.group(1)
 
+            self.root = self._parse_root(body)
             self.source = self._parse_source(body)
             self.arguments = self._parse_arguments(body)
+
+    def _parse_root(self, body: str):
+        root = PluginVar.ROOT  # Default value
+
+        root_match = re.search(self.ROOT_REGEX, body)
+
+        if root_match:
+            root = (root_match.group(1).lower() == 'true')
+
+        return root
 
     def _parse_source(self, body: str):
         source = PluginVar.SOURCE_BRIDGE  # Default value
@@ -81,7 +94,10 @@ class Plugin:
         self.fill_computer_arguments(computer)
 
         if self.source == PluginVar.SOURCE_BRIDGE:
-            return bridge.run(session, self.to_command())
+            if self.root:
+                return bridge.run_as_root(session, self.to_command())
+            else:
+                return bridge.run(session, self.to_command())
 
     def fill_computer_arguments(self, computer: Computer):
         if PluginVar.TARGET_IP in self.arguments:
