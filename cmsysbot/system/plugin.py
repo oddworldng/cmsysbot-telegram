@@ -1,10 +1,9 @@
 import glob
 import os.path
 import re
-from enum import Enum
 from typing import Dict
 
-from system import bridge
+from system import bridge, remote
 from utils import Computer, Session, states
 
 
@@ -14,7 +13,6 @@ class PluginVar:
     BRIDGE_IP = "$BRIDGE_IP"
     TARGET_IP = "$TARGET_IP"
     TARGET_MAC = "$TARGET_MAC"
-    SOURCE_BRIDGE_ONCE = "bridge-once"
     SOURCE_BRIDGE = "bridge"
     SOURCE_REMOTE = "remote"
     ROOT = False
@@ -91,7 +89,6 @@ class Plugin:
         return arguments
 
     def run(self, session: Session):
-
         # Get route in bridge
         bridge_plugin_path = "%s/%s" % (states.config_file.bridge_tmp_dir,
                                         self.name)
@@ -102,28 +99,44 @@ class Plugin:
         self.fill_session_arguments(session)
 
         # Run the command only once on the bridge and return
-        if self.source == PluginVar.SOURCE_BRIDGE_ONCE:
-            print("Run bridge once")
-            command = "%s %s" % (bridge_plugin_path, " ".join(self.arguments))
+        if self.source == PluginVar.SOURCE_BRIDGE:
+            command = "%s %s" % (bridge_plugin_path, " ".join(
+                self.arguments.values()))
+
+            computer = Computer({
+                "name": "Bridge",
+                "ip": session.bridge_ip,
+                "mac": ""
+            })
 
             if self.root:
-                yield (None, *bridge.run_as_root(session, command))
+                yield (computer, *bridge.run_as_root(session, command))
             else:
-                yield (None, *bridge.run(session, command))
+                yield (computer, *bridge.run(session, command))
 
         # Run the command for each included computer
-        for computer in session.computers.get_included_computers():
-            self.fill_computer_arguments(computer)
-            command = "%s %s" % (bridge_plugin_path, " ".join(self.arguments))
+        elif self.source == PluginVar.SOURCE_REMOTE:
 
-            if self.source == PluginVar.SOURCE_BRIDGE:
+            for computer in session.computers.get_included_computers():
+                self.fill_computer_arguments(computer)
+
+                remote_plugin_path = "%s/%s" % (
+                    states.config_file.remote_tmp_dir, self.name)
+
+                # Send plugin to remote for execution
+                remote.send_file_to_remote(session, computer.ip,
+                                           bridge_plugin_path,
+                                           remote_plugin_path)
+
+                command = "%s %s" % (remote_plugin_path, " ".join(
+                    self.arguments.values()))
+
                 if self.root:
-                    yield (computer, *bridge.run_as_root(session, command))
+                    yield (computer,
+                           *remote.run_as_root(session, computer.ip, command))
                 else:
-                    yield (computer, *bridge.run(session, command))
-
-            elif self.source == PluginVar.SOURCE_REMOTE:
-                print("Run in remote!")
+                    yield (computer,
+                           *remote.run(session, computer.ip, command))
 
     def fill_session_arguments(self, session: Session):
         if PluginVar.USERNAME in self.arguments:
@@ -141,9 +154,6 @@ class Plugin:
 
         if PluginVar.TARGET_MAC in self.arguments:
             self.arguments[PluginVar.TARGET_MAC] = computer.mac
-
-    def to_command(self):
-        return "%s %s" % (self.path, " ".join(self.arguments.values()))
 
     def __getitem__(self, key: str) -> str:
         return self.arguments[key]

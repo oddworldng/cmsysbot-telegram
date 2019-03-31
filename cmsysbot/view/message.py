@@ -1,4 +1,5 @@
 import os
+import re
 from typing import List
 
 from utils import Computer
@@ -95,8 +96,12 @@ def plugin_output(computer: Computer, plugin_name: str, stdout: str,
     # Text
     text = ""
 
+    # Remove "[sudo] password for X:" prompt"
+    stderr = re.sub(r"\[sudo\].*?:", "", stderr).strip()
+    print(stderr)
+
     if stderr:
-        text += "-> [ERROR]:\n%s" % stderr
+        text += "-> [Error]: %s" % stderr
 
     if stdout:
         text += stdout
@@ -110,7 +115,7 @@ def plugin_output(computer: Computer, plugin_name: str, stdout: str,
     else:
         computer_name = "Bridge"
 
-    text = "[%s - %s]:\n\n%s" % (computer_name, plugin_name, text)
+    text = "[%s - %s]:\n%s" % (computer_name, plugin_name, text)
 
     # Keyboard
     return Keyboard(text)

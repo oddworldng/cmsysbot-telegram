@@ -111,7 +111,8 @@ def add_conversation_callbacks(dp: Dispatcher):
         },
         fallbacks=[
             RegexHandler('^/cancel$', menu.new_main, pass_user_data=True)
-        ])
+        ],
+        allow_reentry=True)
 
     plugin_exec_handler = ConversationHandler(
         entry_points=[
@@ -128,7 +129,8 @@ def add_conversation_callbacks(dp: Dispatcher):
         },
         fallbacks=[
             RegexHandler('^/cancel$', menu.new_main, pass_user_data=True)
-        ])
+        ],
+        allow_reentry=True)
 
     # Add to dispatcher
     dp.add_handler(login_conv_handler)

@@ -59,6 +59,8 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
     plugin: Plugin = user_data['plugin']
 
     for computer, stdout, stderr in plugin.run(session):
+        print("Yield Stdout %s" % stdout)
+        print("Yield Stderr %s" % stdout)
         view.plugin_output(computer, plugin.name, stdout, stderr).reply(update)
 
     menu.new_main(bot, update, user_data)
