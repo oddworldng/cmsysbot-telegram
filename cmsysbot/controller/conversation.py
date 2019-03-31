@@ -1,12 +1,12 @@
 import os
 import re
 
-from telegram import Bot, ChatAction
+from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
 import view
 from system import Plugin, bridge
-from utils import Session, State, send_action, states
+from utils import Session, State, states
 
 from . import general, menu
 
@@ -52,15 +52,12 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
     return execute_plugin(bot, update, user_data=user_data)
 
 
-@send_action(ChatAction.TYPING)
 def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
     session: Session = user_data['session']
     plugin: Plugin = user_data['plugin']
 
     for computer, stdout, stderr in plugin.run(session):
-        print("Yield Stdout %s" % stdout)
-        print("Yield Stderr %s" % stdout)
         view.plugin_output(computer, plugin.name, stdout, stderr).reply(update)
 
     menu.new_main(bot, update, user_data)

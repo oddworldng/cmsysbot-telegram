@@ -15,7 +15,9 @@ if [[ $? == 0 ]] ; then
 else
   apt-cache show $PACKAGE_NAME &> /dev/null
 
-  if [[ $? == 0 ]] ; then
+  if [[ $? != 0 ]] ; then
+    echo "The package $PACKAGE_NAME doesn't exists!"
+  else
     STDERR=$(sudo apt-get install -y $PACKAGE_NAME 2>&1 > /dev/null)
 
     if [[ $? == 0 ]] ; then
@@ -23,9 +25,5 @@ else
     else
       (>&2 echo $STDERR)
     fi
-  else
-    echo "The package $PACKAGE_NAME doesn't exists!"
   fi
 fi
-
-

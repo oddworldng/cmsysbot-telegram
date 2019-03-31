@@ -13,6 +13,7 @@ class PluginVar:
     BRIDGE_IP = "$BRIDGE_IP"
     TARGET_IP = "$TARGET_IP"
     TARGET_MAC = "$TARGET_MAC"
+    MACS_LIST = "$MACS_LIST"
     SOURCE_BRIDGE = "bridge"
     SOURCE_REMOTE = "remote"
     ROOT = False
@@ -147,6 +148,10 @@ class Plugin:
 
         if PluginVar.BRIDGE_IP in self.arguments:
             self.arguments[PluginVar.BRIDGE_IP] = session.bridge_ip
+
+        if PluginVar.MACS_LIST in self.arguments:
+            self.arguments[PluginVar.MACS_LIST] = " ".join(
+                list(session.computers.get_macs()))
 
     def fill_computer_arguments(self, computer: Computer):
         if PluginVar.TARGET_IP in self.arguments:

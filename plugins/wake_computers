@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# CMSysBot: {
+# "root": "False",
+# "source": "bridge",
+# "arguments": ["$MACS_LIST"]
+# }
+
+MACS_LIST="$@"
+
+if [[ $? != 0 ]]; then
+  sudo apt-get -y install wakeonlan &>/dev/null
+fi
+
+wakeonlan $MACS_LIST

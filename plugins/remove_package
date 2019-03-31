@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# CMSysBot: {
+#   "root": "True",
+#   "source" : "remote",
+#   "arguments": ["Please enter the package name: "]
+# }
+
+PACKAGE_NAME=$1
+
+apt-cache show $PACKAGE_NAME &>/dev/null
+
+if [[ $? != 0 ]]; then
+  echo "The package $PACKAGE_NAME doesn't exists!"
+else
+  dpkg -s $PACKAGE_NAME &>/dev/null
+
+  if [[ $? != 0 ]]; then
+    echo "The package $PACKAGE_NAME is not installed!!"
+
+  else
+    STDERR=$(sudo apt-get purge -y $PACKAGE_NAME 2>&1 >/dev/null)
+
+    if [[ $? == 0 ]]; then
+      echo "The package $PACKAGE_NAME was sucessfully removed!"
+    else
+      (echo >&2 $STDERR)
+    fi
+  fi
+fi

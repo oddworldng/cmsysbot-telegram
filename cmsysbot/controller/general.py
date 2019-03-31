@@ -13,12 +13,12 @@ connecting, disconnecting, sending commands, sending messages, etc.
 
 import re
 
-from telegram import Bot, ChatAction, Document, File
+from telegram import Bot, Document, File
 from telegram.ext import Updater
 
 import view
 from system import Plugin, bridge
-from utils import State, send_action
+from utils import State
 
 from . import menu
 
@@ -75,7 +75,6 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
     menu.new_main(bot, update, user_data)
 
 
-@send_action(ChatAction.TYPING)
 def update_ips(bot: Bot, update: Updater, user_data: dict):
     """
     Get all the macs and its associated ips from the local network. Then,
