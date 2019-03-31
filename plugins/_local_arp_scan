@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# CMSysBot: {
+# "root": "True",
+# "source": "bridge-once",
+# }
+
+dpkg -s arp-scan &> /dev/null
+
+if [[ $? != 0 ]] ; then
+  sudo apt-get -y install arp-scan
+fi
+
+ARP_SCAN_OUTPUT=$(sudo arp-scan -l | cut -f 1,2 | tail -n +3 | head -n -3)
+echo "$ARP_SCAN_OUTPUT"
+

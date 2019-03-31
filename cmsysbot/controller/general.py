@@ -9,10 +9,6 @@ Note:
 
 ``general`` :obj:`callbacks` are the ones that perform any action, like
 connecting, disconnecting, sending commands, sending messages, etc.
-
-``general`` :obj:`callbacks` DON'T show/create new menus, only perform actions.
-The callbacks used to move between menus must be defined inside the :obj:`menu`
-module.
 """
 
 import re
@@ -23,6 +19,60 @@ from telegram.ext import Updater
 import view
 from system import Plugin, bridge
 from utils import State, send_action
+
+from . import menu
+
+
+def connect(bot: Bot, update: Updater, user_data: dict):
+    """
+    Tries to open a SSH connection from the bot server to the bridge computer.
+
+    After that, sends a message to the chat with the result of the connection
+    (successed or failed) and returns to the main menu.
+
+    Args:
+        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
+        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
+            the bot.
+        user_data (:obj:`dict`): The dictionary with user variables.
+    """
+
+    session = user_data['session']
+
+    # Try to connect to the client
+    session.start_connection()
+
+    # Send the status message
+    view.connect_output(session.connected, session.bridge_ip).reply(update)
+
+    # Show the main menu again
+    menu.new_main(bot, update, user_data)
+
+
+def disconnect(bot: Bot, update: Updater, user_data: dict):
+    """
+    Closes the open SSH connection to the bridge computer.
+
+    After that, sends a 'Disconnected' message to the chat and returns to the
+    main menu.
+
+    Args:
+        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
+        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
+            the bot.
+        user_data (:obj:`dict`): The dictionary with user variables.
+    """
+
+    bridge_ip = user_data['session'].bridge_ip
+
+    # Close the connection
+    user_data['session'].end_connetion()
+
+    # Send the disconnect output
+    view.disconnect_output(bridge_ip).edit(update)
+
+    # Show the main menu again
+    menu.new_main(bot, update, user_data)
 
 
 @send_action(ChatAction.TYPING)
@@ -43,7 +93,11 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
 
     # Get all the local ips for every local mac
     plugin = Plugin("plugins/_local_arp_scan")
-    _, stdout, stderr = next(plugin.run(session))
+
+    # Change view to executing
+    view.plugin_start(plugin.name).edit(update)
+
+    _, stdout, _ = next(plugin.run(session))
 
     local_ips = {}
     for line in stdout.splitlines():
@@ -56,6 +110,8 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
             computer.ip = local_ips[computer.mac]
 
             view.update_ip_output(computer, last_ip).reply(update)
+
+    menu.new_main(bot, update, user_data)
 
 
 def include_computers(bot: Bot, update: Updater, user_data: dict):

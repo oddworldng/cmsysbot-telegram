@@ -8,7 +8,7 @@ import view
 from system import Plugin, bridge
 from utils import Session, State, send_action, states
 
-from . import menu
+from . import general, menu
 
 # Conversation States
 USERNAME, PASSWORD, ANSWER = range(3)
@@ -103,6 +103,6 @@ def get_password(bot: Bot, update: Updater,
 
     user_data['session'].password = update.message.text
 
-    menu.connect(bot, update, user_data)
+    general.connect(bot, update, user_data)
 
     return ConversationHandler.END

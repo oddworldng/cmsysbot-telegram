@@ -57,7 +57,7 @@ def add_callbacks(dp: Dispatcher):
     # Triggered when clicking on Disconnect button
     dp.add_handler(
         CallbackQueryHandler(
-            menu.disconnect, pattern=State.DISCONNECT, pass_user_data=True))
+            general.disconnect, pattern=State.DISCONNECT, pass_user_data=True))
 
     # Show menu for filtering computers
     dp.add_handler(

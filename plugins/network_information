@@ -1,3 +1,8 @@
 #!/bin/bash
 
+  # CMSysBot: {
+  #   "root": "False",
+  #   "source" : "bridge-once",
+  # }
+
 ifconfig
