@@ -38,22 +38,21 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
             the bot.
         user_data (:obj:`dict`): The dictionary with user variables.
     """
-    # TODO: WIP. Iterate through the computer macs and change the ips
-
     session = user_data['session']
 
-    # Get all the local ips for every mac
+    # Get all the local ips for every local mac
     local_ips = bridge.get_local_ips(session)
 
-    query = update.callback_query
+    message = update.callback_query.message
 
     for computer in session.computers.get_included_computers():
-        print(computer.mac)
         if computer.mac in local_ips:
+            last_ip = computer.ip
+
             computer.ip = local_ips[computer.mac]
 
-            query.message.reply_text("Computer %s with mac [%s] now has the \
-ip %s" % (computer.name, computer.mac, computer.ip))
+            message.reply_text("Computer %s: %s --> %s" %
+                               (computer.name, last_ip, computer.ip))
 
 
 def include_computers(bot: Bot, update: Updater, user_data: dict):

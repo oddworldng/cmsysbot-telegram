@@ -6,6 +6,7 @@ from telegram.ext import ConversationHandler, Updater
 
 from system import bridge
 from utils import State, plugins, states
+from view import view
 
 from . import menu
 
@@ -38,8 +39,8 @@ def start_plugin(bot: Bot, update: Updater, user_data: dict):
     # Download plugin from server to bridge
     bridge.send_file_to_bridge(session, plugin_path_server, plugin_path_bridge)
 
-    # Command will store the whole command
-    user_data['command'] = [plugin_path_bridge]
+    # Plugin will store the plugin command
+    user_data['plugin'] = [plugin_path_bridge]
 
     # Arguments will store the arguments still to be replaced
     user_data['arguments'] = plugins.get_plugin_arguments(plugin_path_server)
@@ -55,13 +56,13 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
         argument = user_data['arguments'].pop(0)
 
         if argument == "$USERNAME":
-            user_data['command'].append(session.username)
+            user_data['plugin'].append(session.username)
 
         elif argument == "$PASSWORD":
-            user_data['command'].append(session.password)
+            user_data['plugin'].append(session.password)
 
         elif argument == "$TARGET_IP":
-            user_data['command'].append("$TARGET_IP")
+            user_data['plugin'].append("$TARGET_IP")
 
         else:
             if update.message:
@@ -72,8 +73,8 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
             print(argument)
             return ANSWER
 
-    # Whole command
-    print(user_data['command'])
+    # Whole plugin command
+    print(user_data['plugin'])
 
     return execute_plugin(bot, update, user_data)
 
@@ -85,28 +86,17 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
     for computer in session.computers.get_included_computers():
         target_ip = computer.ip
 
-        command_string = " ".join(user_data['command'])
+        plugin = user_data['plugin']
 
         output = bridge.run_plugin_in_remote_as_root(session, target_ip,
-                                                     command_string)
-        message = None
-        if update.message:
-            message = update.message
-        else:
-            message = update.callback_query.message
+                                                     plugin)
 
-        if not output:
-            output = "No output"
-
-        plugin_name = os.path.basename(user_data['command'][0])
-
-        message.reply_text(
-            "[Computer %s - %s]:\n\n%s" % (computer.ip, plugin_name, output))
+        view.command_output(computer, plugin, output).reply(update)
 
 
 def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:
 
-    user_data['command'].append("\"%s\"" % update.message.text)
+    user_data['plugin'].append("\"%s\"" % update.message.text)
     print("Answer: " + update.message.text)
 
     return collect_arguments(bot, update, user_data)

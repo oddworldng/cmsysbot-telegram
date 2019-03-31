@@ -10,7 +10,7 @@ from utils import Session, states
 
 def get_local_ips(session: Session):
 
-    submask = get_submask(session.client)
+    submask = get_submask(session)
 
     arp_scan_output = run_in_bridge_as_root(session, 'arp-scan %s' % submask)
 
@@ -81,19 +81,26 @@ def run_in_remote_as_root(session: Session, target_ip: str, command: str):
 
 
 def run_plugin_in_remote_as_root(session: Session, target_ip: str,
-                                 plugin_path: str):
+                                 plugin: List[str]):
 
-    plugin_name = os.path.basename(plugin_path)
+    plugin_path_bridge = plugin[0]
+
+    plugin_name = os.path.basename(plugin_path_bridge)
 
     plugin_path_remote = "%s/%s" % (states.config_file.remote_tmp_dir,
                                     plugin_name)
 
     print("Plugin name: " + plugin_name)
+    print("Route in bridge: " + plugin_path_remote)
     print("Route in remote: " + plugin_path_remote)
 
-    send_file_to_remote(session, target_ip, plugin_path, plugin_path_remote)
+    send_file_to_remote(session, target_ip, plugin_path_bridge,
+                        plugin_path_remote)
 
-    output = run_in_remote_as_root(session, target_ip, plugin_path_remote)
+    plugin[0] = plugin_path_remote
+    plugin_command = " ".join(plugin)
+
+    output = run_in_remote_as_root(session, target_ip, plugin_command)
 
     return output
 

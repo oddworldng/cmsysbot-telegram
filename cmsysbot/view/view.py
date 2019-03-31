@@ -1,4 +1,5 @@
 from typing import List
+import os
 
 from utils import Computer, State
 
@@ -45,7 +46,12 @@ def connected(route: List[str], plugins: dict, username: str,
     print(plugins)
 
     # Buttons
-    main_buttons = [Button(value, key) for key, value in plugins.items()]
+    main_buttons = [
+        Button("Update ips", State.UPDATE_IPS),
+        Button("Filter computers", State.FILTER_COMPUTERS)
+    ]
+
+    main_buttons.extend([Button(value, key) for key, value in plugins.items()])
 
     footer_buttons = [Button("Disconnect", State.DISCONNECT)]
 
@@ -172,3 +178,15 @@ def filter_computers(computers: List[Computer]):
         n_cols=2,
         main_buttons=main_buttons,
         footer_buttons=footer_buttons)
+
+
+def command_output(computer: Computer, command: List[str], output: str):
+
+    plugin_name = os.path.basename(command[0])
+
+    if not output:
+        output = "-> No output"
+
+    text = "[%s - %s]:\n\n%s" % (computer, plugin_name, output)
+
+    return Keyboard(text)

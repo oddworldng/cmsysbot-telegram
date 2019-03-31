@@ -1,23 +1,31 @@
 {
-  "token": "601812425:AAHYoMgMbyJQnYqlr8da20LgyncuyvGdtWg",
+  "token": "",
   "name": "",
   "email": "",
   "bridge_tmp_dir": "/tmp/",
-  "remote_tmp_dir": "/str/",
-  "structure": [{
-        "name": "ESIT",
-        "sections": [{
-            "name": "Industriales",
-            "sections": ["Aula 3.5", "Aula 3.8"]
-          },
-          {
-            "name": "Ingeniería",
-            "sections": ["OSL", "BBTK"]
-          }
-        ]
-      },
-      {
-        "name": "MATFIS"
-      }
-    ]
+  "remote_tmp_dir": "/tmp/",
+  "structure": [
+    {
+      "name": "ESIT",
+      "sections": [
+        {
+          "name": "Industriales",
+          "sections": [
+            "Aula 3.5",
+            "Aula 3.8"
+          ]
+        },
+        {
+          "name": "Ingeniería",
+          "sections": [
+            "OSL",
+            "BBTK"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MATFIS"
+    }
+  ]
 }
