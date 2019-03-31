@@ -90,15 +90,21 @@ def ask_argument(argument_text: str):
     return Keyboard(text)
 
 
-def plugin_output(computer: Computer, plugin: List[str], output: str):
-
+def plugin_output(computer: Computer, plugin_name: str, stdout: str,
+                  stderr: str):
     # Text
-    plugin_name = os.path.basename(plugin[0])
+    text = ""
 
-    if not output:
-        output = "-> No output"
+    if stderr:
+        text += "-> [ERROR]:\n%s" % stderr
 
-    text = "[%s - %s]:\n\n%s" % (computer, plugin_name, output)
+    if stdout:
+        text += stdout
+
+    if not text:
+        text = "-> No output"
+
+    text = "[%s - %s]:\n\n%s" % (computer, plugin_name, text)
 
     # Keyboard
     return Keyboard(text)

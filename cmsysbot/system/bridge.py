@@ -50,6 +50,23 @@ def run_in_bridge_as_root(session: Session, command: str):
     return stdout.read().decode('utf-8')
 
 
+def run(session: Session, command: str):
+
+    return _execute_command_bridge(session, command)
+
+
+def run_as_root(session: Session, command: str):
+
+    root_command = ' echo %s | sudo -S %s' % (session.password, command)
+    return _execute_command_bridge(session, root_command)
+
+
+def _execute_command_bridge(session: Session, command: str):
+
+    _, stdout, stderr = session.client.exec_command(command)
+    return stdout.read().decode('utf-8'), stderr.read().decode('utf-8')
+
+
 def send_file_to_bridge(session: Session, file: str, bridge_path: str):
 
     scp = SCPClient(session.client.get_transport())

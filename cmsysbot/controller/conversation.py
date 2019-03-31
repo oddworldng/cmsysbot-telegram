@@ -5,8 +5,8 @@ from telegram import Bot, ChatAction
 from telegram.ext import ConversationHandler, Updater
 
 import view
-from system import bridge, plugin
-from utils import State, send_action, states
+from system import Plugin, bridge
+from utils import Session, State, send_action, states
 
 from . import menu
 
@@ -23,29 +23,10 @@ def start_plugin(bot: Bot, update: Updater, user_data: dict):
 
     # Plugin path in server
     plugin_path_server = re.search(State.START_PLUGIN, query.data).group(1)
+    user_data['plugin'] = Plugin(plugin_path_server)
 
-    plugin_name = os.path.basename(plugin_path_server)
-
-    # Plugin path in bridge
-    plugin_path_bridge = "%s/%s" % (states.config_file.bridge_tmp_dir,
-                                    plugin_name)
-
-    print("Plugin name: " + plugin_name)
+    print("Plugin name: " + user_data['plugin'].name)
     print("Route in server: " + plugin_path_server)
-    print("Route in bridge: " + plugin_path_bridge)
-
-    view.plugin_start(plugin_name).edit(update)
-
-    session = user_data['session']
-
-    # Download plugin from server to bridge
-    bridge.send_file_to_bridge(session, plugin_path_server, plugin_path_bridge)
-
-    # Plugin will store the plugin command
-    user_data['plugin'] = [plugin_path_bridge]
-
-    # Arguments will store the arguments still to be replaced
-    user_data['arguments'] = plugin.get_plugin_arguments(plugin_path_server)
 
     return collect_arguments(bot, update, user_data)
 
@@ -54,26 +35,16 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
 
     session = user_data['session']
 
-    while user_data['arguments']:
-        argument = user_data['arguments'].pop(0)
+    plugin = user_data['plugin']
+    plugin.fill_session_arguments(session)
 
-        if argument == "$USERNAME":
-            user_data['plugin'].append(session.username)
-
-        elif argument == "$PASSWORD":
-            user_data['plugin'].append(session.password)
-
-        elif argument == "$TARGET_IP":
-            user_data['plugin'].append("$TARGET_IP")
-
-        else:
+    for argument in plugin.arguments:
+        if argument[0] != '$' and not plugin.arguments[argument]:
+            user_data['asking_for'] = argument
             view.ask_argument(argument).reply(update)
-
-            print(argument)
             return ANSWER
 
-    # Whole plugin command
-    print(user_data['plugin'])
+    print(user_data['plugin'].arguments)
 
     return execute_plugin(bot, update, user_data=user_data)
 
@@ -81,24 +52,29 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
 @send_action(ChatAction.TYPING)
 def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
-    session = user_data['session']
+    session: Session = user_data['session']
+    plugin: Plugin = user_data['plugin']
+
+    bridge_plugin_path = "%s/%s" % (states.config_file.bridge_tmp_dir,
+                                    plugin.name)
+    bridge.send_file_to_bridge(session, plugin.path, bridge_plugin_path)
+    plugin.path = bridge_plugin_path
+
+    print(plugin.path)
 
     for computer in session.computers.get_included_computers():
-        target_ip = computer.ip
+        # TODO: Add stderr
+        stdout, stderr = plugin.run(session, computer)
 
-        plugin = user_data['plugin']
-
-        output = bridge.run_plugin_in_remote_as_root(session, target_ip,
-                                                     plugin)
-
-        view.plugin_output(computer, plugin, output).reply(update)
+        view.plugin_output(computer, plugin.name, stdout, stderr).reply(update)
 
     menu.new_main(bot, update, user_data)
 
 
 def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:
 
-    user_data['plugin'].append("\"%s\"" % update.message.text)
+    argument = user_data['asking_for']
+    user_data['plugin'][argument] = update.message.text
     print("Answer: " + update.message.text)
 
     return collect_arguments(bot, update, user_data)

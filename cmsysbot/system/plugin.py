@@ -1,8 +1,21 @@
 import glob
 import os.path
 import re
+from enum import Enum
+from typing import Dict
 
-from utils import states
+from system import bridge
+from utils import Computer, Session, states
+
+
+class PluginVar:
+    USERNAME = "$USERNAME"
+    PASSWORD = "$PASSWORD"
+    BRIDGE_IP = "$BRIDGE_IP"
+    TARGET_IP = "$TARGET_IP"
+    TARGET_MAC = "$TARGET_MAC"
+    SOURCE_BRIDGE = "bridge"
+    SOURCE_REMOTE = "remote"
 
 
 class Plugin:
@@ -15,8 +28,7 @@ class Plugin:
 
     def __init__(self, path: str):
         self.path = path
-
-        self.parse_cmsysbot_tag()
+        self.parse_cmsysbot_body()
 
     @property
     def name(self):
@@ -26,20 +38,20 @@ class Plugin:
     def dirname(self):
         return os.path.dirname(self.path)
 
-    def parse_cmsysbot_tag(self):
+    def parse_cmsysbot_body(self):
         with open(self.path, 'r') as textfile:
             content = textfile.read()
+            body = ""
 
             body_match = re.search(self.BODY_REGEX, content)
-
             if body_match:
                 body = body_match.group(1)
 
-                self.source = self._parse_source(body)
-                self.arguments = self._parse_arguments(body)
+            self.source = self._parse_source(body)
+            self.arguments = self._parse_arguments(body)
 
     def _parse_source(self, body: str):
-        source = "remote"  # Default value
+        source = PluginVar.SOURCE_BRIDGE  # Default value
 
         source_match = re.search(self.SOURCE_REGEX, body)
 
@@ -64,8 +76,44 @@ class Plugin:
 
         return arguments
 
+    def run(self, session: Session, computer: Computer):
+
+        self.fill_computer_arguments(computer)
+
+        if self.source == PluginVar.SOURCE_BRIDGE:
+            return bridge.run(session, self.to_command())
+
+    def fill_computer_arguments(self, computer: Computer):
+        if PluginVar.TARGET_IP in self.arguments:
+            self.arguments[PluginVar.TARGET_IP] = computer.ip
+
+        if PluginVar.TARGET_MAC in self.arguments:
+            self.arguments[PluginVar.TARGET_MAC] = computer.mac
+
+    def fill_session_arguments(self, session: Session):
+        if PluginVar.USERNAME in self.arguments:
+            self.arguments[PluginVar.USERNAME] = session.username
+
+        if PluginVar.PASSWORD in self.arguments:
+            self.arguments[PluginVar.PASSWORD] = session.password
+
+        if PluginVar.BRIDGE_IP in self.arguments:
+            self.arguments[PluginVar.BRIDGE_IP] = session.bridge_ip
+
+    def to_command(self):
+        return "%s %s" % (self.path, " ".join(self.arguments.values()))
+
+    def __getitem__(self, key: str) -> str:
+        return self.arguments[key]
+
+    def __setitem__(self, key: str, value: str):
+        self.arguments[key] = value
+
+    def __str__(self):
+        return self.name
+
     @staticmethod
-    def get_local_plugins():
+    def get_local_plugins() -> Dict[str, str]:
         """Get plugins names from local path defined in config."""
 
         # Set plugins path
@@ -80,21 +128,3 @@ class Plugin:
                      for x in files)
 
         return names
-
-
-def get_plugin_arguments(plugin_path: str):
-
-    with open(plugin_path, 'r') as content:
-        for line in content:
-            match = re.search(r"^#\s*CMSysBot:\s*(.*)", line)
-
-            if match:
-                result = match.group(1).split(',')
-
-                arguments = [
-                    command.strip().replace('"', '') for command in result
-                ]
-
-                return arguments
-
-    return None
