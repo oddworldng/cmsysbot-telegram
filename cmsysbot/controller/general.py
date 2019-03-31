@@ -21,7 +21,7 @@ from telegram import Bot, Document, File
 from telegram.ext import Updater
 
 import view
-from system import bridge, remote
+from system import bridge
 from utils import State, plugins
 
 
@@ -40,11 +40,10 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
     """
     # TODO: WIP. Iterate through the computer macs and change the ips
 
-    session: Session = user_data['session']
+    session = user_data['session']
 
     # Get all the local ips for every mac
-    local_ips = remote.get_local_ips(session.client, session.password,
-                                     session.computers.get_macs())
+    local_ips = bridge.get_local_ips(session)
 
     query = update.callback_query
 
@@ -131,131 +130,3 @@ def exclude_computers(bot: Bot, update: Updater, user_data: dict):
 
     # Redraw the view
     view.filter_computers(computers).edit(update)
-
-
-def wake_computers(bot: Bot, update: Updater, user_data: dict):
-    """
-    Iterate through the ``included`` computers and send a wake-on-lan command.
-
-    Args:
-        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
-        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
-            the bot.
-        user_data (:obj:`dict`): The dictionary with user variables.
-    """
-
-    query = update.callback_query
-
-    computers = user_data['session'].computers
-
-    # Iterate only through the included computers
-    for computer in computers.get_included_computers():
-        mac = computer.mac
-
-        # Send the wake-on-lan command
-        remote.wake_on_lan(mac)
-
-        query.message.reply_text("Waking up computer with mac %s..." % mac)
-
-
-def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
-    """
-    Iterate through the ``included`` computers and send a shutdown command.
-
-    Args:
-        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
-        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
-            the bot.
-        user_data (:obj:`dict`): The dictionary with user variables.
-    """
-
-    # TODO: ¿Maybe ask if turn down bridge computer too?
-
-    query = update.callback_query
-
-    # Get all necessary data for sending the command
-    client = user_data['session'].client
-    computers = user_data['session'].computers
-    bridge_ip = user_data['session'].bridge_ip
-    username = user_data['session'].username
-    password = user_data['session'].password
-
-    # Iterate only through the included computers
-    for computer in computers.get_included_computers():
-        target_ip = computer.ip
-
-        if target_ip != bridge_ip:  # Don't shutdown bridge computer
-            # Send the shutdown command
-            remote.shutdown_computer(client, target_ip, username, password)
-
-            query.message.reply_text(
-                "Shutdown computer with ip %s" % target_ip)
-
-
-
-
-def update_computers(bot: Bot, update: Updater, user_data: dict):
-    """
-    Iterate through the ``included`` computers and send an update command.
-
-    Args:
-        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
-        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
-            the bot.
-        user_data (:obj:`dict`): The dictionary with user variables.
-    """
-
-    # TODO: Improve the returned message. Tell if the computer is already
-    # updated, or the number of packages to update.
-
-    query = update.callback_query
-
-    # Get all necessary data for sending the command
-    client = user_data['session'].client
-    computers = user_data['session'].computers
-    username = user_data['session'].username
-    password = user_data['session'].password
-
-    # Iterate only through the included computers
-    for computer in computers.get_included_computers():
-        target_ip = computer.ip
-
-        # Send the update command
-        remote.update_computer(client, target_ip, username, password)
-
-        query.message.reply_text("Updated computer with ip %s" % target_ip)
-
-
-def download_script(bot: Bot, update: Updater, user_data: dict):
-
-    session = user_data['session']
-    message = update.message
-
-    if not session.connected:
-        message.reply_text("You must be connected to a bridge computer before sending files!")
-        return
-
-    # Download the file
-    file_object = message.document.get_file()
-    download_path = "/tmp/%s" % message.document.file_name
-    file_object.download(download_path)
-
-    computers = user_data['session'].computers
-    client = user_data['session'].client
-    username = user_data['session'].username
-    password = user_data['session'].password
-
-    # Copiar al bridge
-    bridge.send_file(client, download_path, "/tmp/")
-
-    # Ejecutar desde el bridge
-    for computer in computers.get_included_computers():
-        target_ip = computer.ip
-
-        output = remote.execute_script_as_root(user_data['session'], target_ip, download_path)
-
-        if output:
-            message.reply_text("[Executed %s on Computer %s]:\n %s" % (download_path, target_ip, output))
-        else:
-            message.reply_text("[Executed %s on Computer %s]:\n No output" %
-                               (download_path, target_ip))

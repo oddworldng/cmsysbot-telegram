@@ -54,6 +54,14 @@ class Config(Json):
     def email(self) -> str:
         return self.data['email']
 
+    @property
+    def bridge_tmp_dir(self) -> str:
+        return self.data['bridge_tmp_dir']
+
+    @property
+    def remote_tmp_dir(self) -> str:
+        return self.data['remote_tmp_dir']
+
     def get_sections(self, route: List[str] = None) -> Iterator[Section]:
         route = route or []
 

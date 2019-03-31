@@ -59,29 +59,11 @@ def add_callbacks(dp: Dispatcher):
         CallbackQueryHandler(
             menu.disconnect, pattern=State.DISCONNECT, pass_user_data=True))
 
-    # TRIGGERED if clicked on 'Wake Computers from the main menu'
-    dp.add_handler(
-        CallbackQueryHandler(
-            general.wake_computers,
-            pattern=State.WAKE_COMPUTERS,
-            pass_user_data=True))
-
-    dp.add_handler(
-        CallbackQueryHandler(
-            general.shutdown_computers,
-            pattern=State.SHUTDOWN_COMPUTERS,
-            pass_user_data=True))
-
+    # Show menu for filtering computers
     dp.add_handler(
         CallbackQueryHandler(
             menu.filter_computers,
             pattern=State.FILTER_COMPUTERS,
-            pass_user_data=True))
-
-    dp.add_handler(
-        CallbackQueryHandler(
-            general.exclude_computers,
-            pattern=State.EXCLUDE_COMPUTERS,
             pass_user_data=True))
 
     dp.add_handler(
@@ -92,17 +74,13 @@ def add_callbacks(dp: Dispatcher):
 
     dp.add_handler(
         CallbackQueryHandler(
-            general.update_ips, pattern=State.UPDATE_IPS, pass_user_data=True))
-
-    dp.add_handler(
-        CallbackQueryHandler(
-            general.update_computers,
-            pattern=State.UPDATE_COMPUTERS,
+            general.exclude_computers,
+            pattern=State.EXCLUDE_COMPUTERS,
             pass_user_data=True))
 
     dp.add_handler(
-        MessageHandler(
-            Filters.document, general.download_script, pass_user_data=True))
+        CallbackQueryHandler(
+            general.update_ips, pattern=State.UPDATE_IPS, pass_user_data=True))
 
 
 def add_command_callbacks(dp: Dispatcher):
@@ -111,27 +89,8 @@ def add_command_callbacks(dp: Dispatcher):
 
 def add_conversation_callbacks(dp: Dispatcher):
     """Add all the conversation handlers to the Dispatcher"""
-
-    plugin_exec_handler = ConversationHandler(
-        entry_points=[
-            CallbackQueryHandler(
-                conversation.start_plugin,
-                pattern=State.START_PLUGIN,
-                pass_user_data=True)
-        ],
-        states={
-            conversation.ANSWER: [
-                MessageHandler(
-                    Filters.text, conversation.answer, pass_user_data=True)
-            ]
-        },
-        fallbacks=[])
-
-    dp.add_handler(plugin_exec_handler)
-
     # Login handler
     login_conv_handler = ConversationHandler(
-        # Entry points: From InlineKeyboardButton or /login
         entry_points=[
             CallbackQueryHandler(
                 conversation.login, pattern=State.GET_CREDENTIALS)
@@ -152,23 +111,21 @@ def add_conversation_callbacks(dp: Dispatcher):
         },
         fallbacks=[])
 
-    # Install software handler
-    install_software_handler = ConversationHandler(
-        # Entry points: From InlineKeyboardButton or /login
+    plugin_exec_handler = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(
-                conversation.software, pattern=State.INSTALL_SOFTWARE)
+                conversation.start_plugin,
+                pattern=State.START_PLUGIN,
+                pass_user_data=True)
         ],
         states={
-            conversation.SOFTWARE: [
+            conversation.ANSWER: [
                 MessageHandler(
-                    Filters.text,
-                    conversation.get_software,
-                    pass_user_data=True)
+                    Filters.text, conversation.get_answer, pass_user_data=True)
             ]
         },
         fallbacks=[])
 
     # Add to dispatcher
     dp.add_handler(login_conv_handler)
-    dp.add_handler(install_software_handler)
+    dp.add_handler(plugin_exec_handler)

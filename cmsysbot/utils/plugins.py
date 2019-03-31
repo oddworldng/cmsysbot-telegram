@@ -22,9 +22,9 @@ def get_local_plugins():
     return names
 
 
-def get_plugin_arguments(plugin_name: str):
+def get_plugin_arguments(plugin_path: str):
 
-    with open(plugin_name, 'r') as content:
+    with open(plugin_path, 'r') as content:
         for line in content:
             match = re.search("^#\s*CMSysBot:\s*(.*)", line)
 
@@ -36,4 +36,3 @@ def get_plugin_arguments(plugin_name: str):
                 ]
 
                 return arguments
-

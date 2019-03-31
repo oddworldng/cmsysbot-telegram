@@ -1,27 +1,48 @@
+import os
 import re
 
 from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
-from system import bridge, remote
-from utils import State, plugins
+from system import bridge
+from utils import State, plugins, states
 
 from . import menu
 
 # Conversation States
-USERNAME, PASSWORD, SOFTWARE, ANSWER = range(4)
+USERNAME, PASSWORD, ANSWER = range(3)
 
 # ######################################################################
-#                          LOGIN CONVERSATION
+#                         PLUGIN CONVERSATION
 # ######################################################################
 
 
 def start_plugin(bot: Bot, update: Updater, user_data: dict):
     query = update.callback_query
 
-    plugin_name = re.search(State.START_PLUGIN, query.data).group(1)
-    user_data['arguments'] = plugins.get_plugin_arguments(plugin_name)
-    user_data['command'] = [plugin_name]
+    # Plugin path in server
+    plugin_path_server = re.search(State.START_PLUGIN, query.data).group(1)
+
+    plugin_name = os.path.basename(plugin_path_server)
+
+    # Plugin path in bridge
+    plugin_path_bridge = "%s/%s" % (states.config_file.bridge_tmp_dir,
+                                    plugin_name)
+
+    print("Plugin name: " + plugin_name)
+    print("Route in server: " + plugin_path_server)
+    print("Route in bridge: " + plugin_path_bridge)
+
+    session = user_data['session']
+
+    # Download plugin from server to bridge
+    bridge.send_file_to_bridge(session, plugin_path_server, plugin_path_bridge)
+
+    # Command will store the whole command
+    user_data['command'] = [plugin_path_bridge]
+
+    # Arguments will store the arguments still to be replaced
+    user_data['arguments'] = plugins.get_plugin_arguments(plugin_path_server)
 
     return collect_arguments(bot, update, user_data)
 
@@ -51,6 +72,7 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
             print(argument)
             return ANSWER
 
+    # Whole command
     print(user_data['command'])
 
     return execute_plugin(bot, update, user_data)
@@ -60,35 +82,39 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
     session = user_data['session']
 
-    # Check for arguments that will be repeated
-    target_ip_index = -1
-    try:
-        target_ip_index = user_data['command'].index("$TARGET_IP")
-
-    except ValueError:
-        pass
-
     for computer in session.computers.get_included_computers():
         target_ip = computer.ip
 
-        if target_ip_index != -1:
-            user_data['command'][target_ip_index] = computer.ip
+        command_string = " ".join(user_data['command'])
 
-        print(user_data['command'])
+        output = bridge.run_plugin_in_remote_as_root(session, target_ip,
+                                                     command_string)
+        message = None
+        if update.message:
+            message = update.message
+        else:
+            message = update.callback_query.message
 
-        bridge.send_file(session.client, user_data['command'][0])
+        if not output:
+            output = "No output"
 
-        print(
-            remote.execute_script_as_root(session, target_ip,
-                                          user_data['command']))
+        plugin_name = os.path.basename(user_data['command'][0])
+
+        message.reply_text(
+            "[Computer %s - %s]:\n\n%s" % (computer.ip, plugin_name, output))
 
 
-def answer(bot: Bot, update: Updater, user_data: dict) -> int:
+def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:
 
     user_data['command'].append("\"%s\"" % update.message.text)
     print("Answer: " + update.message.text)
 
     return collect_arguments(bot, update, user_data)
+
+
+# ######################################################################
+#                          LOGIN CONVERSATION
+# ######################################################################
 
 
 def login(bot: Bot, update: Updater) -> int:
@@ -121,42 +147,5 @@ def get_password(bot: Bot, update: Updater,
                               commands.")
 
     menu.connect(bot, update, user_data)
-
-    return ConversationHandler.END
-
-
-def software(bot: Bot, update: Updater) -> int:
-    """ENTRY POINT. Ask for the software to install"""
-
-    message = update.callback_query.message
-    message.reply_text("Please type software name to install")
-
-    return SOFTWARE
-
-
-def get_software(bot: Bot, update: Updater,
-                 user_data: dict) -> ConversationHandler:
-    """Get the software to install from user input"""
-
-    input_software = update.message.text
-    message = update.message
-
-    # Get all necessary data for sending the command
-    client = user_data['session'].client
-    computers = user_data['session'].computers
-    username = user_data['session'].username
-    password = user_data['session'].password
-
-    for computer in computers.get_included_computers():
-        target_ip = computer.ip
-
-        # Send the shutdown command
-        remote.install_software(client, target_ip, username, password,
-                                input_software)
-
-        message.reply_text(
-            "Software %s installed successfully" % input_software)
-
-    menu.new_main(bot, update, user_data)
 
     return ConversationHandler.END
