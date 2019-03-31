@@ -1,5 +1,5 @@
-from typing import List
 import os
+from typing import List
 
 from utils import Computer, State
 
@@ -180,8 +180,32 @@ def filter_computers(computers: List[Computer]):
         footer_buttons=footer_buttons)
 
 
+def connect_output(connected: bool, bridge_ip: str):
+
+    text = ""
+
+    # Text
+    if connected:
+        text = "Successfully connected to %s!" % bridge_ip
+    else:
+        text = "Unable to connect to %s.\nPlease try to login with different credentials!" % bridge_ip
+
+    # Keyboard
+    return Keyboard(text)
+
+
+def disconnect_output(bridge_ip: str):
+
+    # Text
+    text = "Disconnected from %s" % bridge_ip
+
+    # Keyboard
+    return Keyboard(text)
+
+
 def command_output(computer: Computer, command: List[str], output: str):
 
+    # Text
     plugin_name = os.path.basename(command[0])
 
     if not output:
@@ -189,4 +213,5 @@ def command_output(computer: Computer, command: List[str], output: str):
 
     text = "[%s - %s]:\n\n%s" % (computer, plugin_name, output)
 
+    # Keyboard
     return Keyboard(text)

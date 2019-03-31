@@ -2,12 +2,14 @@ import glob
 import os.path
 import re
 
+from utils import states
+
 
 def get_local_plugins():
     """Get plugins names from local path."""
 
     # Set plugins path
-    path = "plugins/*"
+    path = "%s/*" % states.config_file.plugins_dir
 
     # Get plugins file names
     files = glob.glob(path)
@@ -17,8 +19,6 @@ def get_local_plugins():
                   os.path.basename(x).capitalize().replace("_", " "))
                  for x in files)
 
-    print("Plugins: %s" % names)
-
     return names
 
 
@@ -26,7 +26,7 @@ def get_plugin_arguments(plugin_path: str):
 
     with open(plugin_path, 'r') as content:
         for line in content:
-            match = re.search("^#\s*CMSysBot:\s*(.*)", line)
+            match = re.search(r"^#\s*CMSysBot:\s*(.*)", line)
 
             if match:
                 result = match.group(1).split(',')
@@ -36,3 +36,5 @@ def get_plugin_arguments(plugin_path: str):
                 ]
 
                 return arguments
+
+    return None

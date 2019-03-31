@@ -4,6 +4,7 @@
   "email": "",
   "bridge_tmp_dir": "/tmp/",
   "remote_tmp_dir": "/tmp/",
+  "plugins_dir": "plugins/",
   "structure": [
     {
       "name": "ESIT",

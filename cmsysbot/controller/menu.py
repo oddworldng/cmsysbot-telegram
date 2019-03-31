@@ -22,7 +22,8 @@ from telegram import Bot
 from telegram.ext import Updater
 
 import view
-from utils import Computers, State, states, plugins
+from system import plugin
+from utils import Computers, State, states
 
 
 def new_main(bot: Bot, update: Updater, user_data: dict):
@@ -37,13 +38,14 @@ def new_main(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
-    s = user_data['session']
+    session = user_data['session']
 
     # View
-    if not s.connected:
+    if not session.connected:
         view.not_connected().reply(update)
     else:
-        view.connected(s.route, plugins.get_local_plugins(), s.username, s.bridge_ip).reply(update)
+        view.connected(session.route, plugin.get_local_plugins(),
+                       session.username, session.bridge_ip).reply(update)
 
 
 def main(bot: Bot, update: Updater, user_data: dict):
@@ -58,13 +60,14 @@ def main(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
-    s = user_data['session']
+    session = user_data['session']
 
     # View
-    if not s.connected:
+    if not session.connected:
         view.not_connected().edit(update)
     else:
-        view.connected(s.route, plugins.get_local_plugins(), s.username, s.bridge_ip).edit(update)
+        view.connected(session.route, plugin.get_local_plugins(),
+                       session.username, session.bridge_ip).edit(update)
 
 
 def select_department(bot: Bot, update: Updater, user_data: dict):
@@ -145,7 +148,6 @@ def structure(bot: Bot, update: Updater, user_data: dict):
 
     # Update the route
     user_data['session'].route = route
-    print(user_data['session'].route)
 
     # View
     view.structure(
@@ -210,15 +212,8 @@ def connect(bot: Bot, update: Updater, user_data: dict):
     # Try to connect to the client
     session.start_connection()
 
-    text = ""
-    if session.connected:
-        text = "Successfully connected to %s!" % session.bridge_ip
-    else:
-        text = "Unable to connect to %s.\n\
-Please try to login with different credentials!" % session.bridge_ip
-
     # Send the status message
-    update.message.reply_text(text)
+    view.connect_output(session.connected, session.bridge_ip).reply(update)
 
     # Show the main menu again
     new_main(bot, update, user_data)
@@ -238,11 +233,13 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
+    bridge_ip = user_data['session'].bridge_ip
+
     # Close the connection
     user_data['session'].end_connetion()
 
-    message = update.callback_query.message
-    message.edit_text("Disconnect...")
+    # Send the disconnect output
+    view.disconnect_output(bridge_ip).reply(update)
 
     # Show the main menu again
     new_main(bot, update, user_data)

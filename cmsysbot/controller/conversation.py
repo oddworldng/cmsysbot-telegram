@@ -1,11 +1,11 @@
 import os
 import re
 
-from telegram import Bot
+from telegram import Bot, ChatAction
 from telegram.ext import ConversationHandler, Updater
 
-from system import bridge
-from utils import State, plugins, states
+from system import bridge, plugin
+from utils import State, send_action, states
 from view import view
 
 from . import menu
@@ -20,6 +20,7 @@ USERNAME, PASSWORD, ANSWER = range(3)
 
 def start_plugin(bot: Bot, update: Updater, user_data: dict):
     query = update.callback_query
+    message = query.message
 
     # Plugin path in server
     plugin_path_server = re.search(State.START_PLUGIN, query.data).group(1)
@@ -34,6 +35,8 @@ def start_plugin(bot: Bot, update: Updater, user_data: dict):
     print("Route in server: " + plugin_path_server)
     print("Route in bridge: " + plugin_path_bridge)
 
+    message.edit_text(" -- [Executing %s] --" % plugin_name)
+
     session = user_data['session']
 
     # Download plugin from server to bridge
@@ -43,7 +46,7 @@ def start_plugin(bot: Bot, update: Updater, user_data: dict):
     user_data['plugin'] = [plugin_path_bridge]
 
     # Arguments will store the arguments still to be replaced
-    user_data['arguments'] = plugins.get_plugin_arguments(plugin_path_server)
+    user_data['arguments'] = plugin.get_plugin_arguments(plugin_path_server)
 
     return collect_arguments(bot, update, user_data)
 
@@ -76,9 +79,10 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
     # Whole plugin command
     print(user_data['plugin'])
 
-    return execute_plugin(bot, update, user_data)
+    return execute_plugin(bot, update, user_data=user_data)
 
 
+@send_action(ChatAction.TYPING)
 def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
     session = user_data['session']
@@ -92,6 +96,8 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
                                                      plugin)
 
         view.command_output(computer, plugin, output).reply(update)
+
+    menu.new_main(bot, update, user_data)
 
 
 def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:

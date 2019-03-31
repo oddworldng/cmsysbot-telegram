@@ -22,7 +22,7 @@ from telegram.ext import Updater
 
 import view
 from system import bridge
-from utils import State, plugins
+from utils import State
 
 
 def update_ips(bot: Bot, update: Updater, user_data: dict):

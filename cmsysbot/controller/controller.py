@@ -1,6 +1,6 @@
 from telegram.ext import (CallbackQueryHandler, CommandHandler,
                           ConversationHandler, Dispatcher, Filters,
-                          MessageHandler)
+                          MessageHandler, RegexHandler)
 
 from utils import State, states
 
@@ -109,7 +109,9 @@ def add_conversation_callbacks(dp: Dispatcher):
                     pass_user_data=True)
             ],
         },
-        fallbacks=[])
+        fallbacks=[
+            RegexHandler('^/cancel$', menu.new_main, pass_user_data=True)
+        ])
 
     plugin_exec_handler = ConversationHandler(
         entry_points=[
@@ -124,7 +126,9 @@ def add_conversation_callbacks(dp: Dispatcher):
                     Filters.text, conversation.get_answer, pass_user_data=True)
             ]
         },
-        fallbacks=[])
+        fallbacks=[
+            RegexHandler('^/cancel$', menu.new_main, pass_user_data=True)
+        ])
 
     # Add to dispatcher
     dp.add_handler(login_conv_handler)
