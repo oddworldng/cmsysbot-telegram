@@ -43,8 +43,6 @@ def connected(route: List[str], plugins: dict, username: str,
     text += "Username: %s\n" % username
     text += "Bridge ip: %s\n" % bridge_ip
 
-    print(plugins)
-
     # Buttons
     main_buttons = [
         Button("Update ips", State.UPDATE_IPS),

@@ -22,7 +22,7 @@ from telegram import Bot
 from telegram.ext import Updater
 
 import view
-from system import plugin
+from system import Plugin
 from utils import Computers, State, states
 
 
@@ -44,7 +44,7 @@ def new_main(bot: Bot, update: Updater, user_data: dict):
     if not session.connected:
         view.not_connected().reply(update)
     else:
-        view.connected(session.route, plugin.get_local_plugins(),
+        view.connected(session.route, Plugin.get_local_plugins(),
                        session.username, session.bridge_ip).reply(update)
 
 
@@ -66,7 +66,7 @@ def main(bot: Bot, update: Updater, user_data: dict):
     if not session.connected:
         view.not_connected().edit(update)
     else:
-        view.connected(session.route, plugin.get_local_plugins(),
+        view.connected(session.route, Plugin.get_local_plugins(),
                        session.username, session.bridge_ip).edit(update)
 
 
