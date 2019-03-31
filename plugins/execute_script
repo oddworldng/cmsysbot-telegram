@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    CMSysBot: "$TARGET_IP", "$USERNAME", "$PASSWORD", "Script"
+#    CMSysBot: "$TARGET_IP", "$USERNAME", "$PASSWORD", "Script", "HUehue"
 
 # Variables = arguments
 IP=$1

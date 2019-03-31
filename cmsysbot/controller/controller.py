@@ -101,12 +101,6 @@ def add_callbacks(dp: Dispatcher):
             pass_user_data=True))
 
     dp.add_handler(
-        CallbackQueryHandler(
-            general.execute_plugin,
-            pattern=State.EXECUTE_PLUGIN,
-            pass_user_data=True))
-
-    dp.add_handler(
         MessageHandler(
             Filters.document, general.download_script, pass_user_data=True))
 
@@ -117,6 +111,23 @@ def add_command_callbacks(dp: Dispatcher):
 
 def add_conversation_callbacks(dp: Dispatcher):
     """Add all the conversation handlers to the Dispatcher"""
+
+    plugin_exec_handler = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(
+                conversation.start_plugin,
+                pattern=State.START_PLUGIN,
+                pass_user_data=True)
+        ],
+        states={
+            conversation.ANSWER: [
+                MessageHandler(
+                    Filters.text, conversation.answer, pass_user_data=True)
+            ]
+        },
+        fallbacks=[])
+
+    dp.add_handler(plugin_exec_handler)
 
     # Login handler
     login_conv_handler = ConversationHandler(

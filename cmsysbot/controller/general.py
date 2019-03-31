@@ -226,19 +226,6 @@ def update_computers(bot: Bot, update: Updater, user_data: dict):
         query.message.reply_text("Updated computer with ip %s" % target_ip)
 
 
-def execute_plugin(bot: Bot, update: Updater, user_data: dict):
-    query = update.callback_query
-
-    session = user_data['session']
-
-    plugin_name = re.search(State.EXECUTE_PLUGIN, query.data).group(1)
-    arguments = plugins.get_plugin_arguments(plugin_name)
-
-    # TODO: Cambiar valores de variables
-
-    # TODO: Completar funcion
-
-
 def download_script(bot: Bot, update: Updater, user_data: dict):
 
     session = user_data['session']

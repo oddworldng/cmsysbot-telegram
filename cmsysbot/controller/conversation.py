@@ -1,16 +1,96 @@
+import re
+
 from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
+from system import bridge, remote
+from utils import State, plugins
+
 from . import menu
-from system import remote
 
 # Conversation States
-USERNAME, PASSWORD, SOFTWARE = range(3)
-
+USERNAME, PASSWORD, SOFTWARE, ANSWER = range(4)
 
 # ######################################################################
 #                          LOGIN CONVERSATION
 # ######################################################################
+
+
+def start_plugin(bot: Bot, update: Updater, user_data: dict):
+    query = update.callback_query
+
+    plugin_name = re.search(State.START_PLUGIN, query.data).group(1)
+    user_data['arguments'] = plugins.get_plugin_arguments(plugin_name)
+    user_data['command'] = [plugin_name]
+
+    return collect_arguments(bot, update, user_data)
+
+
+def collect_arguments(bot: Bot, update: Updater, user_data: dict):
+
+    session = user_data['session']
+
+    while user_data['arguments']:
+        argument = user_data['arguments'].pop(0)
+
+        if argument == "$USERNAME":
+            user_data['command'].append(session.username)
+
+        elif argument == "$PASSWORD":
+            user_data['command'].append(session.password)
+
+        elif argument == "$TARGET_IP":
+            user_data['command'].append("$TARGET_IP")
+
+        else:
+            if update.message:
+                update.message.reply_text(argument)
+            else:
+                update.callback_query.message.reply_text(argument)
+
+            print(argument)
+            return ANSWER
+
+    print(user_data['command'])
+
+    return execute_plugin(bot, update, user_data)
+
+
+def execute_plugin(bot: Bot, update: Updater, user_data: dict):
+
+    session = user_data['session']
+
+    # Check for arguments that will be repeated
+    target_ip_index = -1
+    try:
+        target_ip_index = user_data['command'].index("$TARGET_IP")
+
+    except ValueError:
+        pass
+
+    for computer in session.computers.get_included_computers():
+        target_ip = computer.ip
+
+        if target_ip_index != -1:
+            user_data['command'][target_ip_index] = computer.ip
+
+        print(user_data['command'])
+
+        bridge.send_file(session.client, user_data['command'][0])
+
+        print(
+            remote.execute_script_as_root(session, target_ip,
+                                          user_data['command']))
+
+
+def answer(bot: Bot, update: Updater, user_data: dict) -> int:
+
+    user_data['command'].append("\"%s\"" % update.message.text)
+    print("Answer: " + update.message.text)
+
+    return collect_arguments(bot, update, user_data)
+
+
 def login(bot: Bot, update: Updater) -> int:
     """ENTRY POINT. Ask for the username and wait for the answer"""
 

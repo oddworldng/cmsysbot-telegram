@@ -14,4 +14,4 @@ class State():
     UPDATE_IPS = "update-ips"
     UPDATE_COMPUTERS = "update-computers"
     INSTALL_SOFTWARE = "install-software"
-    EXECUTE_PLUGIN = "plugin-(.*)"
+    START_PLUGIN = "plugin-(.*)"

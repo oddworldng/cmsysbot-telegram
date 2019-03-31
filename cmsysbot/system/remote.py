@@ -1,3 +1,4 @@
+import os
 import re
 from typing import List
 
@@ -56,8 +57,9 @@ def update_computer(client: paramiko.SSHClient, target_ip: str, username: str,
 
     print(send_command_as_root(client, target_ip, username, password, update))
     print(send_command_as_root(client, target_ip, username, password, upgrade))
-    print(send_command_as_root(client, target_ip, username, password,
-                               dist_upgrade))
+    print(
+        send_command_as_root(client, target_ip, username, password,
+                             dist_upgrade))
 
 
 def run_in_bridge(client: paramiko.SSHClient, command: str):
@@ -97,12 +99,17 @@ def send_command_as_root(client: paramiko.SSHClient, target_ip: str,
     return stdout.read().decode('utf-8')
 
 
-def execute_script_as_root(session: Session, target_ip: str, script: str):
+def execute_script_as_root(session: Session, target_ip: str, script_path: str):
 
-    send_file(session, target_ip, script, "/tmp/")
+    script_name = os.path.basename(script_path)
+
+    remote_folder = "/tmp/"
+
+    send_file(session, target_ip, script_path, remote_folder)
 
     output = send_command_as_root(session.client, target_ip, session.username,
-                                  session.password, script)
+                                  session.password,
+                                  remote_folder + script_name)
 
     return output
 
@@ -116,7 +123,9 @@ def send_file(session: Session, target_ip: str, file: str, remote_path: str):
         'remote_path': remote_path
     }
 
-    _, stdout, _ = session.client.exec_command(full_command)
+    _, stdout, stderr = session.client.exec_command(full_command)
+
+    print("Scp: " + stderr.read().decode('utf-8'))
 
     print("User %s sent file %s from %s to %s" %
           (session.username, file, session.bridge_ip, target_ip))
