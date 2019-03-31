@@ -55,6 +55,10 @@ class Config(Json):
         return self.data['email']
 
     @property
+    def server_tmp_dir(self) -> str:
+        return self.data['server_tmp_dir']
+
+    @property
     def bridge_tmp_dir(self) -> str:
         return self.data['bridge_tmp_dir']
 

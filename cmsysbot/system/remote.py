@@ -8,7 +8,7 @@ def run(session: Session, target_ip: str, command: str):
 
 def run_as_root(session: Session, target_ip: str, command: str):
 
-    root_command = "' echo %s | sudo -kS %s'" % (session.password, command)
+    root_command = "echo %s | sudo -kS %s" % (session.password, command)
 
     return _execute_command_remote(session, target_ip, root_command)
 
@@ -16,7 +16,7 @@ def run_as_root(session: Session, target_ip: str, command: str):
 def _execute_command_remote(session: Session, target_ip: str, command: str):
 
     full_command = (
-        " sshpass -p %(password)s ssh -o ConnectTimeout=3 %(username)s@%(target_ip)s %(command)s"
+        " sshpass -p %(password)s ssh -o ConnectTimeout=3 %(username)s@%(target_ip)s \'%(command)s\'"
         % {
             'password': session.password,
             'username': session.username,

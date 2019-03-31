@@ -98,24 +98,20 @@ def plugin_output(computer: Computer, plugin_name: str, stdout: str,
 
     # Remove "[sudo] password for X:" prompt"
     stderr = re.sub(r"\[sudo\].*?:", "", stderr).strip()
-    print(stderr)
 
+    # Show error output
     if stderr:
-        text += "-> [Error]: %s" % stderr
+        text += "-> [Error]: %s\n" % stderr
 
+    # Show standard output
     if stdout:
         text += stdout
 
+    # Can't send an empty message in telegram, so send '-> No ouptut' instead
     if not text:
         text = "-> No output"
 
-    computer_name = ""
-    if computer:
-        computer_name = computer
-    else:
-        computer_name = "Bridge"
-
-    text = "[%s - %s]:\n%s" % (computer_name, plugin_name, text)
+    text = "[%s - %s]:\n%s" % (computer, plugin_name, text)
 
     # Keyboard
     return Keyboard(text)

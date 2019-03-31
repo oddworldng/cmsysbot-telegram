@@ -18,18 +18,42 @@ USERNAME, PASSWORD, ANSWER = range(3)
 # ######################################################################
 
 
-def start_plugin(bot: Bot, update: Updater, user_data: dict):
+def start_plugin_from_callback(bot: Bot, update: Updater, user_data: dict):
     query = update.callback_query
 
     # Plugin path in server
     plugin_path_server = re.search(State.START_PLUGIN, query.data).group(1)
+
     user_data['plugin'] = Plugin(plugin_path_server)
 
-    # Change view to executing plugin
     view.plugin_start(user_data['plugin'].name).edit(update)
 
-    print("Plugin name: " + user_data['plugin'].name)
-    print("Route in server: " + plugin_path_server)
+    return collect_arguments(bot, update, user_data)
+
+
+def start_plugin_from_download(bot: Bot, update: Updater, user_data: dict):
+
+    session = user_data['session']
+    message = update.message
+
+    if not session.connected:
+        message.reply_text(
+            "You must be connected to a bridge computer before sending files!")
+        return ConversationHandler.END
+
+    # Download the file
+    file_object = message.document.get_file()
+    download_path = "%s/%s" % (states.config_file.server_tmp_dir,
+                               message.document.file_name)
+
+    file_object.download(download_path)
+
+    # Make downloaded file executable by the user
+    os.chmod(download_path, 0o764)
+
+    user_data['plugin'] = Plugin(download_path)
+
+    view.plugin_start(user_data['plugin'].name).reply(update)
 
     return collect_arguments(bot, update, user_data)
 
@@ -47,8 +71,6 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
             view.ask_argument(argument).reply(update)
             return ANSWER
 
-    print(user_data['plugin'].arguments)
-
     return execute_plugin(bot, update, user_data=user_data)
 
 
@@ -62,12 +84,13 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
     menu.new_main(bot, update, user_data)
 
+    return ConversationHandler.END
+
 
 def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:
 
     argument = user_data['ask_argument']
-    user_data['plugin'][argument] = update.message.text
-    print("Answer: " + update.message.text)
+    user_data['plugin'][argument] = "\"%s\"" % update.message.text
 
     return collect_arguments(bot, update, user_data)
 

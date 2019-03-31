@@ -117,8 +117,12 @@ def add_conversation_callbacks(dp: Dispatcher):
     plugin_exec_handler = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(
-                conversation.start_plugin,
+                conversation.start_plugin_from_callback,
                 pattern=State.START_PLUGIN,
+                pass_user_data=True),
+            MessageHandler(
+                Filters.document,
+                conversation.start_plugin_from_download,
                 pass_user_data=True)
         ],
         states={
