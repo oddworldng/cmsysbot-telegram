@@ -43,16 +43,13 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
     # Get all the local ips for every local mac
     local_ips = bridge.get_local_ips(session)
 
-    message = update.callback_query.message
-
     for computer in session.computers.get_included_computers():
         if computer.mac in local_ips:
             last_ip = computer.ip
 
             computer.ip = local_ips[computer.mac]
 
-            message.reply_text("Computer %s: %s --> %s" %
-                               (computer.name, last_ip, computer.ip))
+            view.update_ip_output(computer, last_ip).reply(update)
 
 
 def include_computers(bot: Bot, update: Updater, user_data: dict):

@@ -1,5 +1,4 @@
 import paramiko
-
 from paramiko import ssh_exception
 
 
@@ -31,8 +30,8 @@ class Session:
             self.connected = True
 
         except (ssh_exception.NoValidConnectionsError,
-                ssh_exception.AuthenticationException) as error:
-            # TODO: Rethrow the error
+                ssh_exception.AuthenticationException):
+            # TODO: Rethrow the error?
             self.connected = False
 
     def end_connetion(self):

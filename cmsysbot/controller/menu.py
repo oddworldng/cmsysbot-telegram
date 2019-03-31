@@ -10,8 +10,8 @@ Note:
 ``menu`` :obj:`callbacks` are the ones that handle the movement between
 different menus (For example, from `main menu` to `select a department`)
 
-``menu`` :obj:`callbacks` DON'T perform any other action other than handling the
-movement, and some side effects like updating :obj:`user_data` variable or
+``menu`` :obj:`callbacks` DON'T perform any other action other than handling
+the movement, and some side effects like updating :obj:`user_data` variable or
 sending some messages.
 
 Callbacks that perform an action (like waking or shutting down computers,
@@ -239,7 +239,7 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
     user_data['session'].end_connetion()
 
     # Send the disconnect output
-    view.disconnect_output(bridge_ip).reply(update)
+    view.disconnect_output(bridge_ip).edit(update)
 
     # Show the main menu again
     new_main(bot, update, user_data)

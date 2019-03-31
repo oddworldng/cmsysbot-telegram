@@ -4,9 +4,9 @@ import re
 from telegram import Bot, ChatAction
 from telegram.ext import ConversationHandler, Updater
 
+import view
 from system import bridge, plugin
 from utils import State, send_action, states
-from view import view
 
 from . import menu
 
@@ -20,7 +20,6 @@ USERNAME, PASSWORD, ANSWER = range(3)
 
 def start_plugin(bot: Bot, update: Updater, user_data: dict):
     query = update.callback_query
-    message = query.message
 
     # Plugin path in server
     plugin_path_server = re.search(State.START_PLUGIN, query.data).group(1)
@@ -35,7 +34,7 @@ def start_plugin(bot: Bot, update: Updater, user_data: dict):
     print("Route in server: " + plugin_path_server)
     print("Route in bridge: " + plugin_path_bridge)
 
-    message.edit_text(" -- [Executing %s] --" % plugin_name)
+    view.plugin_start(plugin_name).edit(update)
 
     session = user_data['session']
 
@@ -68,10 +67,7 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
             user_data['plugin'].append("$TARGET_IP")
 
         else:
-            if update.message:
-                update.message.reply_text(argument)
-            else:
-                update.callback_query.message.reply_text(argument)
+            view.ask_argument(argument).reply(update)
 
             print(argument)
             return ANSWER
@@ -95,7 +91,7 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
         output = bridge.run_plugin_in_remote_as_root(session, target_ip,
                                                      plugin)
 
-        view.command_output(computer, plugin, output).reply(update)
+        view.plugin_output(computer, plugin, output).reply(update)
 
     menu.new_main(bot, update, user_data)
 
@@ -116,9 +112,8 @@ def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:
 def login(bot: Bot, update: Updater) -> int:
     """ENTRY POINT. Ask for the username and wait for the answer"""
 
-    message = update.callback_query.message
-    message.reply_text("Please introduce your username and password")
-    message.reply_text("Enter your username: ")
+    view.login_start().reply(update)
+    view.ask_username().reply(update)
 
     return USERNAME
 
@@ -128,7 +123,7 @@ def get_username(bot: Bot, update: Updater, user_data: dict) -> int:
 
     user_data['session'].username = update.message.text
 
-    update.message.reply_text("Enter your password: ")
+    view.ask_password().reply(update)
 
     return PASSWORD
 
@@ -138,9 +133,6 @@ def get_password(bot: Bot, update: Updater,
     """Get the password from the last message. End conversation"""
 
     user_data['session'].password = update.message.text
-
-    update.message.reply_text("This credentials will be used for future \
-                              commands.")
 
     menu.connect(bot, update, user_data)
 
