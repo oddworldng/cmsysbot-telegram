@@ -32,6 +32,7 @@ Centralized Management for Systems Administration (CMSysBot) it is a Telegram bo
 
 * [python-telegram-bot](https://pypi.org/project/python-telegram-bot/)
 * [paramiko](https://pypi.org/project/paramiko/)
+* [scp](https://pypi.org/project/scp/)
 
 #### System dependencies
 
