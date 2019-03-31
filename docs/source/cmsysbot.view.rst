@@ -2,5 +2,6 @@ cmsysbot.view package
 =====================
 
 .. toctree::
-    cmsysbot.view.view
+    cmsysbot.view.menu
+    cmsysbot.view.message
     cmsysbot.view.keyboard

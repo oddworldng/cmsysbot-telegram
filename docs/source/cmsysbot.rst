@@ -12,5 +12,5 @@ Functionality
 -------------
 
 .. toctree::
-    cmsysbot.cmsys
+    cmsysbot.system
     cmsysbot.utils
