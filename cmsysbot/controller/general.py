@@ -17,14 +17,15 @@ module.
 
 import re
 
-from telegram import Bot, Document, File
+from telegram import Bot, ChatAction, Document, File
 from telegram.ext import Updater
 
 import view
-from system import bridge
-from utils import State
+from system import Plugin, bridge
+from utils import State, send_action
 
 
+@send_action(ChatAction.TYPING)
 def update_ips(bot: Bot, update: Updater, user_data: dict):
     """
     Get all the macs and its associated ips from the local network. Then,
@@ -41,12 +42,17 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
     session = user_data['session']
 
     # Get all the local ips for every local mac
-    local_ips = bridge.get_local_ips(session)
+    plugin = Plugin("plugins/_local_arp_scan")
+    _, stdout, stderr = next(plugin.run(session))
+
+    local_ips = {}
+    for line in stdout.splitlines():
+        ip, mac = line.strip().split()
+        local_ips[mac] = ip
 
     for computer in session.computers.get_included_computers():
         if computer.mac in local_ips:
             last_ip = computer.ip
-
             computer.ip = local_ips[computer.mac]
 
             view.update_ip_output(computer, last_ip).reply(update)

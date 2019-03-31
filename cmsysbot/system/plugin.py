@@ -14,6 +14,7 @@ class PluginVar:
     BRIDGE_IP = "$BRIDGE_IP"
     TARGET_IP = "$TARGET_IP"
     TARGET_MAC = "$TARGET_MAC"
+    SOURCE_BRIDGE_ONCE = "bridge-once"
     SOURCE_BRIDGE = "bridge"
     SOURCE_REMOTE = "remote"
     ROOT = False
@@ -89,22 +90,40 @@ class Plugin:
 
         return arguments
 
-    def run(self, session: Session, computer: Computer):
+    def run(self, session: Session):
 
-        self.fill_computer_arguments(computer)
+        # Get route in bridge
+        bridge_plugin_path = "%s/%s" % (states.config_file.bridge_tmp_dir,
+                                        self.name)
+        # Send plugin to bridge
+        bridge.send_file_to_bridge(session, self.path, bridge_plugin_path)
 
-        if self.source == PluginVar.SOURCE_BRIDGE:
+        # Substitute the $USERNAME, $PASSWORD... arguments
+        self.fill_session_arguments(session)
+
+        # Run the command only once on the bridge and return
+        if self.source == PluginVar.SOURCE_BRIDGE_ONCE:
+            print("Run bridge once")
+            command = "%s %s" % (bridge_plugin_path, " ".join(self.arguments))
+
             if self.root:
-                return bridge.run_as_root(session, self.to_command())
+                yield (None, *bridge.run_as_root(session, command))
             else:
-                return bridge.run(session, self.to_command())
+                yield (None, *bridge.run(session, command))
 
-    def fill_computer_arguments(self, computer: Computer):
-        if PluginVar.TARGET_IP in self.arguments:
-            self.arguments[PluginVar.TARGET_IP] = computer.ip
+        # Run the command for each included computer
+        for computer in session.computers.get_included_computers():
+            self.fill_computer_arguments(computer)
+            command = "%s %s" % (bridge_plugin_path, " ".join(self.arguments))
 
-        if PluginVar.TARGET_MAC in self.arguments:
-            self.arguments[PluginVar.TARGET_MAC] = computer.mac
+            if self.source == PluginVar.SOURCE_BRIDGE:
+                if self.root:
+                    yield (computer, *bridge.run_as_root(session, command))
+                else:
+                    yield (computer, *bridge.run(session, command))
+
+            elif self.source == PluginVar.SOURCE_REMOTE:
+                print("Run in remote!")
 
     def fill_session_arguments(self, session: Session):
         if PluginVar.USERNAME in self.arguments:
@@ -115,6 +134,13 @@ class Plugin:
 
         if PluginVar.BRIDGE_IP in self.arguments:
             self.arguments[PluginVar.BRIDGE_IP] = session.bridge_ip
+
+    def fill_computer_arguments(self, computer: Computer):
+        if PluginVar.TARGET_IP in self.arguments:
+            self.arguments[PluginVar.TARGET_IP] = computer.ip
+
+        if PluginVar.TARGET_MAC in self.arguments:
+            self.arguments[PluginVar.TARGET_MAC] = computer.mac
 
     def to_command(self):
         return "%s %s" % (self.path, " ".join(self.arguments.values()))
@@ -139,8 +165,13 @@ class Plugin:
         files = glob.glob(path)
 
         # Filter file names by basename and capitalize
-        names = dict(("plugin-%s" % x,
-                      os.path.basename(x).capitalize().replace("_", " "))
-                     for x in files)
+        names = {}
+
+        for file in files:
+            if os.path.basename(file)[0] != '_':
+
+                key = "plugin-%s" % file
+                names[key] = os.path.basename(file).capitalize().replace(
+                    "_", " ")
 
         return names

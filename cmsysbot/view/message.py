@@ -104,7 +104,13 @@ def plugin_output(computer: Computer, plugin_name: str, stdout: str,
     if not text:
         text = "-> No output"
 
-    text = "[%s - %s]:\n\n%s" % (computer, plugin_name, text)
+    computer_name = ""
+    if computer:
+        computer_name = computer
+    else:
+        computer_name = "Bridge"
+
+    text = "[%s - %s]:\n\n%s" % (computer_name, plugin_name, text)
 
     # Keyboard
     return Keyboard(text)

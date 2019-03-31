@@ -8,48 +8,6 @@ from scp import SCPClient
 from utils import Session, states
 
 
-def get_local_ips(session: Session):
-
-    submask = get_submask(session)
-
-    arp_scan_output = run_in_bridge_as_root(session, 'arp-scan %s' % submask)
-
-    local_ips = {}
-
-    for line in arp_scan_output.splitlines():
-        match = re.search('((?:\d{1,3}\.){3}\d{1,3}).*((?:\w\w:){5}\w\w)',
-                          line)
-
-        if match:
-            ip = match.group(1)
-            mac = match.group(2)
-
-            local_ips[mac] = ip
-
-    return local_ips
-
-
-def get_submask(session: Session):
-
-    command = "ip -o -f inet addr show | awk '/scope global/ {print $4}'"
-
-    return run_in_bridge(session, command)
-
-
-def run_in_bridge(session: Session, command: str):
-
-    _, stdout, _ = session.client.exec_command(command)
-    return stdout.read().decode('utf-8')
-
-
-def run_in_bridge_as_root(session: Session, command: str):
-
-    root_command = ' echo %s | sudo -S %s' % (session.password, command)
-
-    _, stdout, _ = session.client.exec_command(root_command)
-    return stdout.read().decode('utf-8')
-
-
 def run(session: Session, command: str):
 
     return _execute_command_bridge(session, command)
@@ -62,12 +20,6 @@ def run_as_root(session: Session, command: str):
     return _execute_command_bridge(session, root_command)
 
 
-def _execute_command_bridge(session: Session, command: str):
-
-    _, stdout, stderr = session.client.exec_command(command)
-    return stdout.read().decode('utf-8'), stderr.read().decode('utf-8')
-
-
 def send_file_to_bridge(session: Session, file: str, bridge_path: str):
 
     scp = SCPClient(session.client.get_transport())
@@ -75,6 +27,12 @@ def send_file_to_bridge(session: Session, file: str, bridge_path: str):
     scp.put(file, bridge_path)
 
     scp.close()
+
+
+def _execute_command_bridge(session: Session, command: str):
+
+    _, stdout, stderr = session.client.exec_command(command)
+    return stdout.read().decode('utf-8'), stderr.read().decode('utf-8')
 
 
 # TODO: Maybe also should return exit code ($?)
