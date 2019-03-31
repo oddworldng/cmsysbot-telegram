@@ -1,7 +1,6 @@
-from paramiko import SSHClient
 from scp import SCPClient
 
-from utils import Session, states
+from utils import Session
 
 
 def run(session: Session, command: str):

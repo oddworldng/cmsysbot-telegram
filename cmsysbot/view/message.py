@@ -1,6 +1,4 @@
-import os
 import re
-from typing import List
 
 from utils import Computer
 
@@ -15,7 +13,8 @@ def connect_output(connected: bool, bridge_ip: str) -> Keyboard:
     if connected:
         text = "Successfully connected to %s!" % bridge_ip
     else:
-        text = "Unable to connect to %s.\nPlease try to login with different credentials!" % bridge_ip
+        text = ("Unable to connect to %s.\n"
+                "Please try to login with different credentials!" % bridge_ip)
 
     # Keyboard
     return Keyboard(text)
@@ -30,7 +29,7 @@ def disconnect_output(bridge_ip: str) -> Keyboard:
     return Keyboard(text)
 
 
-def update_ip_output(computer: Computer, last_ip: str):
+def update_ip_output(computer: Computer, last_ip: str) -> Keyboard:
 
     # Text
     text = "Computer %s: %s --> %s" % (computer.name, last_ip, computer.ip)
@@ -73,7 +72,7 @@ def ask_password() -> Keyboard:
 # ######################################################################
 
 
-def plugin_start(plugin_name: str):
+def plugin_start(plugin_name: str) -> Keyboard:
 
     # Text
     text = "-- [Executing %s] --" % plugin_name
@@ -82,7 +81,7 @@ def plugin_start(plugin_name: str):
     return Keyboard(text)
 
 
-def ask_argument(argument_text: str):
+def ask_argument(argument_text: str) -> Keyboard:
 
     # Text
     text = "Argument needed: %s " % argument_text
@@ -92,7 +91,7 @@ def ask_argument(argument_text: str):
 
 
 def plugin_output(computer: Computer, plugin_name: str, stdout: str,
-                  stderr: str):
+                  stderr: str) -> Keyboard:
     # Text
     text = ""
 

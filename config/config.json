@@ -1,7 +1,8 @@
 {
   "token": "",
-  "name": "",
+  "name": "CMSysBot",
   "email": "",
+  "server_tmp_dir": "/tmp/",
   "bridge_tmp_dir": "/tmp/",
   "remote_tmp_dir": "/tmp/",
   "plugins_dir": "plugins/",

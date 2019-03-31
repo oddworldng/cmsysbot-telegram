@@ -5,7 +5,7 @@ from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
 import view
-from system import Plugin, bridge
+from system import Plugin
 from utils import Session, State, states
 
 from . import general, menu

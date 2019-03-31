@@ -4,7 +4,6 @@ from telegram.error import InvalidToken
 from telegram.ext import Updater
 
 import controller
-from system import Plugin
 from utils import Config, states
 
 # Enable logging

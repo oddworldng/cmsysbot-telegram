@@ -13,12 +13,12 @@ connecting, disconnecting, sending commands, sending messages, etc.
 
 import re
 
-from telegram import Bot, Document, File
+from telegram import Bot
 from telegram.ext import Updater
 
 import view
-from system import Plugin, bridge
-from utils import State, states
+from system import Plugin
+from utils import State
 
 from . import menu
 
