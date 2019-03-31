@@ -8,22 +8,22 @@
 
 PACKAGE_NAME=$1
 
-dpkg -s $PACKAGE_NAME &> /dev/null
+dpkg -s $PACKAGE_NAME &>/dev/null
 
-if [[ $? == 0 ]] ; then
+if [[ $? == 0 ]]; then
   echo "The package $PACKAGE_NAME is already installed!"
 else
-  apt-cache show $PACKAGE_NAME &> /dev/null
+  apt-cache show $PACKAGE_NAME &>/dev/null
 
-  if [[ $? != 0 ]] ; then
+  if [[ $? != 0 ]]; then
     echo "The package $PACKAGE_NAME doesn't exists!"
   else
-    STDERR=$(sudo apt-get install -y $PACKAGE_NAME 2>&1 > /dev/null)
+    STDERR=$(sudo apt-get install -y $PACKAGE_NAME 2>&1 >/dev/null)
 
-    if [[ $? == 0 ]] ; then
+    if [[ $? == 0 ]]; then
       echo "The package $PACKAGE_NAME was sucessfully installed!"
     else
-      (>&2 echo $STDERR)
+      (echo >&2 $STDERR)
     fi
   fi
 fi

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# CMSysBot: {
+# "root": "True",
+# "source": "remote"
+# }
+
+IFS=';' read updates security_updates < <(/usr/lib/update-notifier/apt-check 2>&1)
+
+if ((updates == 0)); then
+  echo "0 packages can be updated. The computer is already updated"
+else
+  echo "$updates packages can be updated. Updating..."
+
+  sudo apt-get update
+  sudo dpkg --configure -a
+  sudo apt-get -f install -y
+  sudo apt-get upgrade -y
+  sudo apt-get autoremove -y
+fi
