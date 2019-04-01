@@ -90,7 +90,7 @@ class Plugin:
 
         return arguments
 
-    def run(self, session: Session):
+    def run(self, computer: Computer, session: Session):
         # Get route in bridge
         bridge_plugin_path = "%s/%s" % (states.config_file.bridge_tmp_dir,
                                         self.name)
@@ -102,8 +102,8 @@ class Plugin:
 
         # Run the command only once on the bridge and return
         if self.source == PluginVar.SOURCE_BRIDGE:
-            command = "%s %s" % (bridge_plugin_path,
-                                 " ".join(self.arguments.values()))
+            command = "%s %s" % (bridge_plugin_path, " ".join(
+                self.arguments.values()))
 
             computer = Computer({
                 "name": "Bridge",
@@ -132,8 +132,8 @@ class Plugin:
 
                 time.sleep(1)
 
-                command = "%s %s" % (remote_plugin_path,
-                                     " ".join(self.arguments.values()))
+                command = "%s %s" % (remote_plugin_path, " ".join(
+                    self.arguments.values()))
 
                 if self.root:
                     yield (computer,
