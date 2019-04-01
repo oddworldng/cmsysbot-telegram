@@ -1,5 +1,5 @@
-cmsysbot.cmsys.plugin.remote
-============================
+cmsysbot.system.plugin.Plugin
+=============================
 
 .. autoclass:: cmsysbot.system.plugin.Plugin
     :members:
