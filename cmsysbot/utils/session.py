@@ -20,12 +20,13 @@ class Session:
     def start_connection(self):
         self.client = paramiko.SSHClient()
         self.client.load_system_host_keys()
-        self.client.set_missing_host_key_policy(paramiko.WarningPolicy)
+        self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy)
 
         # Try to connect to the client
         try:
             self.client.connect(self.bridge_ip, 22, self.username,
-                                self.password)
+                                self.password, allow_agent=False,
+                                look_for_keys=False)
 
             self.connected = True
 

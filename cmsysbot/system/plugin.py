@@ -1,6 +1,7 @@
 import glob
 import os.path
 import re
+import time
 from typing import Dict
 
 from system import bridge, remote
@@ -101,8 +102,8 @@ class Plugin:
 
         # Run the command only once on the bridge and return
         if self.source == PluginVar.SOURCE_BRIDGE:
-            command = "%s %s" % (bridge_plugin_path, " ".join(
-                self.arguments.values()))
+            command = "%s %s" % (bridge_plugin_path,
+                                 " ".join(self.arguments.values()))
 
             computer = Computer({
                 "name": "Bridge",
@@ -129,8 +130,10 @@ class Plugin:
                                            bridge_plugin_path,
                                            remote_plugin_path)
 
-                command = "%s %s" % (remote_plugin_path, " ".join(
-                    self.arguments.values()))
+                time.sleep(3)
+
+                command = "%s %s" % (remote_plugin_path,
+                                     " ".join(self.arguments.values()))
 
                 if self.root:
                     yield (computer,
