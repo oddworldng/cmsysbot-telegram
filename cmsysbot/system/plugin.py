@@ -130,7 +130,7 @@ class Plugin:
                                            bridge_plugin_path,
                                            remote_plugin_path)
 
-                time.sleep(3)
+                time.sleep(1)
 
                 command = "%s %s" % (remote_plugin_path,
                                      " ".join(self.arguments.values()))

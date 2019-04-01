@@ -27,7 +27,6 @@ class Session:
             self.client.connect(self.bridge_ip, 22, self.username,
                                 self.password, allow_agent=False,
                                 look_for_keys=False)
-
             self.connected = True
 
         except (ssh_exception.NoValidConnectionsError,

@@ -18,7 +18,7 @@ from telegram.ext import Updater
 
 import view
 from system import Plugin
-from utils import State
+from utils import State, states
 
 from . import menu
 
@@ -104,11 +104,13 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
         local_ips[mac] = ip
 
     for computer in session.computers.get_included_computers():
-        if computer.mac in local_ips:
+        if computer.mac.lower() in local_ips:
             last_ip = computer.ip
-            computer.ip = local_ips[computer.mac]
+            computer.ip = local_ips[computer.mac.lower()]
 
             view.update_ip_output(computer, last_ip).reply(update)
+
+    session.computers.save()
 
     menu.new_main(bot, update, user_data)
 
