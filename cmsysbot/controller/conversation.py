@@ -1,7 +1,7 @@
 import os
 import re
 
-from telegram import Bot, ChatAction
+from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 from telegram.ext.dispatcher import run_async
 
@@ -108,8 +108,6 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
         view.plugin_output(computer, plugin.name, stdout, stderr).reply(update)
 
     else:
-        bot.send_chat_action(
-            chat_id=update.message.chat_id, action=ChatAction.TYPING)
         for computer in session.computers.get_included_computers():
 
             remote_plugin_path = "%s/%s" % (states.config_file.remote_tmp_dir,
