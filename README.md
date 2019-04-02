@@ -7,6 +7,7 @@
 ## Table of contents
 * [Description](#description)
 * [Documentation](#documentation)
+* [Contributing](#contributing)
 * [Installing](#installing)
   * [Dependencies](#dependencies)
   * [Instalation guide](#installation-guide)
@@ -18,11 +19,17 @@
 
 ## Description
 
-Centralized Management for Systems Administration (CMSysBot) it is a Telegram bot that allows you to manage computers in a local network from the bot itself, for example, execute a series of commands on all computers automatically, or perform updates and collect information from computers, all in a centralized way.
+__Centralized Management for Systems Administration__ (CMSysBot) it is a Telegram bot that allows you to __manage__ computers in a __local network__ from the bot itself, automating tasks like, for example, executing a series of commands on all computers, or performing updates and collecting information. All in a centralized way.
+
+Also, the bot is easily __extensible__ by adding __plugins__ (bash scripts), so any action that could be performed on a single computer can be easily replicated to the whole local network by using the bot.
 
 ## Documentation
 
 `cmsysbot-telegram`'s documentation lives at [readthedocs.io](https://cmsysbot-telegram.readthedocs.io)
+
+## Contributing
+
+Contributions to the project are really appreciated! Please, refer to the [contribution guide](https://github.com/oddworldng/cmsysbot-telegram/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/oddworldng/cmsysbot-telegram/blob/master/CONTRIBUTING.md) before contributing.
 
 ## Installing
 
@@ -40,11 +47,11 @@ Centralized Management for Systems Administration (CMSysBot) it is a Telegram bo
 
 ### Installation guide
 
-First of all, you need a server with any GNU/Linux distribution, we have tested this bot on a Debian based operating system.
+First of all, you need a __server__ with any _GNU/Linux distribution_, we have tested this bot on a Debian based operating system.
 
-Once you have installed your server operating system, you have to download the bot from GitHub, install Python3 libraries and system dependencies:
+Once you have installed the server operating system, you have to get the bot from __GitHub__, install `python3` libraries and system dependencies:
 
-#### Download bot
+#### Download the bot
 
 ```console
 git clone https://github.com/oddworldng/cmsysbot-telegram.git
@@ -88,7 +95,7 @@ Make sure to fill up all fields in the `config/config.json` file.
 
 #### How to run
 
-That's all! now you can open your Telegram client and get into your created bot `@YourTelegramBot` and start to use it.
+That's all! Now you can open your Telegram client and start a chat with your new bot `@YourTelegramBot` to use it.
 
 ## Social media
 
