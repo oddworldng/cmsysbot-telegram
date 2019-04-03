@@ -11,6 +11,7 @@
 config/
 docs/build/
 tmp/
+log/
 
 __pycache__
 .mypy_cache/

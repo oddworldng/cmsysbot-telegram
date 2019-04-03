@@ -4,15 +4,10 @@ from telegram.error import InvalidToken
 from telegram.ext import Updater
 
 import controller
-from utils import Config, states
+from utils import Config, states, log
 
 # Enable logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO)
-
-logger = logging.getLogger(__name__)
-
+logger = log.generate_log_config()
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
