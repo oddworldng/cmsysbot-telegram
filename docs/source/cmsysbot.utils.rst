@@ -5,5 +5,5 @@ cmsysbot.utils package
     cmsysbot.utils.base_json
     cmsysbot.utils.computers_json
     cmsysbot.utils.config_json
-    cmsysbot.utils.glob
+    cmsysbot.utils.states
     cmsysbot.utils.session

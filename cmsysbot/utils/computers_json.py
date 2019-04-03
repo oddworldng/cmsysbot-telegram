@@ -21,11 +21,11 @@ class Computer:
         # they're not empty
         if computer_data:
             for key in computer_data:
-                if (computer_data[key]):
+                if computer_data[key]:
                     setattr(self, key, computer_data[key])
 
     def __str__(self) -> str:
-        return 'Name: %s Ip: %s Mac: %s' % (self.name, self.ip, self.mac)
+        return "%s (%s)" % (self.name, self.ip)
 
     def asdict(self) -> dict:
         return {'name': self.name, 'ip': self.ip, 'mac': self.mac}

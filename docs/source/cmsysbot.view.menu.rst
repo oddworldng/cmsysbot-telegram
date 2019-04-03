@@ -1,6 +1,6 @@
-cmsysbot.view.view Module
+cmsysbot.view.menu Module
 =========================
 
-.. automodule:: cmsysbot.view.view
+.. automodule:: cmsysbot.view.menu
     :members:
     :show-inheritance:

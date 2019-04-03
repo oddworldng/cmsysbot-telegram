@@ -1,15 +1,28 @@
-from typing import List
+"""
+In this module are defined all the menus (text + keyboard) created by the bot.
+For views that are text only, see the module :mod:`cmsysbot.view.message`.
+"""
+
+from typing import Dict, List
 
 from utils import Computer, State
 
 from .keyboard import Button, Keyboard
 
 
-# Status: Not Connected
-# ---------------------------------
-# |  "Connnect" -> (Departments)  |
-# ---------------------------------
 def not_connected() -> Keyboard:
+    """
+    .. code-block:: python
+
+        # Status: Not Connected
+        # ---------------------------------
+        # |        "Connnect"             |
+        # ---------------------------------
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+
+    """
     # Text
     text = "Status: Not Connected"
 
@@ -20,21 +33,37 @@ def not_connected() -> Keyboard:
     return Keyboard(text, main_buttons=main_buttons)
 
 
-# Status: Connected
-# Route: [route]
-# Username: [username]
-# Bridge ip: [bridge_ip]
-# ---------------- ----------------
-# |  Update Ips  | | Filter comp. |
-# ---------------- ----------------
-# ---------------- ----------------
-# |  Wake comp.  | | Shutd. comp. |
-# ---------------- ----------------
-#               . . .
-# ---------------------------------
-# |          Disconnect           |
-# ---------------------------------
-def connected(route: List[str], username: str, bridge_ip: str) -> Keyboard:
+def connected(route: List[str], plugins: Dict[str, str], username: str,
+              bridge_ip: str) -> Keyboard:
+    """
+    .. code-block:: python
+
+        # Status: Connected
+        # Route: [route]
+        # Username: [username]
+        # Bridge ip: [bridge_ip]
+        # ---------------- ----------------
+        # |  Update Ips  | | Filter comp. |
+        # ---------------- ----------------
+        # ---------------- ----------------
+        # |  Wake comp.  | | Shutd. comp. |
+        # ---------------- ----------------
+        #               . . .
+        # ---------------------------------
+        # |          Disconnect           |
+        # ---------------------------------
+
+    Args:
+        route (:obj:`List[str]`): Selected path (structure/substructure/...)
+        plugins (:obj:`Dict[str, str]`): Names and callback_data for each
+            defined plugin.
+        username (:obj:`str`): Username
+        bridge_ip (:obj:`str`): Ip of the bridge computer
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
+
     # Text
     text = "Status: Connected\n"
     text += "Route: %s\n" % "/".join(route)
@@ -43,15 +72,11 @@ def connected(route: List[str], username: str, bridge_ip: str) -> Keyboard:
 
     # Buttons
     main_buttons = [
-        Button("Update Ips", State.UPDATE_IPS),
-        Button("Filter computers", State.FILTER_COMPUTERS),
-        Button("Wake computers", State.WAKE_COMPUTERS),
-        Button("Shutdown computers", State.SHUTDOWN_COMPUTERS),
-        Button("Update computers", State.UPDATE_COMPUTERS),
-        Button("Install software", State.INSTALL_SOFTWARE),
-        Button("Execute script"),
-        Button("Upload file")
+        Button("Update ips", State.UPDATE_IPS),
+        Button("Filter computers", State.FILTER_COMPUTERS)
     ]
+
+    main_buttons.extend([Button(value, key) for key, value in plugins.items()])
 
     footer_buttons = [Button("Disconnect", State.DISCONNECT)]
 
@@ -63,16 +88,20 @@ def connected(route: List[str], username: str, bridge_ip: str) -> Keyboard:
         footer_buttons=footer_buttons)
 
 
-# Route: ESIT/A/B/...
-# Select your department
-# ---------------- ----------------
-# |      OSL     | |     ESIT     |
-# ---------------- ----------------
-# ---------------------------------
-# |       "Return" -> (Main)      |
-# ---------------------------------
 def structure(route: List[str], sections: List[Computer],
               return_to: str) -> Keyboard:
+    """
+    .. code-block:: python
+        # Route: ESIT/A/B/...
+        # Select your department
+        # ---------------- ----------------
+        # |      OSL     | |     ESIT     |
+        # ---------------- ----------------
+        # ---------------------------------
+        # |       "Return" -> (Main)      |
+        # ---------------------------------
+
+    """
 
     # Text
     text = "Select the section to connect\n"

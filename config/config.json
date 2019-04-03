@@ -1,21 +1,33 @@
 {
   "token": "",
-  "name": "",
+  "name": "CMSysBot",
   "email": "",
-  "structure": [{
-        "name": "ESIT",
-        "sections": [{
-            "name": "Industriales",
-            "sections": ["Aula 3.5", "Aula 3.8"]
-          },
-          {
-            "name": "Ingeniería",
-            "sections": ["OSL", "BBTK"]
-          }
-        ]
-      },
-      {
-        "name": "MATFIS"
-      }
-    ]
+  "server_tmp_dir": "/tmp/",
+  "bridge_tmp_dir": "/tmp/",
+  "remote_tmp_dir": "/tmp/",
+  "plugins_dir": "plugins/",
+  "structure": [
+    {
+      "name": "ESIT",
+      "sections": [
+        {
+          "name": "Industriales",
+          "sections": [
+            "Aula 3.5",
+            "Aula 3.8"
+          ]
+        },
+        {
+          "name": "Ingeniería",
+          "sections": [
+            "OSL",
+            "BBTK"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MATFIS"
+    }
+  ]
 }

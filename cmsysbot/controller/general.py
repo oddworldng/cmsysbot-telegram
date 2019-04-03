@@ -9,20 +9,70 @@ Note:
 
 ``general`` :obj:`callbacks` are the ones that perform any action, like
 connecting, disconnecting, sending commands, sending messages, etc.
-
-``general`` :obj:`callbacks` DON'T show/create new menus, only perform actions.
-The callbacks used to move between menus must be defined inside the :obj:`menu`
-module.
 """
 
 import re
 
-from telegram import Bot, Document, File
+from telegram import Bot
 from telegram.ext import Updater
 
 import view
-from system import remote, bridge
-from utils import State
+from system import Plugin
+from utils import State, states
+
+from . import menu
+
+
+def connect(bot: Bot, update: Updater, user_data: dict):
+    """
+    Tries to open a SSH connection from the bot server to the bridge computer.
+
+    After that, sends a message to the chat with the result of the connection
+    (successed or failed) and returns to the main menu.
+
+    Args:
+        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
+        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
+            the bot.
+        user_data (:obj:`dict`): The dictionary with user variables.
+    """
+
+    session = user_data['session']
+
+    # Try to connect to the client
+    session.start_connection()
+
+    # Send the status message
+    view.connect_output(session.connected, session.bridge_ip).reply(update)
+
+    # Show the main menu again
+    menu.new_main(bot, update, user_data)
+
+
+def disconnect(bot: Bot, update: Updater, user_data: dict):
+    """
+    Closes the open SSH connection to the bridge computer.
+
+    After that, sends a 'Disconnected' message to the chat and returns to the
+    main menu.
+
+    Args:
+        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
+        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
+            the bot.
+        user_data (:obj:`dict`): The dictionary with user variables.
+    """
+
+    bridge_ip = user_data['session'].bridge_ip
+
+    # Close the connection
+    user_data['session'].end_connetion()
+
+    # Send the disconnect output
+    view.disconnect_output(bridge_ip).edit(update)
+
+    # Show the main menu again
+    menu.new_main(bot, update, user_data)
 
 
 def update_ips(bot: Bot, update: Updater, user_data: dict):
@@ -38,23 +88,31 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
             the bot.
         user_data (:obj:`dict`): The dictionary with user variables.
     """
-    # TODO: WIP. Iterate through the computer macs and change the ips
+    session = user_data['session']
 
-    session: Session = user_data['session']
+    # Get all the local ips for every local mac
+    plugin = Plugin("plugins/_local_arp_scan")
 
-    # Get all the local ips for every mac
-    local_ips = remote.get_local_ips(session.client, session.password,
-                                     session.computers.get_macs())
+    # Change view to executing
+    view.plugin_start(plugin.name).edit(update)
 
-    query = update.callback_query
+    _, stdout, _ = next(plugin.run(session))
+
+    local_ips = {}
+    for line in stdout.splitlines():
+        ip, mac = line.strip().split()
+        local_ips[mac] = ip
 
     for computer in session.computers.get_included_computers():
-        print(computer.mac)
-        if computer.mac in local_ips:
-            computer.ip = local_ips[computer.mac]
+        if computer.mac.lower() in local_ips:
+            last_ip = computer.ip
+            computer.ip = local_ips[computer.mac.lower()]
 
-            query.message.reply_text("Computer %s with mac [%s] now has the \
-ip %s" % (computer.name, computer.mac, computer.ip))
+            view.update_ip_output(computer, last_ip).reply(update)
+
+    session.computers.save()
+
+    menu.new_main(bot, update, user_data)
 
 
 def include_computers(bot: Bot, update: Updater, user_data: dict):
@@ -131,126 +189,3 @@ def exclude_computers(bot: Bot, update: Updater, user_data: dict):
 
     # Redraw the view
     view.filter_computers(computers).edit(update)
-
-
-def wake_computers(bot: Bot, update: Updater, user_data: dict):
-    """
-    Iterate through the ``included`` computers and send a wake-on-lan command.
-
-    Args:
-        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
-        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
-            the bot.
-        user_data (:obj:`dict`): The dictionary with user variables.
-    """
-
-    query = update.callback_query
-
-    computers = user_data['session'].computers
-
-    # Iterate only through the included computers
-    for computer in computers.get_included_computers():
-        mac = computer.mac
-
-        # Send the wake-on-lan command
-        remote.wake_on_lan(mac)
-
-        query.message.reply_text("Waking up computer with mac %s..." % mac)
-
-
-def shutdown_computers(bot: Bot, update: Updater, user_data: dict):
-    """
-    Iterate through the ``included`` computers and send a shutdown command.
-
-    Args:
-        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
-        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
-            the bot.
-        user_data (:obj:`dict`): The dictionary with user variables.
-    """
-
-    # TODO: ¿Maybe ask if turn down bridge computer too?
-
-    query = update.callback_query
-
-    # Get all necessary data for sending the command
-    client = user_data['session'].client
-    computers = user_data['session'].computers
-    bridge_ip = user_data['session'].bridge_ip
-    username = user_data['session'].username
-    password = user_data['session'].password
-
-    # Iterate only through the included computers
-    for computer in computers.get_included_computers():
-        target_ip = computer.ip
-
-        if target_ip != bridge_ip:  # Don't shutdown bridge computer
-            # Send the shutdown command
-            remote.shutdown_computer(client, target_ip, username, password)
-
-            query.message.reply_text(
-                "Shutdown computer with ip %s" % target_ip)
-
-
-def update_computers(bot: Bot, update: Updater, user_data: dict):
-    """
-    Iterate through the ``included`` computers and send an update command.
-
-    Args:
-        bot (:obj:`telegram.bot.Bot`): The telegram bot instance.
-        update (:obj:`telegram.ext.update.Updater`): The Updater associated to
-            the bot.
-        user_data (:obj:`dict`): The dictionary with user variables.
-    """
-
-    # TODO: Improve the returned message. Tell if the computer is already
-    # updated, or the number of packages to update.
-
-    query = update.callback_query
-
-    # Get all necessary data for sending the command
-    client = user_data['session'].client
-    computers = user_data['session'].computers
-    username = user_data['session'].username
-    password = user_data['session'].password
-
-    # Iterate only through the included computers
-    for computer in computers.get_included_computers():
-        target_ip = computer.ip
-
-        # Send the update command
-        remote.update_computer(client, target_ip, username, password)
-
-        query.message.reply_text("Updated computer with ip %s" % target_ip)
-
-
-def download_script(bot: Bot, update: Updater, user_data: dict):
-
-    session = user_data['session']
-    message = update.message
-
-    if not session.connected:
-        message.reply_text("You must be connected to a bridge computer before sending files!")
-        return
-
-    # Download the file
-    file_object = message.document.get_file()
-    download_path = "/tmp/%s" % message.document.file_name
-    file_object.download(download_path)
-
-    computers = user_data['session'].computers
-    client = user_data['session'].client
-    username = user_data['session'].username
-    password = user_data['session'].password
-
-    # Copiar al bridge
-    bridge.send_file(client, download_path, "/tmp/")
-
-    # Ejecutar desde el bridge
-    for computer in computers.get_included_computers():
-        message.reply_text("Sending script to computer %s" % computer.mac);
-
-        target_ip = computer.ip
-
-
-        # TODO: Send script

@@ -1,6 +1,6 @@
-cmsysbot.cmsys.action Module
+cmsysbot.view.message Module
 ============================
 
-.. automodule:: cmsysbot.cmsys.action
+.. automodule:: cmsysbot.view.message
     :members:
     :show-inheritance:
