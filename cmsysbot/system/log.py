@@ -5,10 +5,7 @@ def generate_log_config():
 
     log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
-    logging.basicConfig(
-        format=log_format,
-        level=logging.INFO
-    )
+    logging.basicConfig(format=log_format, level=logging.INFO)
 
     formatter = logging.Formatter(log_format)
 
@@ -28,7 +25,7 @@ def generate_log_config():
     ih.setFormatter(formatter)
 
     # Logger
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger("CMSysBot")
     logger.addHandler(eh)
     logger.addHandler(wh)
     logger.addHandler(ih)
