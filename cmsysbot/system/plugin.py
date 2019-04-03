@@ -90,7 +90,7 @@ class Plugin:
 
         return arguments
 
-    def run(self, computer: Computer, session: Session):
+    def run(self, session: Session):
         # Get route in bridge
         bridge_plugin_path = "%s/%s" % (states.config_file.bridge_tmp_dir,
                                         self.name)
