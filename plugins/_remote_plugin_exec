@@ -1,0 +1,22 @@
+#!/bin/bash
+
+USERNAME=$1
+PASSWORD=$2
+TARGET_IP=$3
+
+# Local and remote paths must include the name of the file on the path
+PLUGIN_PATH_BRIDGE=$4
+PLUGIN_PATH_REMOTE=$5
+
+ROOT=$6
+ARGUMENTS=${@:7}
+
+if [ $ROOT = true ] ; then
+  COMMAND="echo $PASSWORD | sudo -S $PLUGIN_PATH_REMOTE $ARGUMENTS"
+else
+  COMMAND="$PLUGIN_PATH_REMOTE $ARGUMENTS"
+fi
+
+ sshpass -p $PASSWORD scp $PLUGIN_PATH_BRIDGE $USERNAME@$TARGET_IP:$PLUGIN_PATH_REMOTE
+
+ sshpass -p $PASSWORD ssh $USERNAME@$TARGET_IP $COMMAND
