@@ -21,8 +21,8 @@ def not_connected() -> Keyboard:
 
     Returns:
         :obj:`cmsysbot.view.keyboard.Keyboard`
-
     """
+
     # Text
     text = "Status: Not Connected"
 
@@ -88,7 +88,7 @@ def connected(route: List[str], plugins: Dict[str, str], username: str,
         footer_buttons=footer_buttons)
 
 
-def structure(route: List[str], sections: List[Computer],
+def structure(route: List[str], sections: List[str],
               return_to: str) -> Keyboard:
     """
     .. code-block:: python
@@ -97,10 +97,19 @@ def structure(route: List[str], sections: List[Computer],
         # ---------------- ----------------
         # |      OSL     | |     ESIT     |
         # ---------------- ----------------
+        #                ...
         # ---------------------------------
-        # |       "Return" -> (Main)      |
+        # |            "Return"           |
         # ---------------------------------
 
+    Args:
+        route (:obj:`List[str]`): Selected path (structure/substructure/...)
+        sections (:obj:`List[Computer]`): List of the sections for the current
+            route
+        return_to (:obj:`str`): Callback data value for the return button
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
     """
 
     # Text
@@ -119,16 +128,32 @@ def structure(route: List[str], sections: List[Computer],
         footer_buttons=footer_buttons)
 
 
-# Route: ESIT/A/B/...
-# Now, select your bridge computer
-# ---------------------------------
-# |  Name: E1. Ip: 192.168.1.10   |
-# ---------------------------------
-# ---------------------------------
-# |  Name: E2. Ip: 192.168.1.13   |
-# ---------------------------------
 def ip_selection(route: List[str], computers: List[Computer],
                  return_to: str) -> Keyboard:
+    """
+    .. code-block:: python
+        # Route: ESIT/A/B/...
+        # Now, select your bridge computer
+        # ---------------------------------
+        # |  Name: E1. Ip: 192.168.1.10   |
+        # ---------------------------------
+        # ---------------------------------
+        # |  Name: E2. Ip: 192.168.1.13   |
+        # ---------------------------------
+        #               ...
+        # ---------------------------------
+        # |            "Return"           |
+        # ---------------------------------
+
+    Args:
+        route (:obj:`List[str]`): Selected path (structure/substructure/...)
+        computers(:obj:`List[Computer]`): List of the computers on the current
+            section
+        return_to (:obj:`str`): Callback data value for the return button
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
 
     # Text
     text = "Route: %s" % "/".join(route)
@@ -145,12 +170,25 @@ def ip_selection(route: List[str], computers: List[Computer],
         text, main_buttons=main_buttons, footer_buttons=footer_buttons)
 
 
-# [text]
-# ---------------- ----------------
-# |      Yes     | |      No      |
-# ---------------- ----------------
 def yes_no(text: str, yes_callback_data: str,
            no_callback_data: str) -> Keyboard:
+    """
+    .. code-block:: python
+        # [text]
+        # ---------------- ----------------
+        # |      Yes     | |      No      |
+        # ---------------- ----------------
+
+    Args:
+        text (:obj:`str`): Text of the keyboard
+        yes_callback_data(:obj:`str`): Callback to call after clicking on the
+            yes button
+        no_callback_data(:obj:`str`): Callback to call after clicking on the
+            no button
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
 
     # Buttons
     main_buttons = [
@@ -162,33 +200,45 @@ def yes_no(text: str, yes_callback_data: str,
     return Keyboard(text, n_cols=2, main_buttons=main_buttons)
 
 
-# Select the computers that will be
-# included in future operations
-# ---------------- ----------------
-# |   Inc. All   | |  Excl. All   |
-# ---------------- ----------------
-# --------------------------- -----
-# |   Name: E1. Ip: 191...  | | V |
-# --------------------------- -----
-# --------------------------- -----
-# |   Name: E2. Ip: 191...  | | X |
-# --------------------------- -----
-# --------------------------- -----
-# |   Name: E3. Ip: 191...  | | X |
-# --------------------------- -----
-# ---------------------------------
-# |       "Return" -> (Main)      |
-# ---------------------------------
 def filter_computers(computers: List[Computer]):
+    """
+    .. code-block:: python
+        # Select the computers that will be
+        # included in future operations
+        # ---------------- ----------------
+        # |   Inc. All   | |  Excl. All   |
+        # ---------------- ----------------
+        # --------------------------- -----
+        # |   Name: E1. Ip: 191...  | | V |
+        # --------------------------- -----
+        # --------------------------- -----
+        # |   Name: E2. Ip: 191...  | | X |
+        # --------------------------- -----
+        # --------------------------- -----
+        # |   Name: E3. Ip: 191...  | | X |
+        # --------------------------- -----
+        #               ...
+        # ---------------------------------
+        # |            "Return"           |
+        # ---------------------------------
+
+    Args:
+        computer(:obj:`List[Computer]`): List of computers to show as buttons.
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
 
     # Text
     text = "Select the computers that will be included in future operations"
 
+    # Buttons
     main_buttons = [
         Button("Include All", "include-all"),
         Button("Exclude All", "exclude-all")
     ]
 
+    # Add the buttons according to the computer attributes
     for computer in computers.get_computers():
         main_buttons.append(Button(str(computer)))
 

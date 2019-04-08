@@ -1,3 +1,12 @@
+"""
+In this module are defined all the ``conversations`` used by the bot.
+
+Note:
+    A ``conversation`` is a type of interaction between the user and the bot
+    based on a "Question-Answer" system. It can also be represented as a state
+    machine.
+"""
+
 import os
 import re
 

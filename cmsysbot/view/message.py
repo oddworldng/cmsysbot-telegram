@@ -1,3 +1,8 @@
+"""
+In this module are defined all the messages (without keyboard) returned by the
+bot.
+"""
+
 import re
 
 from utils import Computer
@@ -6,10 +11,22 @@ from .keyboard import Keyboard
 
 
 def connect_output(connected: bool, bridge_ip: str) -> Keyboard:
+    """
+    .. code-block:: python
+        # Sucessfully connected to [bridge_ip]
+        #
+        # or
+        #
+        # Unable to connect to [bridge_ip]. Please try to login with different
+        # credentials.
 
-    text = ""
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
 
     # Text
+    text = ""
+
     if connected:
         text = "Successfully connected to %s!" % bridge_ip
     else:
@@ -21,6 +38,13 @@ def connect_output(connected: bool, bridge_ip: str) -> Keyboard:
 
 
 def disconnect_output(bridge_ip: str) -> Keyboard:
+    """
+    .. code-block:: python
+        # Disconnected from [bridge_ip]
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
 
     # Text
     text = "Disconnected from %s" % bridge_ip
@@ -30,6 +54,13 @@ def disconnect_output(bridge_ip: str) -> Keyboard:
 
 
 def update_ip_output(computer: Computer, last_ip: str) -> Keyboard:
+    """
+    .. code-block:: python
+        # Computer [name]: [last_ip] -> [new_ip]
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
 
     # Text
     text = "Computer %s: %s --> %s" % (computer.name, last_ip, computer.ip)
@@ -44,6 +75,14 @@ def update_ip_output(computer: Computer, last_ip: str) -> Keyboard:
 
 
 def login_start() -> Keyboard:
+    """
+    .. code-block:: python
+        # Please introduce your username and password
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
+
     # Text
     text = "Please introduce your username and password"
 
@@ -52,6 +91,14 @@ def login_start() -> Keyboard:
 
 
 def ask_username() -> Keyboard:
+    """
+    .. code-block:: python
+        # Enter your username
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
+
     # Text
     text = "Enter your username"
 
@@ -60,6 +107,14 @@ def ask_username() -> Keyboard:
 
 
 def ask_password() -> Keyboard:
+    """
+    .. code-block:: python
+        # Enter your password
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
+
     # Text
     text = "Enter your password"
 
@@ -73,6 +128,13 @@ def ask_password() -> Keyboard:
 
 
 def plugin_start(plugin_name: str) -> Keyboard:
+    """
+    .. code-block:: python
+        # -- [Executing [plugin-name]] --
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
 
     # Text
     text = "-- [Executing %s] --" % plugin_name
@@ -82,6 +144,13 @@ def plugin_start(plugin_name: str) -> Keyboard:
 
 
 def ask_argument(argument_text: str) -> Keyboard:
+    """
+    .. code-block:: python
+        # Argument needed: [argument-text]
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
 
     # Text
     text = "Argument needed: %s " % argument_text
@@ -92,6 +161,19 @@ def ask_argument(argument_text: str) -> Keyboard:
 
 def plugin_output(computer: Computer, plugin_name: str, stdout: str,
                   stderr: str) -> Keyboard:
+    """
+    .. code-block:: python
+        # -> [Error]: stderr     {Doesn't show if stderr is empty}
+        # stdout
+        #
+        #   or
+        #
+        # -> No output          {Shown only if stderr and stdout are emtpy
+
+    Returns:
+        :obj:`cmsysbot.view.keyboard.Keyboard`
+    """
+
     # Text
     text = ""
 
