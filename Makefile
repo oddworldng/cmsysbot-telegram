@@ -1,4 +1,4 @@
-.PHONY: run
+.PHONY: run, install, tests
 
 PY := python3
 CONFIG_FILE := config/config.json
@@ -13,3 +13,7 @@ run:
 
 install:
 	$(PY) -m pip install -r $(REQS)
+
+
+tests:
+	$(PY) -m pytest
