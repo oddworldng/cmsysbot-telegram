@@ -4,6 +4,7 @@
 
 # Exceptions
 !requirements.txt
+!requirements-dev.txt
 !requirements-docs.txt
 !config/config.json
 
