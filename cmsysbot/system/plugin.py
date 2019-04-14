@@ -1,3 +1,4 @@
+import json
 import glob
 import os.path
 import re
@@ -21,17 +22,26 @@ class PluginVar:
 
 
 class Plugin:
-    BODY_REGEX = re.compile(r"CMSysBot:\s*{(.*)}",
+    BODY_REGEX = re.compile(r"CMSysBot:\s*({.*})",
                             re.IGNORECASE | re.MULTILINE | re.DOTALL)
-    ROOT_REGEX = re.compile(r"\"root\"\s*:\s*\"(.*)\"\s*,?", re.IGNORECASE)
-    SOURCE_REGEX = re.compile(r"\"source\"\s*:\s*\"(.*)\"\s*,?", re.IGNORECASE)
-    ARGUMENTS_REGEX = re.compile(r"\"arguments\"\s*:\s*\[(.*)\]",
-                                 re.MULTILINE | re.DOTALL)
-    WORD_REGEX = re.compile(r".*?\"(.*)\"", re.DOTALL)
+    COMMENTS_REGEX = re.compile(r"\n\s*#")
 
     def __init__(self, path: str):
         self.path = path
-        self.parse_cmsysbot_body()
+        self.data = self.parse_cmsysbot_body()
+        print(self.data)
+
+    @property
+    def root(self):
+        return self.data.root
+
+    @property
+    def source(self):
+        return self.data.source
+
+    @property
+    def arguments(self):
+        return self.data.arguments
 
     @property
     def name(self):
@@ -41,106 +51,30 @@ class Plugin:
     def dirname(self):
         return os.path.dirname(self.path)
 
+    @property
+    def bridge_path(self):
+        return f"{states.config_file.bridge_tmp_dir}/{self.name}"
+
+    @property
+    def remote_path(self):
+        return f"{states.config_file.remote_tmp_dir}/{self.name}"
+
     def parse_cmsysbot_body(self):
         with open(self.path, 'r') as textfile:
             content = textfile.read()
-            body = ""
-
             body_match = re.search(self.BODY_REGEX, content)
+
             if body_match:
                 body = body_match.group(1)
+                # Remove start line comments
+                body = re.sub(self.COMMENTS_REGEX, "\n", body)
+                return json.loads(body)
 
-            self.root = self._parse_root(body)
-            self.source = self._parse_source(body)
-            self.arguments = self._parse_arguments(body)
-
-    def _parse_root(self, body: str):
-        root = PluginVar.ROOT  # Default value
-
-        root_match = re.search(self.ROOT_REGEX, body)
-
-        if root_match:
-            root = (root_match.group(1).lower() == 'true')
-
-        return root
-
-    def _parse_source(self, body: str):
-        source = PluginVar.SOURCE_BRIDGE  # Default value
-
-        source_match = re.search(self.SOURCE_REGEX, body)
-
-        if source_match:
-            source = source_match.group(1)
-
-        return source
-
-    def _parse_arguments(self, body: str):
-        arguments = {}
-
-        arguments_match = re.search(self.ARGUMENTS_REGEX, body)
-
-        if arguments_match:
-            raw_arguments = arguments_match.group(1).split(',')
-
-            for word in raw_arguments:
-                word_match = re.match(self.WORD_REGEX, word)
-
-                if word_match:
-                    arguments[word_match.group(1)] = ""
-
-        return arguments
+        return None
 
     def run(self, session: Session):
-        # Get route in bridge
-        bridge_plugin_path = "%s/%s" % (states.config_file.bridge_tmp_dir,
-                                        self.name)
-        # Send plugin to bridge
-        bridge.send_file_to_bridge(session, self.path, bridge_plugin_path)
-
-        # Substitute the $USERNAME, $PASSWORD... arguments
-        self.fill_session_arguments(session)
-
-        # Run the command only once on the bridge and return
-        if self.source == PluginVar.SOURCE_BRIDGE:
-            command = "%s %s" % (bridge_plugin_path, " ".join(
-                self.arguments.values()))
-
-            computer = Computer({
-                "name": "Bridge",
-                "ip": session.bridge_ip,
-                "mac": ""
-            })
-
-            if self.root:
-                yield (computer, *bridge.run_as_root(session, command))
-            else:
-                yield (computer, *bridge.run(session, command))
-
-        # Run the command for each included computer
-        elif self.source == PluginVar.SOURCE_REMOTE:
-
-            for computer in session.computers.get_included_computers():
-                self.fill_computer_arguments(computer)
-
-                remote_plugin_path = "%s/%s" % (
-                    states.config_file.remote_tmp_dir, self.name)
-
-                # Send plugin to remote for execution
-                remote.send_file_to_remote(session, computer.ip,
-                                           bridge_plugin_path,
-                                           remote_plugin_path)
-
-                time.sleep(1)
-
-                command = "%s %s" % (remote_plugin_path, " ".join(
-                    self.arguments.values()))
-
-                if self.root:
-                    yield (computer,
-                           *remote.run_as_root(session, computer.ip, command))
-                else:
-                    yield (computer,
-                           *remote.run(session, computer.ip, command))
+        print(self.bridge_path)
+        print(self.remote_path)
 
     def fill_session_arguments(self, session: Session):
         if PluginVar.USERNAME in self.arguments:

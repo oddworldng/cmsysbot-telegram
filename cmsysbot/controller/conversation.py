@@ -101,12 +101,6 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
         print("bridge: %s" % command)
 
-        computer = Computer({
-            "name": "Bridge",
-            "ip": session.bridge_ip,
-            "mac": ""
-        })
-
         stdout = ""
         stderr = ""
         if plugin.root:
@@ -114,7 +108,7 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
         else:
             stdout, stderr = bridge.run(session, command)
 
-        view.plugin_output(computer, plugin.name, stdout, stderr).reply(update)
+        view.plugin_output("Bridge", session.bridge_ip, plugin.name, stdout, stderr).reply(update)
 
     else:
         for computer in session.computers.get_included_computers():
@@ -151,7 +145,7 @@ def run_plugin_remote(computer, update: Updater, session: Session, plugin,
 
     print("Stdout: %s" % stdout)
     print("Stderr: %s" % stderr)
-    view.plugin_output(computer, plugin.name, stdout, stderr).reply(update)
+    view.plugin_output(computer.name, computer.ip, plugin.name, stdout, stderr).reply(update)
 
 
 def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:

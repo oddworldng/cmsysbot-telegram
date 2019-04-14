@@ -159,7 +159,7 @@ def ask_argument(argument_text: str) -> Keyboard:
     return Keyboard(text)
 
 
-def plugin_output(computer: Computer, plugin_name: str, stdout: str,
+def plugin_output(name: str, ip: str, plugin_name: str, stdout: str,
                   stderr: str) -> Keyboard:
     """
     .. code-block:: python
@@ -192,7 +192,7 @@ def plugin_output(computer: Computer, plugin_name: str, stdout: str,
     if not text:
         text = "-> No output"
 
-    text = "[%s - %s]:\n%s" % (computer, plugin_name, text)
+    text = "[%s (%s): %s]:\n%s" % (name, ip, plugin_name, text)
 
     # Keyboard
     return Keyboard(text)
