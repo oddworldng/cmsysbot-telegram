@@ -92,6 +92,7 @@ def structure(route: List[str], sections: List[str],
               return_to: str) -> Keyboard:
     """
     .. code-block:: python
+
         # Route: ESIT/A/B/...
         # Select your department
         # ---------------- ----------------
@@ -132,6 +133,7 @@ def ip_selection(route: List[str], computers: List[Computer],
                  return_to: str) -> Keyboard:
     """
     .. code-block:: python
+
         # Route: ESIT/A/B/...
         # Now, select your bridge computer
         # ---------------------------------
@@ -174,6 +176,7 @@ def yes_no(text: str, yes_callback_data: str,
            no_callback_data: str) -> Keyboard:
     """
     .. code-block:: python
+
         # [text]
         # ---------------- ----------------
         # |      Yes     | |      No      |
@@ -203,6 +206,7 @@ def yes_no(text: str, yes_callback_data: str,
 def filter_computers(computers: List[Computer]):
     """
     .. code-block:: python
+
         # Select the computers that will be
         # included in future operations
         # ---------------- ----------------

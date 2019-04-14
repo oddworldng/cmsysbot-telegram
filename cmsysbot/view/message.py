@@ -13,6 +13,7 @@ from .keyboard import Keyboard
 def connect_output(connected: bool, bridge_ip: str) -> Keyboard:
     """
     .. code-block:: python
+
         # Sucessfully connected to [bridge_ip]
         #
         # or
@@ -40,6 +41,7 @@ def connect_output(connected: bool, bridge_ip: str) -> Keyboard:
 def disconnect_output(bridge_ip: str) -> Keyboard:
     """
     .. code-block:: python
+
         # Disconnected from [bridge_ip]
 
     Returns:
@@ -56,6 +58,7 @@ def disconnect_output(bridge_ip: str) -> Keyboard:
 def update_ip_output(computer: Computer, last_ip: str) -> Keyboard:
     """
     .. code-block:: python
+
         # Computer [name]: [last_ip] -> [new_ip]
 
     Returns:
@@ -77,6 +80,7 @@ def update_ip_output(computer: Computer, last_ip: str) -> Keyboard:
 def login_start() -> Keyboard:
     """
     .. code-block:: python
+
         # Please introduce your username and password
 
     Returns:
@@ -93,6 +97,7 @@ def login_start() -> Keyboard:
 def ask_username() -> Keyboard:
     """
     .. code-block:: python
+
         # Enter your username
 
     Returns:
@@ -109,6 +114,7 @@ def ask_username() -> Keyboard:
 def ask_password() -> Keyboard:
     """
     .. code-block:: python
+
         # Enter your password
 
     Returns:
@@ -130,6 +136,7 @@ def ask_password() -> Keyboard:
 def plugin_start(plugin_name: str) -> Keyboard:
     """
     .. code-block:: python
+
         # -- [Executing [plugin-name]] --
 
     Returns:
@@ -146,6 +153,7 @@ def plugin_start(plugin_name: str) -> Keyboard:
 def ask_argument(argument_text: str) -> Keyboard:
     """
     .. code-block:: python
+
         # Argument needed: [argument-text]
 
     Returns:
@@ -163,6 +171,7 @@ def plugin_output(name: str, ip: str, plugin_name: str, stdout: str,
                   stderr: str) -> Keyboard:
     """
     .. code-block:: python
+
         # -> [Error]: stderr     {Doesn't show if stderr is empty}
         # stdout
         #

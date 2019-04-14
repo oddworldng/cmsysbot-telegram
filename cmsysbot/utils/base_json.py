@@ -1,7 +1,7 @@
 import json
 
 
-class Json:
+class BaseJson:
     def __init__(self, filepath: str):
         self.data = None
         self.filepath = filepath

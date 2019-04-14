@@ -7,21 +7,21 @@ import controller
 from system import log, Plugin
 from utils import Config, states
 
-# Enable logging
-logger = log.generate_log_config()
-
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def error(bot, update, error):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, error)
+    logging.getLogger().warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():
     # Load the config file
     states.config_file = Config("config/config.json")
 
-    # Create the EventHandler and pass it your bot's token.
+    # Initial logger config
+    log.generate_log_config()
+
+    # Create the EventHandler and pass your bot's token.
     try:
         updater = Updater(states.config_file.token)
     except InvalidToken:

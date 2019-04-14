@@ -1,7 +1,7 @@
 import os
 from typing import Iterator, List, Union
 
-from .base_json import Json
+from .base_json import BaseJson
 from .computers_json import Computers
 
 
@@ -32,7 +32,7 @@ class Section:
         return "%s: %s" % (self.name, self.subsections)
 
 
-class Config(Json):
+class Config(BaseJson):
     def __init__(self, filepath: str):
         """Load the .json from an existent file. Throws if couldn't open/read
         the file"""
@@ -65,6 +65,10 @@ class Config(Json):
     @property
     def remote_tmp_dir(self) -> str:
         return self.data['remote_tmp_dir']
+
+    @property
+    def log_dir(self) -> str:
+        return self.data['log_dir']
 
     @property
     def plugins_dir(self) -> str:

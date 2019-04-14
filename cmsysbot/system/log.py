@@ -1,7 +1,15 @@
 import logging
+import os
+
+from utils import states
 
 
 def generate_log_config():
+
+    log_dir = states.config_file.log_dir
+
+    if not os.path.isdir(log_dir):
+        os.makedirs(log_dir)
 
     log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
@@ -10,17 +18,17 @@ def generate_log_config():
     formatter = logging.Formatter(log_format)
 
     # Error handler
-    eh = logging.FileHandler('log/error.log')
+    eh = logging.FileHandler(f'{log_dir}/error.log')
     eh.setLevel(logging.ERROR)
     eh.setFormatter(formatter)
 
     # Warning handler
-    wh = logging.FileHandler('log/warn.log')
+    wh = logging.FileHandler(f'{log_dir}/warn.log')
     wh.setLevel(logging.WARNING)
     wh.setFormatter(formatter)
 
     # INFO handler
-    ih = logging.FileHandler('log/info.log')
+    ih = logging.FileHandler(f'{log_dir}/info.log')
     ih.setLevel(logging.INFO)
     ih.setFormatter(formatter)
 

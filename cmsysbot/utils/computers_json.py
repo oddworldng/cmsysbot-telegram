@@ -1,7 +1,7 @@
 import json
 from typing import Iterator
 
-from .base_json import Json
+from .base_json import BaseJson
 
 
 class Computer:
@@ -31,7 +31,7 @@ class Computer:
         return {'name': self.name, 'ip': self.ip, 'mac': self.mac}
 
 
-class Computers(Json):
+class Computers(BaseJson):
     """This class provides an interface for using the .json files created on
     config/ (not config.json). Provides functions to get the names/ips/macs of
     the computers and easily save changes on the .json"""
