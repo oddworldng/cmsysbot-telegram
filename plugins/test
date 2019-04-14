@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# CMSysBot: {
+# "root": "True",
+# "source": "remote"
+# }
+
+# DEBUG ONLY: Plugin for Testing parallel execution
+
+num=$(( ( RANDOM % 10  ) + 1))
+echo "Sleeping $num sec"
+sleep $num
+echo "Finished"
+sudo id

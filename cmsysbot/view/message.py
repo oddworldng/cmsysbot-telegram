@@ -192,7 +192,7 @@ def plugin_output(name: str, ip: str, plugin_name: str, stdout: str,
     if not text:
         text = "-> No output"
 
-    text = "[%s (%s): %s]:\n%s" % (name, ip, plugin_name, text)
+    text = "[%s (%s) - %s]\n%s" % (name, ip, plugin_name, text)
 
     # Keyboard
     return Keyboard(text)

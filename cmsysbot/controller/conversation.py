@@ -15,7 +15,7 @@ from telegram.ext import ConversationHandler, Updater
 from telegram.ext.dispatcher import run_async
 
 import view
-from system import Plugin, PluginVar, bridge, remote
+from system import Plugin
 from utils import Computer, Session, State, states
 
 from . import general, menu
@@ -33,6 +33,7 @@ def start_plugin_from_callback(bot: Bot, update: Updater, user_data: dict):
 
     # Plugin path in server
     plugin_path_server = re.search(State.START_PLUGIN, query.data).group(1)
+    print(plugin_path_server)
 
     user_data['plugin'] = Plugin(plugin_path_server)
 
@@ -89,63 +90,12 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
     session: Session = user_data['session']
     plugin: Plugin = user_data['plugin']
 
-    # Get route in bridge
-    bridge_plugin_path = "%s/%s" % (states.config_file.bridge_tmp_dir,
-                                    plugin.name)
-    # Send plugin to bridge
-    bridge.send_file_to_bridge(session, plugin.path, bridge_plugin_path)
-
-    if plugin.source == PluginVar.SOURCE_BRIDGE:
-        command = "%s %s" % (bridge_plugin_path, " ".join(
-            plugin.arguments.values()))
-
-        print("bridge: %s" % command)
-
-        stdout = ""
-        stderr = ""
-        if plugin.root:
-            stdout, stderr = bridge.run_as_root(session, command)
-        else:
-            stdout, stderr = bridge.run(session, command)
-
-        view.plugin_output("Bridge", session.bridge_ip, plugin.name, stdout, stderr).reply(update)
-
-    else:
-        for computer in session.computers.get_included_computers():
-
-            remote_plugin_path = "%s/%s" % (states.config_file.remote_tmp_dir,
-                                            plugin.name)
-
-            # Send plugin to remote for execution
-            remote.send_file_to_remote(session, computer.ip,
-                                       bridge_plugin_path, remote_plugin_path)
-            plugin.fill_computer_arguments(computer)
-
-            command = "%s %s" % (remote_plugin_path, " ".join(
-                plugin.arguments.values()))
-
-            print("remote: %s" % command)
-
-            run_plugin_remote(computer, update, session, plugin, command)
+    for name, ip, stdout, stderr in plugin.run(session):
+        view.plugin_output(name, ip, plugin.name, stdout, stderr).reply(update)
 
     menu.new_main(bot, update, user_data)
 
     return ConversationHandler.END
-
-
-@run_async
-def run_plugin_remote(computer, update: Updater, session: Session, plugin,
-                      command: str):
-    stdout = ""
-    stderr = ""
-    if plugin.root:
-        stdout, stderr = remote.run_as_root(session, computer.ip, command)
-    else:
-        stdout, stderr = remote.run(session, computer.ip, command)
-
-    print("Stdout: %s" % stdout)
-    print("Stderr: %s" % stderr)
-    view.plugin_output(computer.name, computer.ip, plugin.name, stdout, stderr).reply(update)
 
 
 def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:

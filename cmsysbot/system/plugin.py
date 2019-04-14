@@ -1,11 +1,11 @@
-import json
 import glob
+import json
 import os.path
 import re
 import time
+from concurrent import futures
 from typing import Dict
 
-from system import bridge, remote
 from utils import Computer, Session, states
 
 
@@ -22,34 +22,29 @@ class PluginVar:
 
 
 class Plugin:
-    BODY_REGEX = re.compile(r"CMSysBot:\s*({.*})",
+    BODY_REGEX = re.compile(r"CMSysBot:\s*({.*?})\s*\n",
                             re.IGNORECASE | re.MULTILINE | re.DOTALL)
     COMMENTS_REGEX = re.compile(r"\n\s*#")
 
-    def __init__(self, path: str):
-        self.path = path
+    def __init__(self, server_path: str):
+        self.server_path = server_path
         self.data = self.parse_cmsysbot_body()
-        print(self.data)
 
     @property
     def root(self):
-        return self.data.root
+        return self.data['root']
 
     @property
     def source(self):
-        return self.data.source
+        return self.data['source']
 
     @property
     def arguments(self):
-        return self.data.arguments
+        return self.data['arguments']
 
     @property
     def name(self):
-        return os.path.basename(self.path)
-
-    @property
-    def dirname(self):
-        return os.path.dirname(self.path)
+        return os.path.basename(self.server_path)
 
     @property
     def bridge_path(self):
@@ -60,7 +55,7 @@ class Plugin:
         return f"{states.config_file.remote_tmp_dir}/{self.name}"
 
     def parse_cmsysbot_body(self):
-        with open(self.path, 'r') as textfile:
+        with open(self.server_path, 'r') as textfile:
             content = textfile.read()
             body_match = re.search(self.BODY_REGEX, content)
 
@@ -68,15 +63,51 @@ class Plugin:
                 body = body_match.group(1)
                 # Remove start line comments
                 body = re.sub(self.COMMENTS_REGEX, "\n", body)
-                return json.loads(body)
+                data = json.loads(body)
+
+                if 'arguments' not in data:
+                    data['arguments'] = []
+
+                return data
 
         return None
 
     def run(self, session: Session):
-        print(self.bridge_path)
-        print(self.remote_path)
+        session.copy_to_bridge(self.server_path, self.bridge_path, 0o755)
+
+        # Replace the session $arguments (username, password...)
+        self.fill_session_arguments(session)
+
+        # RUN ON BRIDGE
+        if (self.source == PluginVar.SOURCE_BRIDGE):
+            command = f"{self.bridge_path} {' '.join(self.arguments)}"
+
+            yield "Bridge", session.bridge_ip, (*session.run_on_bridge(
+                command, root=self.root))
+
+        # RUN ON REMOTE
+        else:
+            with futures.ThreadPoolExecutor() as executor:
+                result_futures = [
+                    executor.submit(self._run_on_remote, computer, session)
+                    for computer in session.computers.get_computers()
+                ]
+
+                for future in futures.as_completed(result_futures):
+                    yield future.result()
+
+    def _run_on_remote(self, computer: Computer, session: Session):
+
+        session.copy_to_remote(computer.ip, self.bridge_path, self.remote_path)
+
+        self.fill_computer_arguments(computer)
+        command = f"{self.remote_path} {' '.join(self.arguments)}"
+
+        return computer.name, computer.ip, (*session.run_on_remote(
+            computer.ip, command, self.root))
 
     def fill_session_arguments(self, session: Session):
+
         if PluginVar.USERNAME in self.arguments:
             self.arguments[PluginVar.USERNAME] = session.username
 
@@ -91,6 +122,7 @@ class Plugin:
                 list(session.computers.get_macs()))
 
     def fill_computer_arguments(self, computer: Computer):
+
         if PluginVar.TARGET_IP in self.arguments:
             self.arguments[PluginVar.TARGET_IP] = computer.ip
 

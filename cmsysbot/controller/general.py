@@ -96,7 +96,7 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
     # Change view to executing
     view.plugin_start(plugin.name).edit(update)
 
-    _, stdout, _ = next(plugin.run(session))
+    _, _, stdout, _ = next(plugin.run(session))
 
     local_ips = {}
     for line in stdout.splitlines():
