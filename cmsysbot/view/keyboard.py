@@ -53,12 +53,14 @@ class Keyboard:
             split in several columns (n_cols doesn't affect them)
     """
 
-    def __init__(self,
-                 text: str,
-                 n_cols: int = 1,
-                 header_buttons: List[InlineKeyboardButton] = None,
-                 main_buttons: List[InlineKeyboardButton] = None,
-                 footer_buttons: List[InlineKeyboardButton] = None):
+    def __init__(
+        self,
+        text: str,
+        n_cols: int = 1,
+        header_buttons: List[InlineKeyboardButton] = None,
+        main_buttons: List[InlineKeyboardButton] = None,
+        footer_buttons: List[InlineKeyboardButton] = None,
+    ):
         self.text = text
         self.n_cols = n_cols
         self.header_buttons = header_buttons
@@ -77,7 +79,8 @@ class Keyboard:
         """
 
         self._get_message(update).reply_text(
-            text=self.text, reply_markup=self._generate_keyboard())
+            text=self.text, reply_markup=self._generate_keyboard()
+        )
 
     def edit(self, update: Updater):
         """
@@ -91,7 +94,8 @@ class Keyboard:
         """
 
         self._get_message(update).edit_text(
-            text=self.text, reply_markup=self._generate_keyboard())
+            text=self.text, reply_markup=self._generate_keyboard()
+        )
 
     @staticmethod
     def _get_message(update: Updater) -> Message:
@@ -135,7 +139,7 @@ class Keyboard:
 
         if self.main_buttons:
             menu = [
-                self.main_buttons[i:i + self.n_cols]
+                self.main_buttons[i : i + self.n_cols]
                 for i in range(0, len(self.main_buttons), self.n_cols)
             ]
 

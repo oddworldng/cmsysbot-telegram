@@ -31,8 +31,10 @@ def connect_output(connected: bool, bridge_ip: str) -> Keyboard:
     if connected:
         text = "Successfully connected to %s!" % bridge_ip
     else:
-        text = ("Unable to connect to %s.\n"
-                "Please try to login with different credentials!" % bridge_ip)
+        text = (
+            "Unable to connect to %s.\n"
+            "Please try to login with different credentials!" % bridge_ip
+        )
 
     # Keyboard
     return Keyboard(text)
@@ -167,8 +169,9 @@ def ask_argument(argument_text: str) -> Keyboard:
     return Keyboard(text)
 
 
-def plugin_output(name: str, ip: str, plugin_name: str, stdout: str,
-                  stderr: str) -> Keyboard:
+def plugin_output(
+    name: str, ip: str, plugin_name: str, stdout: str, stderr: str
+) -> Keyboard:
     """
     .. code-block:: python
 

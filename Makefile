@@ -28,10 +28,15 @@ dev-install:
 	virtualenv -p python3 $(VENV)
 	$(PIP) install -r $(REQS)
 	$(PIP) install -r $(DEV_REQS)
+	$(BIN)/pre-commit install
 
 
 clean:
 	rm -rf $(VENV)
+
+
+freeze:
+	$(PIP) freeze
 
 
 test:

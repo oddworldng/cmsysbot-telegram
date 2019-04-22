@@ -12,11 +12,10 @@ import re
 
 from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
-from telegram.ext.dispatcher import run_async
 
 import view
 from system import Plugin
-from utils import Computer, Session, State, states
+from utils import Session, State, states
 
 from . import general, menu
 
@@ -35,50 +34,53 @@ def start_plugin_from_callback(bot: Bot, update: Updater, user_data: dict):
     plugin_path_server = re.search(State.START_PLUGIN, query.data).group(1)
     print(plugin_path_server)
 
-    user_data['plugin'] = Plugin(plugin_path_server)
+    user_data["plugin"] = Plugin(plugin_path_server)
 
-    view.plugin_start(user_data['plugin'].name).edit(update)
+    view.plugin_start(user_data["plugin"].name).edit(update)
 
     return collect_arguments(bot, update, user_data)
 
 
 def start_plugin_from_download(bot: Bot, update: Updater, user_data: dict):
 
-    session = user_data['session']
+    session = user_data["session"]
     message = update.message
 
     if not session.connected:
         message.reply_text(
-            "You must be connected to a bridge computer before sending files!")
+            "You must be connected to a bridge computer before sending files!"
+        )
         return ConversationHandler.END
 
     # Download the file
     file_object = message.document.get_file()
-    download_path = "%s/%s" % (states.config_file.server_tmp_dir,
-                               message.document.file_name)
+    download_path = "%s/%s" % (
+        states.config_file.server_tmp_dir,
+        message.document.file_name,
+    )
 
     file_object.download(download_path)
 
     # Make downloaded file executable by the user
     os.chmod(download_path, 0o764)
 
-    user_data['plugin'] = Plugin(download_path)
+    user_data["plugin"] = Plugin(download_path)
 
-    view.plugin_start(user_data['plugin'].name).reply(update)
+    view.plugin_start(user_data["plugin"].name).reply(update)
 
     return collect_arguments(bot, update, user_data)
 
 
 def collect_arguments(bot: Bot, update: Updater, user_data: dict):
 
-    session = user_data['session']
+    session = user_data["session"]
 
-    plugin = user_data['plugin']
+    plugin = user_data["plugin"]
     plugin.fill_session_arguments(session)
 
     for argument in plugin.arguments:
-        if argument[0] != '$' and not plugin.arguments[argument]:
-            user_data['ask_argument'] = argument
+        if argument[0] != "$" and not plugin.arguments[argument]:
+            user_data["ask_argument"] = argument
             view.ask_argument(argument).reply(update)
             return ANSWER
 
@@ -87,8 +89,8 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
 
 def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
-    session: Session = user_data['session']
-    plugin: Plugin = user_data['plugin']
+    session: Session = user_data["session"]
+    plugin: Plugin = user_data["plugin"]
 
     for name, ip, stdout, stderr in plugin.run(session):
         view.plugin_output(name, ip, plugin.name, stdout, stderr).reply(update)
@@ -100,8 +102,8 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
 def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:
 
-    argument = user_data['ask_argument']
-    user_data['plugin'][argument] = "\"%s\"" % update.message.text
+    argument = user_data["ask_argument"]
+    user_data["plugin"][argument] = '"%s"' % update.message.text
 
     return collect_arguments(bot, update, user_data)
 
@@ -123,18 +125,17 @@ def login(bot: Bot, update: Updater) -> int:
 def get_username(bot: Bot, update: Updater, user_data: dict) -> int:
     """Get the username from the last messge. Ask for the password and wait"""
 
-    user_data['session'].username = update.message.text
+    user_data["session"].username = update.message.text
 
     view.ask_password().reply(update)
 
     return PASSWORD
 
 
-def get_password(bot: Bot, update: Updater,
-                 user_data: dict) -> ConversationHandler:
+def get_password(bot: Bot, update: Updater, user_data: dict) -> ConversationHandler:
     """Get the password from the last message. End conversation"""
 
-    user_data['session'].password = update.message.text
+    user_data["session"].password = update.message.text
 
     general.connect(bot, update, user_data)
 

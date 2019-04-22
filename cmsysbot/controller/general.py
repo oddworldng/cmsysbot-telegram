@@ -18,7 +18,7 @@ from telegram.ext import Updater
 
 import view
 from system import Plugin
-from utils import State, states
+from utils import State
 
 from . import menu
 
@@ -37,7 +37,7 @@ def connect(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
-    session = user_data['session']
+    session = user_data["session"]
 
     # Try to connect to the client
     session.start_connection()
@@ -63,10 +63,10 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
-    bridge_ip = user_data['session'].bridge_ip
+    bridge_ip = user_data["session"].bridge_ip
 
     # Close the connection
-    user_data['session'].end_connetion()
+    user_data["session"].end_connetion()
 
     # Send the disconnect output
     view.disconnect_output(bridge_ip).edit(update)
@@ -88,7 +88,7 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
             the bot.
         user_data (:obj:`dict`): The dictionary with user variables.
     """
-    session = user_data['session']
+    session = user_data["session"]
 
     # Get all the local ips for every local mac
     plugin = Plugin("plugins/_local_arp_scan")
@@ -138,10 +138,10 @@ def include_computers(bot: Bot, update: Updater, user_data: dict):
     # Extract the target from the string. Values: 'all' or '[mac_address]'
     target = re.search(State.INCLUDE_COMPUTERS, query.data).group(1)
 
-    computers = user_data['session'].computers
+    computers = user_data["session"].computers
 
     # Include all computers
-    if target == 'all':
+    if target == "all":
         for computer in computers.get_computers():
             computer.included = True
 
@@ -176,10 +176,10 @@ def exclude_computers(bot: Bot, update: Updater, user_data: dict):
     # Extract the target from the string. Values: 'all' or '[mac_address]'
     target = re.search(State.EXCLUDE_COMPUTERS, query.data).group(1)
 
-    computers = user_data['session'].computers
+    computers = user_data["session"].computers
 
     # Exclude all computers
-    if target == 'all':
+    if target == "all":
         for computer in computers.get_computers():
             computer.included = False
 

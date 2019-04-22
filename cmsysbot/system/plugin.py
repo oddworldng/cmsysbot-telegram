@@ -2,7 +2,6 @@ import glob
 import json
 import os.path
 import re
-import time
 from concurrent import futures
 from typing import Dict
 

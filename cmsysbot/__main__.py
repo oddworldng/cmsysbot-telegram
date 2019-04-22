@@ -4,8 +4,9 @@ from telegram.error import InvalidToken
 from telegram.ext import Updater
 
 import controller
-from system import log, Plugin
+from system import log
 from utils import Config, states
+
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
@@ -49,5 +50,5 @@ def main():
     updater.idle()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

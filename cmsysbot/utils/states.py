@@ -1,7 +1,7 @@
 config_file = None
 
 
-class State():
+class State:
     MAIN = "main"
     CONNECT = "connect"
     CONFIRM_CONNECT = r"^[\d*\.*]*$"  # TODO: Make a better regex

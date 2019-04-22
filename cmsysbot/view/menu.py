@@ -33,8 +33,9 @@ def not_connected() -> Keyboard:
     return Keyboard(text, main_buttons=main_buttons)
 
 
-def connected(route: List[str], plugins: Dict[str, str], username: str,
-              bridge_ip: str) -> Keyboard:
+def connected(
+    route: List[str], plugins: Dict[str, str], username: str, bridge_ip: str
+) -> Keyboard:
     """
     .. code-block:: python
 
@@ -73,7 +74,7 @@ def connected(route: List[str], plugins: Dict[str, str], username: str,
     # Buttons
     main_buttons = [
         Button("Update ips", State.UPDATE_IPS),
-        Button("Filter computers", State.FILTER_COMPUTERS)
+        Button("Filter computers", State.FILTER_COMPUTERS),
     ]
 
     main_buttons.extend([Button(value, key) for key, value in plugins.items()])
@@ -82,14 +83,11 @@ def connected(route: List[str], plugins: Dict[str, str], username: str,
 
     # Keyboard
     return Keyboard(
-        text,
-        n_cols=2,
-        main_buttons=main_buttons,
-        footer_buttons=footer_buttons)
+        text, n_cols=2, main_buttons=main_buttons, footer_buttons=footer_buttons
+    )
 
 
-def structure(route: List[str], sections: List[str],
-              return_to: str) -> Keyboard:
+def structure(route: List[str], sections: List[str], return_to: str) -> Keyboard:
     """
     .. code-block:: python
 
@@ -123,14 +121,13 @@ def structure(route: List[str], sections: List[str],
 
     # Keyboard
     return Keyboard(
-        text,
-        n_cols=2,
-        main_buttons=main_buttons,
-        footer_buttons=footer_buttons)
+        text, n_cols=2, main_buttons=main_buttons, footer_buttons=footer_buttons
+    )
 
 
-def ip_selection(route: List[str], computers: List[Computer],
-                 return_to: str) -> Keyboard:
+def ip_selection(
+    route: List[str], computers: List[Computer], return_to: str
+) -> Keyboard:
     """
     .. code-block:: python
 
@@ -162,18 +159,14 @@ def ip_selection(route: List[str], computers: List[Computer],
     text += "\nNow, select a 'bridge' computer for the local connection"
 
     # Buttons
-    main_buttons = [
-        Button(str(computer), computer.ip) for computer in computers
-    ]
+    main_buttons = [Button(str(computer), computer.ip) for computer in computers]
     footer_buttons = [Button("Return", return_to)]
 
     # Keyboard
-    return Keyboard(
-        text, main_buttons=main_buttons, footer_buttons=footer_buttons)
+    return Keyboard(text, main_buttons=main_buttons, footer_buttons=footer_buttons)
 
 
-def yes_no(text: str, yes_callback_data: str,
-           no_callback_data: str) -> Keyboard:
+def yes_no(text: str, yes_callback_data: str, no_callback_data: str) -> Keyboard:
     """
     .. code-block:: python
 
@@ -194,10 +187,7 @@ def yes_no(text: str, yes_callback_data: str,
     """
 
     # Buttons
-    main_buttons = [
-        Button("Yes", yes_callback_data),
-        Button("No", no_callback_data)
-    ]
+    main_buttons = [Button("Yes", yes_callback_data), Button("No", no_callback_data)]
 
     # Keyboard
     return Keyboard(text, n_cols=2, main_buttons=main_buttons)
@@ -239,7 +229,7 @@ def filter_computers(computers: List[Computer]):
     # Buttons
     main_buttons = [
         Button("Include All", "include-all"),
-        Button("Exclude All", "exclude-all")
+        Button("Exclude All", "exclude-all"),
     ]
 
     # Add the buttons according to the computer attributes
@@ -247,17 +237,13 @@ def filter_computers(computers: List[Computer]):
         main_buttons.append(Button(str(computer)))
 
         if computer.included:
-            main_buttons.append(
-                Button("Included", "exclude-%s" % computer.mac))
+            main_buttons.append(Button("Included", "exclude-%s" % computer.mac))
         else:
-            main_buttons.append(
-                Button("Excluded", "include-%s" % computer.mac))
+            main_buttons.append(Button("Excluded", "include-%s" % computer.mac))
 
     footer_buttons = [Button("Return", State.MAIN)]
 
     # Keyboard
     return Keyboard(
-        text,
-        n_cols=2,
-        main_buttons=main_buttons,
-        footer_buttons=footer_buttons)
+        text, n_cols=2, main_buttons=main_buttons, footer_buttons=footer_buttons
+    )

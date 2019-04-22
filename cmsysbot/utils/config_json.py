@@ -16,11 +16,11 @@ class Section:
 
         # Initialize Section from a dict
         elif isinstance(section_data, dict):
-            if 'name' in section_data:
-                self.name = section_data['name']
+            if "name" in section_data:
+                self.name = section_data["name"]
 
-            if 'sections' in section_data:
-                self.subsections = section_data['sections']
+            if "sections" in section_data:
+                self.subsections = section_data["sections"]
 
     def has_subsections(self):
         return self.subsections
@@ -44,40 +44,40 @@ class Config(BaseJson):
 
     @property
     def token(self) -> str:
-        return self.data['token']
+        return self.data["token"]
 
     @property
     def bot_name(self) -> str:
-        return self.data['name']
+        return self.data["name"]
 
     @property
     def email(self) -> str:
-        return self.data['email']
+        return self.data["email"]
 
     @property
     def server_tmp_dir(self) -> str:
-        return self.data['server_tmp_dir']
+        return self.data["server_tmp_dir"]
 
     @property
     def bridge_tmp_dir(self) -> str:
-        return self.data['bridge_tmp_dir']
+        return self.data["bridge_tmp_dir"]
 
     @property
     def remote_tmp_dir(self) -> str:
-        return self.data['remote_tmp_dir']
+        return self.data["remote_tmp_dir"]
 
     @property
     def log_dir(self) -> str:
-        return self.data['log_dir']
+        return self.data["log_dir"]
 
     @property
     def plugins_dir(self) -> str:
-        return self.data['plugins_dir']
+        return self.data["plugins_dir"]
 
     def get_sections(self, route: List[str] = None) -> Iterator[Section]:
         route = route or []
 
-        sections = [Section(s) for s in self.data['structure']]
+        sections = [Section(s) for s in self.data["structure"]]
 
         for part in route:
             for section in sections:

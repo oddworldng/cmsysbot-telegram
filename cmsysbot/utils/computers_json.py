@@ -28,7 +28,7 @@ class Computer:
         return "%s (%s)" % (self.name, self.ip)
 
     def asdict(self) -> dict:
-        return {'name': self.name, 'ip': self.ip, 'mac': self.mac}
+        return {"name": self.name, "ip": self.ip, "mac": self.mac}
 
 
 class Computers(BaseJson):
@@ -42,12 +42,10 @@ class Computers(BaseJson):
         super().__init__(filepath)
 
         # Transform dict to array of Computer objects
-        self.computers = [Computer(entry) for entry in self.data['computers']]
+        self.computers = [Computer(entry) for entry in self.data["computers"]]
 
     def save(self):
-        self.data['computers'] = [
-            computer.asdict() for computer in self.computers
-        ]
+        self.data["computers"] = [computer.asdict() for computer in self.computers]
 
         super().save()
 
@@ -57,12 +55,8 @@ class Computers(BaseJson):
 
         with open(filepath, "w") as outfile:
             json_scheme = {}
-            json_scheme['computers'] = []
-            json_scheme['computers'].append({
-                'name': "N/A",
-                'ip': "N/A",
-                'mac': "N/A"
-            })
+            json_scheme["computers"] = []
+            json_scheme["computers"].append({"name": "N/A", "ip": "N/A", "mac": "N/A"})
             json.dump(json_scheme, outfile)
 
     # Operators
@@ -70,7 +64,7 @@ class Computers(BaseJson):
         """Add a new computer. NOTE: Changes are only made in the dictionary. To
         make the changes permanent in the .json file, use save() afterwards"""
 
-        self.data['computers'].append({'name': name, 'ip': ip, 'mac': mac})
+        self.data["computers"].append({"name": name, "ip": ip, "mac": mac})
 
     def remove(self, mac: str):
         """Remove a computer with the same mac value. If the computer to be
@@ -79,8 +73,8 @@ class Computers(BaseJson):
         afterwards"""
 
         for i, computer in enumerate(self.get_computers()):
-            if (computer.mac == mac):
-                del self.data['computers'][i]
+            if computer.mac == mac:
+                del self.data["computers"][i]
                 break
 
     def find(self, mac: str):
