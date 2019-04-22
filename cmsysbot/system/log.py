@@ -33,9 +33,13 @@ def generate_log_config():
     ih.setFormatter(formatter)
 
     # Logger
-    logger = logging.getLogger("CMSysBot")
+    logger = logging.getLogger()
     logger.addHandler(eh)
     logger.addHandler(wh)
     logger.addHandler(ih)
 
     return logger
+
+
+def getLogger():
+    return logging.getLogger()

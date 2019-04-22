@@ -1,3 +1,5 @@
+import logging
+
 import paramiko
 from paramiko import ssh_exception
 
@@ -34,6 +36,11 @@ class Session:
             # TODO: Check if sshpass is installed
             # .........
 
+            logging.getLogger().info(
+                f"User {self.username} connected to "
+                f"{self.bridge_ip} in {'/'.join(self.route)}"
+            )
+
         except (
             ssh_exception.NoValidConnectionsError,
             ssh_exception.AuthenticationException,
@@ -41,7 +48,18 @@ class Session:
             # TODO: Rethrow the error?
             self.connected = False
 
+            logging.getLogger().warning(
+                f"User {self.username} tried to connect to "
+                f"{self.bridge_ip} in {'/'.join(self.route)}"
+            )
+
     def end_connetion(self):
+
+        logging.getLogger().info(
+            f"User {self.username} disconnected from {self.bridge_ip} "
+            f"in {'/'.join(self.route)}"
+        )
+
         self.username = ""
         self.password = ""
         self.bridge_ip = ""
@@ -61,6 +79,8 @@ class Session:
         sftp.close()
 
     def run_on_bridge(self, command: str, root: bool):
+
+        self.__log_command(self.bridge_ip, command, root)
 
         if root:
             command = f" echo {self.password} | sudo -kS {command}"
@@ -83,6 +103,8 @@ class Session:
 
     def run_on_remote(self, target_host: str, command: str, root: bool):
 
+        self.__log_command(target_host, command, root)
+
         if root:
             command = f" echo {self.password} | sudo -kS {command}"
 
@@ -94,3 +116,11 @@ class Session:
         _, stdout, stderr = self.client.exec_command(ssh_command)
 
         return stdout.read().decode("utf-8"), stderr.read().decode("utf-8")
+
+    def __log_command(self, target_ip: str, command: str, root: bool):
+        msg = (
+            f"User {self.username} executed {'AS ROOT' if root else ''} the command "
+            f"{command} on {target_ip} in {'/'.join(self.route)}"
+        )
+
+        logging.getLogger().info(msg)

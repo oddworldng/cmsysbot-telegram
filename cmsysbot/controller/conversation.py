@@ -32,7 +32,6 @@ def start_plugin_from_callback(bot: Bot, update: Updater, user_data: dict):
 
     # Plugin path in server
     plugin_path_server = re.search(State.START_PLUGIN, query.data).group(1)
-    print(plugin_path_server)
 
     user_data["plugin"] = Plugin(plugin_path_server)
 

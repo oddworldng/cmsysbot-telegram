@@ -1,5 +1,3 @@
-import logging
-
 from telegram.error import InvalidToken
 from telegram.ext import Updater
 
@@ -8,11 +6,10 @@ from system import log
 from utils import Config, states
 
 
-# Define a few command handlers. These usually take the two arguments bot and
-# update. Error handlers also receive the raised TelegramError object in error.
+# Error handlers also receive the raised TelegramError object in error.
 def error(bot, update, error):
     """Log Errors caused by Updates."""
-    logging.getLogger().warning('Update "%s" caused error "%s"', update, error)
+    log.getLogger().error('Update "%s" caused error "%s"', update, error)
 
 
 def main():
