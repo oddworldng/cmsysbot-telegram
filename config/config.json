@@ -5,6 +5,7 @@
   "server_tmp_dir": "/tmp/",
   "bridge_tmp_dir": "/tmp/",
   "remote_tmp_dir": "/tmp/",
+  "log_dir": "log/",
   "plugins_dir": "plugins/",
   "structure": [
     {
@@ -20,7 +21,7 @@
         {
           "name": "Ingeniería",
           "sections": [
-            "OSL",
+            "Oficina de Software Libre",
             "BBTK"
           ]
         }

@@ -5,7 +5,7 @@ VENV = venv
 BIN := $(VENV)/bin
 
 PY :=  $(BIN)/python
-PIP := $(BIN)pip
+PIP := $(BIN)/pip
 
 REQS := requirements.txt
 DEV_REQS := requirements.txt
@@ -16,7 +16,7 @@ CONFIG_FILE := config/config.json
 .PHONY: run, install, test
 
 run:
-	$(PY) $(MAIN) -c $(CONFIG_FILE)
+	$(PY) $(PROJECT) -c $(CONFIG_FILE)
 
 
 install:

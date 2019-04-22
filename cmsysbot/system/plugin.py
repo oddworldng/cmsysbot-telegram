@@ -22,25 +22,26 @@ class PluginVar:
 
 
 class Plugin:
-    BODY_REGEX = re.compile(r"CMSysBot:\s*({.*?})\s*\n",
-                            re.IGNORECASE | re.MULTILINE | re.DOTALL)
+    BODY_REGEX = re.compile(
+        r"CMSysBot:\s*({.*?})\s*\n", re.IGNORECASE | re.MULTILINE | re.DOTALL
+    )
     COMMENTS_REGEX = re.compile(r"\n\s*#")
 
     def __init__(self, server_path: str):
         self.server_path = server_path
         self.data = self.parse_cmsysbot_body()
 
+        self.arguments = {}
+        for key in self.data["arguments"]:
+            self.arguments[key] = ""
+
     @property
     def root(self):
-        return self.data['root']
+        return self.data["root"]
 
     @property
     def source(self):
-        return self.data['source']
-
-    @property
-    def arguments(self):
-        return self.data['arguments']
+        return self.data["source"]
 
     @property
     def name(self):
@@ -55,7 +56,7 @@ class Plugin:
         return f"{states.config_file.remote_tmp_dir}/{self.name}"
 
     def parse_cmsysbot_body(self):
-        with open(self.server_path, 'r') as textfile:
+        with open(self.server_path, "r") as textfile:
             content = textfile.read()
             body_match = re.search(self.BODY_REGEX, content)
 
@@ -65,8 +66,8 @@ class Plugin:
                 body = re.sub(self.COMMENTS_REGEX, "\n", body)
                 data = json.loads(body)
 
-                if 'arguments' not in data:
-                    data['arguments'] = []
+                if "arguments" not in data:
+                    data["arguments"] = []
 
                 return data
 
@@ -79,11 +80,12 @@ class Plugin:
         self.fill_session_arguments(session)
 
         # RUN ON BRIDGE
-        if (self.source == PluginVar.SOURCE_BRIDGE):
-            command = f"{self.bridge_path} {' '.join(self.arguments)}"
+        if self.source == PluginVar.SOURCE_BRIDGE:
+            command = f"{self.bridge_path} {' '.join(self.arguments.values())}"
 
-            yield "Bridge", session.bridge_ip, (*session.run_on_bridge(
-                command, root=self.root))
+            yield "Bridge", session.bridge_ip, (
+                *session.run_on_bridge(command, root=self.root)
+            )
 
         # RUN ON REMOTE
         else:
@@ -100,11 +102,15 @@ class Plugin:
 
         session.copy_to_remote(computer.ip, self.bridge_path, self.remote_path)
 
+        # Replace the computer arguments (ip, mac...)
         self.fill_computer_arguments(computer)
-        command = f"{self.remote_path} {' '.join(self.arguments)}"
+        command = f"{self.remote_path} {' '.join(self.arguments.values())}"
 
-        return computer.name, computer.ip, (*session.run_on_remote(
-            computer.ip, command, self.root))
+        return (
+            computer.name,
+            computer.ip,
+            (*session.run_on_remote(computer.ip, command, self.root)),
+        )
 
     def fill_session_arguments(self, session: Session):
 
@@ -119,7 +125,8 @@ class Plugin:
 
         if PluginVar.MACS_LIST in self.arguments:
             self.arguments[PluginVar.MACS_LIST] = " ".join(
-                list(session.computers.get_macs()))
+                list(session.computers.get_macs())
+            )
 
     def fill_computer_arguments(self, computer: Computer):
 
@@ -152,10 +159,9 @@ class Plugin:
         names = {}
 
         for file in files:
-            if os.path.basename(file)[0] != '_':
+            if os.path.basename(file)[0] != "_":
 
                 key = "plugin-%s" % file
-                names[key] = os.path.basename(file).capitalize().replace(
-                    "_", " ")
+                names[key] = os.path.basename(file).capitalize().replace("_", " ")
 
         return names
