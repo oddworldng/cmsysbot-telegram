@@ -1,19 +1,38 @@
-.PHONY: run, install, tests
+PROJECT = cmsysbot
 
-PY := python3
-CONFIG_FILE := config/config.json
+VENV = venv
+
+BIN := $(VENV)/bin
+
+PY :=  $(BIN)/python
+PIP := $(BIN)pip
+
 REQS := requirements.txt
+DEV_REQS := requirements.txt
 
-MAIN := cmsysbot
+CONFIG_FILE := config/config.json
 
+
+.PHONY: run, install, test
 
 run:
 	$(PY) $(MAIN) -c $(CONFIG_FILE)
 
 
 install:
-	$(PY) -m pip install -r $(REQS)
+	virtualenv -p python3 $(VENV)
+	$(PIP) install -r $(REQS)
 
 
-tests:
+dev-install:
+	virtualenv -p python3 $(VENV)
+	$(PIP) install -r $(REQS)
+	$(PIP) install -r $(DEV_REQS)
+
+
+clean:
+	rm -rf $(VENV)
+
+
+test:
 	$(PY) -m pytest
