@@ -12,6 +12,7 @@ REQS := requirements.txt
 REQS-DEV := requirements-dev.txt
 
 CONFIG_FILE := config/config.json
+TEST_FOLDER := tests/
 
 
 .PHONY: run install install-dev test clean freeze
@@ -33,7 +34,7 @@ install-dev:
 
 
 test:
-	$(PYTEST)
+	$(PYTEST) --cov=$(PROJECT) --cov-report=term-missing $(TEST_FOLDER)
 
 
 clean:
