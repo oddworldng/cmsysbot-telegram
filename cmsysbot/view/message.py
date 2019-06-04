@@ -5,12 +5,11 @@ bot.
 
 import re
 
-from utils import Computer
-
+from utils import Computer, Session
 from .keyboard import Keyboard
 
 
-def connect_output(connected: bool, bridge_ip: str) -> Keyboard:
+def connect_output(session: Session) -> Keyboard:
     """
     .. code-block:: python
 
@@ -28,12 +27,17 @@ def connect_output(connected: bool, bridge_ip: str) -> Keyboard:
     # Text
     text = ""
 
-    if connected:
-        text = "Successfully connected to %s!" % bridge_ip
+    if not session.is_allowed:
+        text = "Oops! user %s is not allowed access to %s" % (
+            session.username,
+            session.route,
+        )
+    elif session.connected:
+        text = "Successfully connected to %s!" % session.bridge_ip
     else:
         text = (
             "Unable to connect to %s.\n"
-            "Please try to login with different credentials!" % bridge_ip
+            "Please try to login with different credentials!" % session.bridge_ip
         )
 
     # Keyboard

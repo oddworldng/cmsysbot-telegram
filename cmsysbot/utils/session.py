@@ -1,7 +1,7 @@
-import logging
-
-import paramiko
 from paramiko import ssh_exception
+from utils import states
+import logging
+import paramiko
 
 
 class Session:
@@ -13,45 +13,60 @@ class Session:
         self.route = []
         self.computers = None
 
+        self.is_allowed = False
         self.connected = False
         self.client: paramiko.SSHClient = None
 
+    def __user_acl(self):
+        # Access to user actual section
+        section = states.config_file.get_sections(self.route)
+        print(section.allowed_users)
+        if self.username in section.allowed_users or not section.allowed_users:
+            return True
+        else:
+            return False
+
     def start_connection(self):
-        self.client = paramiko.SSHClient()
-        self.client.load_system_host_keys()
-        self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy)
 
-        # Try to connect to the client
-        try:
-            self.client.connect(
-                self.bridge_ip,
-                22,
-                self.username,
-                self.password,
-                allow_agent=False,
-                look_for_keys=False,
-            )
-            self.connected = True
+        self.is_allowed = self.__user_acl()
+        # Security: check user acl
+        if self.is_allowed:
 
-            # TODO: Check if sshpass is installed
-            # .........
+            self.client = paramiko.SSHClient()
+            self.client.load_system_host_keys()
+            self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy)
 
-            logging.getLogger().info(
-                f"User {self.username} connected to "
-                f"{self.bridge_ip} in {'/'.join(self.route)}"
-            )
+            # Try to connect to the client
+            try:
+                self.client.connect(
+                    self.bridge_ip,
+                    22,
+                    self.username,
+                    self.password,
+                    allow_agent=False,
+                    look_for_keys=False,
+                )
+                self.connected = True
 
-        except (
-            ssh_exception.NoValidConnectionsError,
-            ssh_exception.AuthenticationException,
-        ):
-            # TODO: Rethrow the error?
-            self.connected = False
+                # TODO: Check if sshpass is installed
+                # .........
 
-            logging.getLogger().warning(
-                f"User {self.username} tried to connect to "
-                f"{self.bridge_ip} in {'/'.join(self.route)}"
-            )
+                logging.getLogger().info(
+                    f"User {self.username} connected to "
+                    f"{self.bridge_ip} in {'/'.join(self.route)}"
+                )
+
+            except (
+                ssh_exception.NoValidConnectionsError,
+                ssh_exception.AuthenticationException,
+            ):
+                # TODO: Rethrow the error?
+                self.connected = False
+
+                logging.getLogger().warning(
+                    f"User {self.username} tried to connect to "
+                    f"{self.bridge_ip} in {'/'.join(self.route)}"
+                )
 
     def end_connetion(self):
 

@@ -43,7 +43,7 @@ def connect(bot: Bot, update: Updater, user_data: dict):
     session.start_connection()
 
     # Send the status message
-    view.connect_output(session.connected, session.bridge_ip).reply(update)
+    view.connect_output(session).reply(update)
 
     # Show the main menu again
     menu.new_main(bot, update, user_data)

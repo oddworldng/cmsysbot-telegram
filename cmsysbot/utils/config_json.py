@@ -9,6 +9,7 @@ class Section:
     def __init__(self, section_data: Union[str, dict]):
         self.name = "N/A"
         self.subsections = []
+        self.allowed_users = []
 
         # Initialiize Section from a string
         if isinstance(section_data, str):
@@ -18,6 +19,9 @@ class Section:
         elif isinstance(section_data, dict):
             if "name" in section_data:
                 self.name = section_data["name"]
+
+            if "allowed_users" in section_data:
+                self.allowed_users = section_data["allowed_users"]
 
             if "sections" in section_data:
                 self.subsections = section_data["sections"]
@@ -73,6 +77,10 @@ class Config(BaseJson):
     @property
     def plugins_dir(self) -> str:
         return self.data["plugins_dir"]
+
+    @property
+    def admins(self) -> str:
+        return self.data["admins"]
 
     def get_sections(self, route: List[str] = None) -> Iterator[Section]:
         route = route or []

@@ -7,28 +7,55 @@
   "remote_tmp_dir": "/tmp/",
   "log_dir": "log/",
   "plugins_dir": "plugins/",
-  "structure": [
-    {
-      "name": "ESIT",
-      "sections": [
-        {
-          "name": "Industriales",
-          "sections": [
-            "Aula 3.5",
-            "Aula 3.8"
-          ]
-        },
-        {
-          "name": "Ingeniería",
-          "sections": [
-            "Oficina de Software Libre",
-            "BBTK"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "MATFIS"
-    }
-  ]
+  "admins": [],
+  "structure":
+	[
+		{
+			"name": "Edificio de Servicios al Alumnado de Anchieta",
+            "allowed_users": [],
+			"sections":
+			[
+				"Aula grande",
+				"Aula pequeña"
+			]
+		},
+		{
+			"name": "Escuela Superior de Ingeniería y Tecnología",
+			"sections":
+			[
+				{
+					"name": "Industriales",
+					"allowed_users": [],
+					"sections":
+					[
+						"Aula 3.1",
+						"Aula 3.5",
+						"Aula 3.8",
+						"Aula 3.9",
+						"Aula 3.10",
+						"Aula 2.9",
+						"Aula 2.10",
+						"Aula 2.11",
+						"Aula 2.12",
+						"Aula 2.13",
+						"Aula 4 Matemáticas",
+						"Aula 1.4"
+				    	]
+				},
+				{
+					"name": "Centro de Cálculo",
+					"allowed_users": [],
+					"sections":
+					[
+						"Aula DSIC 1",
+						"Aula DSIC 2"
+					]
+				}
+			]
+		},
+		{
+			"name": "Oficina de Software Libre",
+			"allowed_users": []
+		}
+	]
 }
