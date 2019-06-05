@@ -108,6 +108,15 @@ class TestConfig(unittest.TestCase):
     def test_admins(self):
         assert self.config.admins == ["aa", "bb"]
 
+    def test_get_section(self):
+        """Should be able to return the individual Section object from its route"""
+
+        section = self.config.get_section(["A1", "B1"])
+
+        assert isinstance(section, Section)
+        assert section.name == "B1"
+        assert section.subsections == ["C1", "C2"]
+
     def test_get_sections(self):
         # Get subsections from root
         subsections = list(self.config.get_sections())

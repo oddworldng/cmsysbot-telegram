@@ -117,6 +117,18 @@ class Config(BaseJson):
 
         return self.data["admins"]
 
+    def get_section(self, route: List[str] = None) -> Section:
+        """
+        Return the Section object corresponding to the passed route.
+        """
+
+        parent_route = route[:-1]
+        section_name = route[-1]
+
+        for section in self.get_sections(parent_route):
+            if section_name == section.name:
+                return section
+
     def get_sections(self, route: List[str] = None) -> Iterator[Section]:
         """
         Return an Iterator with the next direct childs (subsections) from a route, as
