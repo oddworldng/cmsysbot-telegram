@@ -7,10 +7,12 @@
 !requirements-dev.txt
 !requirements-docs.txt
 !config/config.json
+!tests/res/config.json
 
 # Directories
 .idea/
 config/
+tests/res/
 docs/build/
 tmp/
 log/

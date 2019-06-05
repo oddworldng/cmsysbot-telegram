@@ -1,5 +1,5 @@
 from paramiko import ssh_exception
-from utils import states
+from . import states
 import logging
 import paramiko
 

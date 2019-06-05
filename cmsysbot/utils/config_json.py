@@ -6,9 +6,9 @@ from .computers_json import Computers
 
 
 class Section:
-    def __init__(self, section_data: Union[str, dict]):
+    def __init__(self, section_data: Union[str, dict, None] = None):
         self.name = "N/A"
-        self.subsections = []
+        self.sections = []
         self.allowed_users = []
 
         # Initialiize Section from a string
@@ -16,73 +16,124 @@ class Section:
             self.name = section_data
 
         # Initialize Section from a dict
-        elif isinstance(section_data, dict):
-            if "name" in section_data:
-                self.name = section_data["name"]
+        if isinstance(section_data, dict):
+            for key in section_data:
+                try:
+                    getattr(self, key)
+                    setattr(self, key, section_data[key])
+                except AttributeError:
+                    pass
 
-            if "allowed_users" in section_data:
-                self.allowed_users = section_data["allowed_users"]
+    @property
+    def subsections(self):
+        """'sections' and 'subsections' are aliases."""
 
-            if "sections" in section_data:
-                self.subsections = section_data["sections"]
+        return self.sections
 
     def has_subsections(self):
-        return self.subsections
+        """Test if the current section has or not subsections."""
+
+        return bool(self.sections)
 
     def len(self):
-        return len(self.subsections)
+        """Get the number of subsections (TODO: Change to __len__ ??)."""
+
+        return len(self.sections)
 
     def __str__(self):
-        return "%s: %s" % (self.name, self.subsections)
+        return f"{self.name}: {self.sections}"
 
 
 class Config(BaseJson):
     def __init__(self, filepath: str):
         """Load the .json from an existent file. Throws if couldn't open/read
-        the file"""
+        the file."""
 
         super().__init__(filepath)
 
         self.root_folder = os.path.dirname(filepath) + "/"
-        self._create_folder_structure()
+        self.__create_folder_structure()
 
     @property
     def token(self) -> str:
+        """Get the bot's Telegram token."""
+
         return self.data["token"]
 
     @property
     def bot_name(self) -> str:
+        """Get the bot name."""
+
         return self.data["name"]
 
     @property
     def email(self) -> str:
+        """Get the email specified on the config.json."""
+
         return self.data["email"]
 
     @property
     def server_tmp_dir(self) -> str:
+        """
+        Get the server's tmp dir, used for storing files downloaded (like plugins
+        dropped on the chat for execution)
+        """
+
         return self.data["server_tmp_dir"]
 
     @property
     def bridge_tmp_dir(self) -> str:
+        """
+        Get the bridge's tmp dir. In this directory will be stored all the files sent to
+        a bridge computer (like plugins for execution).
+        """
+
         return self.data["bridge_tmp_dir"]
 
     @property
     def remote_tmp_dir(self) -> str:
+        """
+        Get the remote's tmp dir. In this directory will be stored all the files sent to
+        a remote computer (like plugins for execution).
+        """
+
         return self.data["remote_tmp_dir"]
 
     @property
     def log_dir(self) -> str:
+        """Get the directory where to store all the generated logs."""
+
         return self.data["log_dir"]
 
     @property
     def plugins_dir(self) -> str:
+        """Get the directory where all the plugins are stored."""
+
         return self.data["plugins_dir"]
 
     @property
-    def admins(self) -> str:
+    def admins(self) -> List[str]:
+        """Return a list with all the users defined as admin on the config.json"""
+
         return self.data["admins"]
 
     def get_sections(self, route: List[str] = None) -> Iterator[Section]:
+        """
+        Return an Iterator with the next direct childs (subsections) from a route, as
+        Section objects.
+
+        Example:
+            For a structure like
+                    Root
+                    /  \
+                   A1  A2
+                   / \
+                  B1 B2
+
+            The function would return from the Root: [Section(A1), Section(A2)]
+            And, from A1 would return: [Section(B1), Section(B2)]
+        """
+
         route = route or []
 
         sections = [Section(s) for s in self.data["structure"]]
@@ -97,6 +148,27 @@ class Config(BaseJson):
             yield section
 
     def get_all_sections(self, route: List[str] = None) -> Iterator[Section]:
+        """
+        Return an Iterator with the all subsections from a route, including the child
+        subsections.
+
+        Note:
+            The resulting Sections will be ordered like in a depth-first search.
+
+        Example:
+            For a structure like
+                    Root
+                    /  \
+                   A1  A2
+                   / \
+                  B1 B2
+
+            The function would return from the Root:
+                [Section(A1), Section(B1), Section(B2), Section(A2)]
+
+            And, from A1 would return: [Section(B1), Section(B2)]
+        """
+
         route = route or []
 
         for section in self.get_sections(route):
@@ -107,29 +179,35 @@ class Config(BaseJson):
                 yield from self.get_all_sections(route)
                 route.pop()
 
-    def _create_folder_structure(self, route: List[str] = None):
+    def __create_folder_structure(self, route: List[str] = None):
         route = route or []
 
         for section in self.get_sections(route):
             if section.has_subsections():
-                self._create_folder(route + [section.name])
+                self.__create_folder(route + [section.name])
 
                 route.append(section.name)
-                self._create_folder_structure(route)
+                self.__create_folder_structure(route)
                 route.pop()
             else:
-                self._create_file(route + [section.name])
+                self.__create_file(route + [section.name])
 
-    def _create_folder(self, route: List[str]):
+    def __create_folder(self, route: List[str]):
+        """Create a folder on the specified route if doesn't exists."""
+
         folder_path = self.root_folder + "/".join(route)
 
         if not os.path.isdir(folder_path):
             print("> Create directory", folder_path)
             os.makedirs(folder_path)
 
-    def _create_file(self, route: List[str]):
+    def __create_file(self, route: List[str]) -> str:
+        """Create a .json file on the specified route if doesn't exists."""
+
         file_path = self.root_folder + "/".join(route) + ".json"
 
         if not os.path.exists(file_path):
             print("> Create file", file_path)
             Computers.create(file_path)
+
+        return file_path
