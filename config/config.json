@@ -1,33 +1,30 @@
 {
-  "token": "",
-  "name": "CMSysBot",
-  "email": "",
-  "server_tmp_dir": "/tmp/",
-  "bridge_tmp_dir": "/tmp/",
-  "remote_tmp_dir": "/tmp/",
-  "log_dir": "log/",
-  "plugins_dir": "plugins/",
-  "admins": [],
-  "structure":
-	[
+	"token": "",
+	"name": "CMSysBot",
+	"email": "",
+	"server_tmp_dir": "/tmp/",
+	"bridge_tmp_dir": "/tmp/",
+	"remote_tmp_dir": "/tmp/",
+	"log_dir": "log/",
+	"plugins_dir": "plugins/",
+	"admins": [],
+	"structure": [
 		{
 			"name": "Edificio de Servicios al Alumnado de Anchieta",
-            "allowed_users": [],
-			"sections":
-			[
+			"allowed_users": [],
+			"sections": [
 				"Aula grande",
 				"Aula pequeña"
 			]
 		},
 		{
 			"name": "Escuela Superior de Ingeniería y Tecnología",
-			"sections":
-			[
+			"allowed_users": [],
+			"sections": [
 				{
 					"name": "Industriales",
 					"allowed_users": [],
-					"sections":
-					[
+					"sections": [
 						"Aula 3.1",
 						"Aula 3.5",
 						"Aula 3.8",
@@ -40,13 +37,12 @@
 						"Aula 2.13",
 						"Aula 4 Matemáticas",
 						"Aula 1.4"
-				    	]
+					]
 				},
 				{
 					"name": "Centro de Cálculo",
 					"allowed_users": [],
-					"sections":
-					[
+					"sections": [
 						"Aula DSIC 1",
 						"Aula DSIC 2"
 					]

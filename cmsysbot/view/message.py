@@ -6,6 +6,7 @@ bot.
 import re
 
 from utils import Computer, Session
+
 from .keyboard import Keyboard
 
 
@@ -30,7 +31,7 @@ def connect_output(session: Session) -> Keyboard:
     if not session.is_allowed:
         text = "Oops! user %s is not allowed access to %s" % (
             session.username,
-            session.route,
+            "/".join(session.route),
         )
     elif session.connected:
         text = "Successfully connected to %s!" % session.bridge_ip

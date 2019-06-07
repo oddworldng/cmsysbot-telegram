@@ -129,6 +129,8 @@ class Config(BaseJson):
             if section_name == section.name:
                 return section
 
+        return None
+
     def get_sections(self, route: List[str] = None) -> Iterator[Section]:
         """
         Return an Iterator with the next direct childs (subsections) from a route, as
@@ -192,6 +194,11 @@ class Config(BaseJson):
                 route.pop()
 
     def __create_folder_structure(self, route: List[str] = None):
+        """
+        Create the structur of folders/subfolders and .json files, following the
+        config.json structure.
+        """
+
         route = route or []
 
         for section in self.get_sections(route):
