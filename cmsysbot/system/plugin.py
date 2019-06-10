@@ -73,7 +73,7 @@ class Plugin:
         return None
 
     def run(self, session: Session):
-        session.copy_to_bridge(self.server_path, self.bridge_path, 0o755)
+        session.copy_to_bridge(self.server_path, self.bridge_path, 0o777)
 
         # Replace the session $arguments (username, password...)
         self.fill_session_arguments(session)
