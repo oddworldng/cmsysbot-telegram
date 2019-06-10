@@ -29,7 +29,7 @@ class Session:
 
         # Try to connect to the client
         try:
-            if self.is_allowed:
+            if not self.is_allowed:
                 raise RuntimeError("User has no access to the section")
 
             self.client.connect(
