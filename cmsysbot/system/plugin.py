@@ -91,7 +91,7 @@ class Plugin:
             with futures.ThreadPoolExecutor() as executor:
                 result_futures = [
                     executor.submit(self._run_on_remote, computer, session)
-                    for computer in session.computers.get_computers()
+                    for computer in session.computers.get_included_computers()
                 ]
 
                 for future in futures.as_completed(result_futures):
@@ -124,7 +124,7 @@ class Plugin:
 
         if PluginVar.MACS_LIST in self.arguments:
             self.arguments[PluginVar.MACS_LIST] = " ".join(
-                list(session.computers.get_macs())
+                list(map(lambda c: c.mac, session.computers.get_included_computers()))
             )
 
     def fill_computer_arguments(self, computer: Computer):
