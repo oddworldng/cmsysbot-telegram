@@ -12,12 +12,12 @@ def find_telegram_tokens(filenames):
 
     detected_issues = []
 
-    for i, line in enumerate(fileinput.input(filenames, inplace=True)):
+    for line in fileinput.input(filenames, inplace=True):
         if re.search(TELEGRAM_BOT_TOKEN_REGEX, line):
             line = re.sub(TELEGRAM_BOT_TOKEN_REGEX, "", line)
 
             detected_issues.append(
-                f"Warning!! Telegram Token found in line {i+1} of"
+                f"Warning!! Telegram Token found in line {fileinput.filelineno()} of"
                 f"{fileinput.filename()}."
             )
 
