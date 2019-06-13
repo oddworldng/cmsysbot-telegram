@@ -43,9 +43,6 @@ class Session:
 
             self.connected = True
 
-            # TODO: Check if sshpass is installed
-            # .........
-
             logging.getLogger().info(
                 f"User {self.username} connected to "
                 f"{self.bridge_ip} in {'/'.join(self.route)}"

@@ -45,6 +45,15 @@ def connect(bot: Bot, update: Updater, user_data: dict):
     # Send the status message
     view.connect_output(session).reply(update)
 
+    if session.connected:
+        # Check if the bridge computer has all the required dependencies
+        plugin = Plugin("plugins/_bridge_initialization")
+
+        name, ip, stdout, stderr = next(plugin.run(session))
+        view.plugin_output(
+            name, ip, "Bridge Initialization", stdout, stderr, hide_header=True
+        ).reply(update)
+
     # Show the main menu again
     menu.new_main(bot, update, user_data)
 

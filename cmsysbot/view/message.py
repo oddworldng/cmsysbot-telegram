@@ -34,7 +34,12 @@ def connect_output(session: Session) -> Keyboard:
             "/".join(session.route),
         )
     elif session.connected:
-        text = "Successfully connected to %s!" % session.bridge_ip
+        text = (
+            f"Successfully connected to {session.bridge_ip}!\n\n"
+            f"Now, the bot will check if the bridge computer is ready.\n\n"
+            f"This action may take a few minutes if its the first time that this "
+            f"computer is being used as a bridge."
+        )
     else:
         text = (
             "Unable to connect to %s.\n"
@@ -175,7 +180,7 @@ def ask_argument(argument_text: str) -> Keyboard:
 
 
 def plugin_output(
-    name: str, ip: str, plugin_name: str, stdout: str, stderr: str
+    name: str, ip: str, plugin_name: str, stdout: str, stderr: str, hide_header=False
 ) -> Keyboard:
     """
     .. code-block:: python
@@ -199,7 +204,7 @@ def plugin_output(
 
     # Show error output
     if stderr:
-        text += "-> [Error]: %s\n" % stderr
+        text += f"-> [Error]: {stderr}\n"
 
     # Show standard output
     if stdout:
@@ -209,7 +214,9 @@ def plugin_output(
     if not text:
         text = "-> No output"
 
-    text = "[%s (%s) - %s]\n%s" % (name, ip, plugin_name, text)
+    header_text = f"[{name} ({ip}) - {plugin_name}]\n\n"
+
+    text = f"{header_text if not hide_header else ''}{text}"
 
     # Keyboard
     return Keyboard(text)

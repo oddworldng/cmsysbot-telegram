@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# CMSysBot: {
+# "root": "True",
+# "source": "bridge"
+# }
+
+## Check that all the dependencies used by the bridge are installed
+
+# Check if arp-scan is installed
+dpkg -s arp-scan &>/dev/null
+
+if [[ $? != 0 ]]; then
+  sudo apt-get -y install arp-scan &>/dev/null
+  printf "\n* 'arp-scan' installed."
+fi
+
+# Check if wakeonlan is installed
+dpkg -s wakeonlan &>/dev/null
+
+if [[ $? != 0 ]]; then
+  sudo apt-get -y install wakeonlan &>/dev/null
+  printf "\n* 'wakeonlan' installed."
+fi
+
+# Check if sshpass is installed
+dpkg -s sshpass &>/dev/null
+
+if [[ $? != 0 ]]; then
+  sudo apt-get -y install sshpass &>/dev/null
+  printf "\n* 'sshpass' installed."
+fi
+
+printf "\n\xE2\x9C\x85 The bridge computer is ready."
