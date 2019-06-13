@@ -9,3 +9,10 @@ repos:
     rev: v2.1.0
     hooks:
       - id: flake8
+
+  - repo: local
+    hooks:
+      - id: detect-telegram-tokens
+        name: "detect-telegram-tokens"
+        entry: python3 hooks/detect_telegram_tokens.py
+        language: python
