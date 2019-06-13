@@ -39,7 +39,6 @@ Contributions to the project are really appreciated! Please, refer to the [contr
 
 * [python-telegram-bot](https://pypi.org/project/python-telegram-bot/)
 * [paramiko](https://pypi.org/project/paramiko/)
-* [scp](https://pypi.org/project/scp/)
 
 #### System dependencies
 
