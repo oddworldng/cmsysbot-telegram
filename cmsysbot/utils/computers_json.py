@@ -25,8 +25,11 @@ class Computer:
         # If a dictionary is passed, save the keys (name, ip, mac...) as attributes
         # values
         for key in computer_data:
-            if computer_data[key]:
+            try:
+                getattr(self, key)
                 setattr(self, key, computer_data[key])
+            except AttributeError:
+                pass
 
     def __str__(self) -> str:
         """Return the Computer object as a string for identification."""
@@ -56,6 +59,8 @@ class Computers(BaseJson):
         Load the .json from an existent file. Throws if couldn't open/read the file
         """
 
+        self.__index = 0
+
         super().__init__(filepath)
 
         # Transform dict to array of Computer objects
@@ -68,6 +73,7 @@ class Computers(BaseJson):
         Transform each Computer object to a Dict and write the changes to the file.
         """
 
+        # TODO: Really necessary or doing the conversion twice?
         self.data["computers"] = [computer.asdict() for computer in self.computers]
 
         super().save()
@@ -82,6 +88,10 @@ class Computers(BaseJson):
 
             json_scheme["computers"].append(Computer().asdict())
             json.dump(json_scheme, outfile, indent=2)
+
+            return json_scheme
+
+        return None
 
     # Operators
     def add(self, name: str, ip: str, mac: str):
@@ -116,12 +126,25 @@ class Computers(BaseJson):
 
         return None
 
+    def __len__(self):
+        """Return the number of computers defined on the config file"""
+
+        return len(self.data["computers"])
+
     # Generators
+    def __iter__(self):
+        """Iterate through all the computer objects using the class as an Iterator"""
+        return self.get_computers()
+
     def get_computers(self) -> Iterator[Computer]:
         """Yield Computer objects."""
 
         for computer in self.computers:
             yield computer
+
+    def get_included(self):
+        """Alias for `get_included_computers()`"""
+        return self.get_included_computers()
 
     def get_included_computers(self) -> Iterator[Computer]:
         """Yield only Computer objects where "included" is true."""
@@ -131,19 +154,31 @@ class Computers(BaseJson):
                 yield computer
 
     def get_names(self) -> Iterator[str]:
-        """Yield the name of each computer."""
+        """
+        DEPRECATED. Use map() with a lambda function instead.
+
+        Yield the name of each computer.
+        """
 
         for computer in self.get_computers():
             yield computer.name
 
     def get_ips(self) -> Iterator[str]:
-        """Yield the ip of each computer."""
+        """
+        DEPRECATED. Use map() with a lambda function instead.
+
+        Yield the ip of each computer.
+        """
 
         for computer in self.get_computers():
             yield computer.ip
 
     def get_macs(self) -> Iterator[str]:
-        """Yield the mac of each computer."""
+        """
+        DEPRECATED. Use map() with a lambda function instead.
+
+        Yield the mac of each computer.
+        """
 
         for computer in self.get_computers():
             yield computer.mac
