@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# CMSysBot: {
+#   "root": "True",
+#   "source" : "remote",
+#   "arguments": ["Please enter command to run: "]
+# }
+
+# Get all params
+COMMAND=$@
+
+# Run command
+$COMMAND
