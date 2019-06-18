@@ -1,9 +1,9 @@
 from telegram.error import InvalidToken
 from telegram.ext import Updater
 
-import controller
-from system import log
-from utils import Config, states
+from . import controller
+from cmsysbot.system import log
+from cmsysbot.utils import Config, states
 
 
 # Error handlers also receive the raised TelegramError object in error.

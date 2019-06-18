@@ -5,7 +5,7 @@ bot.
 
 import re
 
-from utils import Computer, Session
+from cmsysbot.utils import Computer, Session
 
 from .keyboard import Keyboard
 

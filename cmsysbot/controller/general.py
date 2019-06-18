@@ -16,9 +16,9 @@ import re
 from telegram import Bot
 from telegram.ext import Updater
 
-import view
-from system import Plugin
-from utils import State
+from cmsysbot import view
+from cmsysbot.system import Plugin
+from cmsysbot.utils import State
 
 from . import menu
 

@@ -5,7 +5,7 @@ import re
 from concurrent import futures
 from typing import Dict
 
-from utils import Computer, Session, states
+from cmsysbot.utils import Computer, Session, states
 
 
 class PluginVar:

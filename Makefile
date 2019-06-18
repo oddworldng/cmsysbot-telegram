@@ -18,7 +18,7 @@ TEST_FOLDER := tests/
 .PHONY: run install install-dev test clean freeze
 
 run:
-	$(PY) $(PROJECT) -c $(CONFIG_FILE)
+	$(PY) -m $(PROJECT) -c $(CONFIG_FILE)
 
 
 install:

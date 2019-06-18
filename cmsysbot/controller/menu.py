@@ -21,9 +21,9 @@ updating computers/ips...) must be defined inside the :obj:`general` module.
 from telegram import Bot
 from telegram.ext import Updater
 
-import view
-from system import Plugin
-from utils import Computers, State, states
+from cmsysbot import view
+from cmsysbot.system import Plugin
+from cmsysbot.utils import Computers, State, states
 
 
 def new_main(bot: Bot, update: Updater, user_data: dict):

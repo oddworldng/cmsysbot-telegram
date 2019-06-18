@@ -5,7 +5,7 @@ For views that are text only, see the module :mod:`cmsysbot.view.message`.
 
 from typing import Dict, List
 
-from utils import Computer, State
+from cmsysbot.utils import Computer, State
 
 from .keyboard import Button, Keyboard
 

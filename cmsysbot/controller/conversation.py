@@ -13,9 +13,9 @@ import re
 from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
-import view
-from system import Plugin
-from utils import Session, State, states
+from cmsysbot import view
+from cmsysbot.system import Plugin
+from cmsysbot.utils import Session, State, states
 
 from . import general, menu
 

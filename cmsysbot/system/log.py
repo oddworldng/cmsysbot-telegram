@@ -1,7 +1,7 @@
 import logging
 import os
 
-from utils import states
+from cmsysbot.utils import states
 
 
 def generate_log_config():

@@ -10,7 +10,7 @@ Note:
 from telegram import Bot
 from telegram.ext import Updater
 
-from utils import Session
+from cmsysbot.utils import Session
 
 from . import menu
 

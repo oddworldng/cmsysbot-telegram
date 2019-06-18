@@ -19,7 +19,7 @@ from telegram.ext import (
     RegexHandler,
 )
 
-from utils import State, states
+from cmsysbot.utils import State, states
 
 from . import command, conversation, general, menu
 
