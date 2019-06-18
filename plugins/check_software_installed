@@ -6,11 +6,11 @@
 #   "arguments": ["Please enter a software name to check: "]
 # }
 
-IS_INSTALLED=`dpkg --get-selections | grep $1`
+# Check if software is installed
+dpkg -s $1 &>/dev/null
 
-if [ -z "$IS_INSTALLED" ]
-then
-      echo "Not installed"
+if [[ $? != 0 ]]; then
+  printf "Not installed."
 else
-      echo "Installed"
+  printf "Installed."
 fi
