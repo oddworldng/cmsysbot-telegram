@@ -7,4 +7,7 @@ install:
   - pip install -r requirements-dev.txt
 
 script:
-  - pytest
+  - pytest --cov=cmsysbot
+
+after_success:
+  - coveralls
