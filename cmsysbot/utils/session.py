@@ -117,8 +117,25 @@ class Session:
     def copy_to_bridge(self, source_path: str, bridge_path: str, permissions: int):
 
         sftp = self.client.open_sftp()
-        sftp.put(source_path, bridge_path, confirm=True)
-        sftp.chmod(bridge_path, permissions)
+
+        try:
+            # Check if the file is already on the bridge computer
+            sftp.stat(bridge_path)
+
+            logging.getLogger().info(
+                f"({self.username}) - Tried to copy the file {source_path} but is "
+                f"already present on the destiny path ({bridge_path})"
+            )
+
+        # Copy the file otherwise
+        except FileNotFoundError:
+            sftp.put(source_path, bridge_path, confirm=True)
+            sftp.chmod(bridge_path, permissions)
+
+            logging.getLogger().info(
+                f"({self.username}) - The file {source_path} has been copied to "
+                f"{bridge_path}"
+            )
 
         sftp.close()
 

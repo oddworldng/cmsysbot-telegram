@@ -26,6 +26,8 @@ class Plugin:
     )
     COMMENTS_REGEX = re.compile(r"\n\s*#")
 
+    COPY_MODE = 0o555
+
     def __init__(self, server_path: str):
         self.server_path = server_path
         self.data = self.parse_cmsysbot_body()
@@ -73,7 +75,7 @@ class Plugin:
         return None
 
     def run(self, session: Session):
-        session.copy_to_bridge(self.server_path, self.bridge_path, 0o777)
+        session.copy_to_bridge(self.server_path, self.bridge_path, Plugin.COPY_MODE)
 
         # Replace the session $arguments (username, password...)
         self.fill_session_arguments(session)
