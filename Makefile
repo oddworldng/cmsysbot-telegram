@@ -37,6 +37,9 @@ test:
 	$(PYTEST) --cov=$(PROJECT) --cov-report=term-missing $(TEST_FOLDER)
 
 
+test-simple:
+	$(PYTEST)
+
 clean:
 	rm -rf $(VENV)
 

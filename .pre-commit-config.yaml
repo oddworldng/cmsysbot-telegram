@@ -16,3 +16,7 @@ repos:
         name: "detect-telegram-tokens"
         entry: python3 hooks/detect_telegram_tokens.py
         language: python
+      - id: pytest
+        name: "pytest"
+        entry: make test-simple
+        language: system
