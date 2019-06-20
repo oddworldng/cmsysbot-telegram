@@ -14,9 +14,3 @@ labels: bug
   1.
   1.
   1.
-
-## Specifications
-
-  - Version:
-  - Platform:
-  - Subsystem:
