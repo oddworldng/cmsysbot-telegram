@@ -1,6 +1,7 @@
 ---
 name: 'Bug Report'
 about: 'Issue Template to report code errors.'
+labels: bug
 ---
 
 ## Expected Behavior
