@@ -1,6 +1,6 @@
 ---
-title: 'Bug report'
-labels: bug
+name: 'Bug Report'
+about: 'Issue Template to report code errors.'
 ---
 
 ## Expected Behavior
