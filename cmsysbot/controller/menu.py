@@ -23,7 +23,8 @@ from telegram.ext import Updater
 
 from cmsysbot import view
 from cmsysbot.system import Plugin
-from cmsysbot.utils import Computers, State, states, Session
+from cmsysbot.utils import Computers, Session, State, states
+from cmsysbot.utils.decorators import connected, not_connected
 
 
 def new_main(bot: Bot, update: Updater, user_data: dict):
@@ -78,6 +79,7 @@ def main(bot: Bot, update: Updater, user_data: dict):
         ).edit(update)
 
 
+@not_connected
 def select_department(bot: Bot, update: Updater, user_data: dict):
     """
     Show the nodes on the first level of the :obj:`structure` field on the
@@ -99,6 +101,7 @@ def select_department(bot: Bot, update: Updater, user_data: dict):
     ).edit(update)
 
 
+@not_connected
 def structure(bot: Bot, update: Updater, user_data: dict):
     """
     Show the nodes on the level indicated by the route from the
@@ -163,6 +166,7 @@ def structure(bot: Bot, update: Updater, user_data: dict):
     ).edit(update)
 
 
+@not_connected
 def ip_selection(bot: Bot, update: Updater, user_data: dict):
     """
     Show a menu with the list of the computers that have a defined 'ip' field
@@ -189,6 +193,7 @@ def ip_selection(bot: Bot, update: Updater, user_data: dict):
     ).edit(update)
 
 
+@not_connected
 def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
 
     # Get the clicked ip
@@ -201,6 +206,7 @@ def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
     ).edit(update)
 
 
+@connected
 def filter_computers(bot: Bot, update: Updater, user_data: dict):
 
     # View
