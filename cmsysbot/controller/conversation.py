@@ -10,6 +10,7 @@ Note:
 import os
 import re
 
+import pytesseract
 from telegram import Bot
 from telegram.ext import ConversationHandler, Updater
 
@@ -20,8 +21,14 @@ from cmsysbot.utils.decorators import connected, not_connected
 
 from . import general, menu
 
+try:
+    from PIL import Image
+except ImportError:
+    import Image
+
+
 # Conversation States
-USERNAME, PASSWORD, ANSWER = range(3)
+USERNAME, PASSWORD, ANSWER, INET_IMAGE = range(4)
 
 # ######################################################################
 #                         PLUGIN CONVERSATION
@@ -140,5 +147,55 @@ def get_password(bot: Bot, update: Updater, user_data: dict) -> ConversationHand
     Session.get_from(user_data).password = update.message.text
 
     general.connect(bot, update, user_data)
+
+    return ConversationHandler.END
+
+
+# ######################################################################
+#                       ADD COMPUTER CONVERSATION
+# ######################################################################
+
+
+def add_computer(bot: Bot, update: Updater, user_data: dict) -> int:
+    view.add_computer_start().reply(update)
+
+    return INET_IMAGE
+
+
+def inet_image(bot: Bot, update: Updater) -> int:
+
+    photo_file = update.message.photo[-1].get_file()
+
+    download_path = f"{states.config_file.server_tmp_dir}/inet_config.jpg"
+    photo_file.download(download_path)
+
+    text = pytesseract.image_to_string(Image.open(download_path))
+
+    print(text)
+
+    IP_REGEX = re.compile(r"inet\s+(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b")
+
+    # TODO: Handle "no match" cases
+    ip = IP_REGEX.search(text).group(1)
+
+    MAC_REGEX = re.compile(r"ether\s+(\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2})\b")
+
+    # TODO: Handle "no match" cases
+    mac = MAC_REGEX.search(text).group(1)
+
+    view.read_inet_image(ip, mac).reply(update)
+
+    return INET_IMAGE
+
+
+def end_add_computer(bot: Bot, update: Updater, user_data: dict) -> int:
+
+    data = update.message.text
+
+    name, ip, mac = data.split("/")
+
+    print(f"New computer:\nName: {name}\nIp: {ip}\nMac: {mac}")
+
+    # TODO: Check if ip/mac are correct
 
     return ConversationHandler.END

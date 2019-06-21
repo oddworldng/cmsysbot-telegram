@@ -12,3 +12,4 @@ class State:
     EXCLUDE_COMPUTERS = "exclude-(.*)"
     UPDATE_IPS = "update-ips"
     START_PLUGIN = "plugin-(.*)"
+    ADD_COMPUTER = "add-computer"

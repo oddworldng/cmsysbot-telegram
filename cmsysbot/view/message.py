@@ -221,3 +221,33 @@ def plugin_output(
 
     # Keyboard
     return Keyboard(text)
+
+
+# ######################################################################
+#                       ADD COMPUTER CONVERSATION
+# ######################################################################
+
+
+def add_computer_start() -> Keyboard:
+
+    # Text
+    text = (
+        f"Please, send a message with the data of the new computer following this "
+        f"format:\n\n\tname/ip/mac\n\nOr, write 'ifconfig' on the computer and "
+        f"send a picture of the output."
+    )
+
+    # Keyboard
+    return Keyboard(text)
+
+
+def read_inet_image(ip: str, mac: str) -> Keyboard:
+
+    # Text
+    text = (
+        f"Could extract the following data from the image:"
+        f"\n\n\t/{ip}/{mac}\n\nSend another image or copy the data and complete it."
+    )
+
+    # Keyboard
+    return Keyboard(text)

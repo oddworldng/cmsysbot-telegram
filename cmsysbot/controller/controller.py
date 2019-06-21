@@ -215,6 +215,27 @@ def add_conversation_callbacks(dp: Dispatcher):
         allow_reentry=True,
     )
 
+    add_computer_handler = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(
+                conversation.add_computer,
+                pattern=State.ADD_COMPUTER,
+                pass_user_data=True,
+            )
+        ],
+        states={
+            conversation.INET_IMAGE: [
+                MessageHandler(Filters.photo, conversation.inet_image),
+                MessageHandler(
+                    Filters.text, conversation.end_add_computer, pass_user_data=True
+                ),
+            ]
+        },
+        fallbacks=[RegexHandler("^/cancel$", menu.new_main, pass_user_data=True)],
+        allow_reentry=True,
+    )
+
     # Add to dispatcher
     dp.add_handler(login_conv_handler)
     dp.add_handler(plugin_exec_handler)
+    dp.add_handler(add_computer_handler)

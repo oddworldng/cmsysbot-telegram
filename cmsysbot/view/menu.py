@@ -241,7 +241,10 @@ def filter_computers(computers: List[Computer]):
         else:
             main_buttons.append(Button("Excluded", f"include-{computer.mac}"))
 
-    footer_buttons = [Button("Return", State.MAIN)]
+    footer_buttons = [
+        Button("Add computer", State.ADD_COMPUTER),
+        Button("Return", State.MAIN),
+    ]
 
     # Keyboard
     return Keyboard(
