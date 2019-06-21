@@ -27,8 +27,5 @@ def start(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
-    if "session" not in user_data:
-        user_data["session"] = Session()
-
     # Show the main menu on a new message
     menu.new_main(bot, update, user_data)

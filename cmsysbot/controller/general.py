@@ -18,7 +18,7 @@ from telegram.ext import Updater
 
 from cmsysbot import view
 from cmsysbot.system import Plugin
-from cmsysbot.utils import State
+from cmsysbot.utils import State, Session
 
 from . import menu
 
@@ -37,7 +37,7 @@ def connect(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
-    session = user_data["session"]
+    session = Session.get_from(user_data)
 
     # Try to connect to the client
     session.start_connection()
@@ -72,10 +72,10 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
-    bridge_ip = user_data["session"].bridge_ip
+    bridge_ip = Session.get_from(user_data).bridge_ip
 
     # Close the connection
-    user_data["session"].end_connetion()
+    Session.get_from(user_data).end_connetion()
 
     # Send the disconnect output
     view.disconnect_output(bridge_ip).edit(update)
@@ -97,7 +97,7 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
             the bot.
         user_data (:obj:`dict`): The dictionary with user variables.
     """
-    session = user_data["session"]
+    session = Session.get_from(user_data)
 
     # Get all the local ips for every local mac
     plugin = Plugin("plugins/_local_arp_scan")
@@ -147,7 +147,7 @@ def include_computers(bot: Bot, update: Updater, user_data: dict):
     # Extract the target from the string. Values: 'all' or '[mac_address]'
     target = re.search(State.INCLUDE_COMPUTERS, query.data).group(1)
 
-    computers = user_data["session"].computers
+    computers = Session.get_from(user_data).computers
 
     # Include all computers
     if target == "all":
@@ -185,7 +185,7 @@ def exclude_computers(bot: Bot, update: Updater, user_data: dict):
     # Extract the target from the string. Values: 'all' or '[mac_address]'
     target = re.search(State.EXCLUDE_COMPUTERS, query.data).group(1)
 
-    computers = user_data["session"].computers
+    computers = Session.get_from(user_data).computers
 
     # Exclude all computers
     if target == "all":
