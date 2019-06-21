@@ -42,7 +42,7 @@ def start_plugin_from_callback(bot: Bot, update: Updater, user_data: dict):
 
 def start_plugin_from_download(bot: Bot, update: Updater, user_data: dict):
 
-    session = user_data["session"]
+    session = Session.get_from(user_data)
     message = update.message
 
     if not session.connected:
@@ -72,7 +72,7 @@ def start_plugin_from_download(bot: Bot, update: Updater, user_data: dict):
 
 def collect_arguments(bot: Bot, update: Updater, user_data: dict):
 
-    session = user_data["session"]
+    session = Session.get_from(user_data)
 
     plugin = user_data["plugin"]
     plugin.fill_session_arguments(session)
@@ -88,7 +88,7 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
 
 def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
-    session: Session = user_data["session"]
+    session = Session.get_from(user_data)
     plugin: Plugin = user_data["plugin"]
 
     for name, ip, stdout, stderr in plugin.run(session):
@@ -124,7 +124,7 @@ def login(bot: Bot, update: Updater) -> int:
 def get_username(bot: Bot, update: Updater, user_data: dict) -> int:
     """Get the username from the last messge. Ask for the password and wait"""
 
-    user_data["session"].username = update.message.text
+    Session.get_from(user_data).username = update.message.text
 
     view.ask_password().reply(update)
 
@@ -134,7 +134,7 @@ def get_username(bot: Bot, update: Updater, user_data: dict) -> int:
 def get_password(bot: Bot, update: Updater, user_data: dict) -> ConversationHandler:
     """Get the password from the last message. End conversation"""
 
-    user_data["session"].password = update.message.text
+    Session.get_from(user_data).password = update.message.text
 
     general.connect(bot, update, user_data)
 

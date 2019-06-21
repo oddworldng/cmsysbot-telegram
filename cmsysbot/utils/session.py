@@ -19,6 +19,13 @@ class Session:
         self.connected = False
         self.client: paramiko.SSHClient = None
 
+    @staticmethod
+    def get_from(user_data):
+        if "session" not in user_data:
+            user_data["session"] = Session()
+
+        return user_data["session"]
+
     def start_connection(self):
 
         self.is_allowed = self.__user_acl()

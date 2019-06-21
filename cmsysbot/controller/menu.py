@@ -23,7 +23,7 @@ from telegram.ext import Updater
 
 from cmsysbot import view
 from cmsysbot.system import Plugin
-from cmsysbot.utils import Computers, State, states
+from cmsysbot.utils import Computers, State, states, Session
 
 
 def new_main(bot: Bot, update: Updater, user_data: dict):
@@ -38,7 +38,7 @@ def new_main(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
-    session = user_data["session"]
+    session = Session.get_from(user_data)
 
     # View
     if not session.connected:
@@ -64,7 +64,7 @@ def main(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
-    session = user_data["session"]
+    session = Session.get_from(user_data)
 
     # View
     if not session.connected:
@@ -90,8 +90,8 @@ def select_department(bot: Bot, update: Updater, user_data: dict):
         user_data (:obj:`dict`): The dictionary with user variables.
     """
 
-    user_data["session"].route = []  # Reset route
-    route = user_data["session"].route
+    Session.get_from(user_data).route = []
+    route = Session.get_from(user_data).route
 
     # View
     view.structure(
@@ -138,7 +138,7 @@ def structure(bot: Bot, update: Updater, user_data: dict):
     # Get the clicked section
     next_section = update.callback_query.data
 
-    route = user_data["session"].route
+    route = Session.get_from(user_data).route
 
     # Remove section from the route if going backwards, otherwise append
     if route and route[-1] == next_section:
@@ -155,7 +155,7 @@ def structure(bot: Bot, update: Updater, user_data: dict):
         return_to = route[-1]
 
     # Update the route
-    user_data["session"].route = route
+    Session.get_from(user_data).route = route
 
     # View
     view.structure(
@@ -169,7 +169,7 @@ def ip_selection(bot: Bot, update: Updater, user_data: dict):
     in the corresponding .json file
     """
 
-    route = user_data["session"].route
+    route = Session.get_from(user_data).route
 
     # Get the clicked section
     next_section = update.callback_query.data
@@ -177,23 +177,25 @@ def ip_selection(bot: Bot, update: Updater, user_data: dict):
 
     # Create a path to the .json file from the route
     filepath = "config/%s.json" % "/".join(route)
-    user_data["session"].computers = Computers(filepath)
+    Session.get_from(user_data).computers = Computers(filepath)
 
-    user_data["session"].route = route
+    Session.get_from(user_data).route = route
 
     # View
     view.ip_selection(
-        route, user_data["session"].computers.get_computers(), return_to=State.CONNECT
+        route,
+        Session.get_from(user_data).computers.get_computers(),
+        return_to=State.CONNECT,
     ).edit(update)
 
 
 def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
 
     # Get the clicked ip
-    user_data["session"].bridge_ip = update.callback_query.data
+    Session.get_from(user_data).bridge_ip = update.callback_query.data
 
     # View
-    text = "Connect to %s?" % user_data["session"].bridge_ip
+    text = "Connect to %s?" % Session.get_from(user_data).bridge_ip
     view.yes_no(
         text, yes_callback_data=State.GET_CREDENTIALS, no_callback_data=State.MAIN
     ).edit(update)
@@ -202,5 +204,5 @@ def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
 def filter_computers(bot: Bot, update: Updater, user_data: dict):
 
     # View
-    computers = user_data["session"].computers
+    computers = Session.get_from(user_data).computers
     view.filter_computers(computers).edit(update)
