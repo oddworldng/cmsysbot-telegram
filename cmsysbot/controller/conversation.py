@@ -16,6 +16,7 @@ from telegram.ext import ConversationHandler, Updater
 from cmsysbot import view
 from cmsysbot.system import Plugin
 from cmsysbot.utils import Session, State, states
+from cmsysbot.utils.decorators import connected, not_connected
 
 from . import general, menu
 
@@ -27,6 +28,7 @@ USERNAME, PASSWORD, ANSWER = range(3)
 # ######################################################################
 
 
+@connected
 def start_plugin_from_callback(bot: Bot, update: Updater, user_data: dict):
     query = update.callback_query
 
@@ -40,6 +42,7 @@ def start_plugin_from_callback(bot: Bot, update: Updater, user_data: dict):
     return collect_arguments(bot, update, user_data)
 
 
+@connected
 def start_plugin_from_download(bot: Bot, update: Updater, user_data: dict):
 
     session = Session.get_from(user_data)
@@ -70,6 +73,7 @@ def start_plugin_from_download(bot: Bot, update: Updater, user_data: dict):
     return collect_arguments(bot, update, user_data)
 
 
+@connected
 def collect_arguments(bot: Bot, update: Updater, user_data: dict):
 
     session = Session.get_from(user_data)
@@ -86,6 +90,7 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
     return execute_plugin(bot, update, user_data=user_data)
 
 
+@connected
 def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
     session = Session.get_from(user_data)
@@ -99,6 +104,7 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
     return ConversationHandler.END
 
 
+@connected
 def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:
 
     argument = user_data["ask_argument"]

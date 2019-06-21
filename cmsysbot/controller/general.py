@@ -18,11 +18,13 @@ from telegram.ext import Updater
 
 from cmsysbot import view
 from cmsysbot.system import Plugin
-from cmsysbot.utils import State, Session
+from cmsysbot.utils import Session, State
+from cmsysbot.utils.decorators import connected, not_connected
 
 from . import menu
 
 
+@not_connected
 def connect(bot: Bot, update: Updater, user_data: dict):
     """
     Tries to open a SSH connection from the bot server to the bridge computer.
@@ -58,6 +60,7 @@ def connect(bot: Bot, update: Updater, user_data: dict):
     menu.new_main(bot, update, user_data)
 
 
+@connected
 def disconnect(bot: Bot, update: Updater, user_data: dict):
     """
     Closes the open SSH connection to the bridge computer.
@@ -84,6 +87,7 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
     menu.new_main(bot, update, user_data)
 
 
+@connected
 def update_ips(bot: Bot, update: Updater, user_data: dict):
     """
     Get all the macs and its associated ips from the local network. Then,
@@ -124,6 +128,7 @@ def update_ips(bot: Bot, update: Updater, user_data: dict):
     menu.new_main(bot, update, user_data)
 
 
+@connected
 def include_computers(bot: Bot, update: Updater, user_data: dict):
     """
     Change the attribute :obj:`included` for one/all computers to ``True``. If
@@ -162,6 +167,7 @@ def include_computers(bot: Bot, update: Updater, user_data: dict):
     view.filter_computers(computers).edit(update)
 
 
+@connected
 def exclude_computers(bot: Bot, update: Updater, user_data: dict):
     """
     Change the attribute :obj:`included` for one/all computers to ``False``. If
