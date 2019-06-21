@@ -52,9 +52,9 @@ def add_callbacks(dp: Dispatcher):
 
     for section in states.config_file.get_all_sections():
         if section.has_subsections():
-            with_subsections.append("^%s$" % section.name)
+            with_subsections.append(f"^{section.name}$")
         else:
-            without_subsections.append("^%s$" % section.name)
+            without_subsections.append(f"^{section.name}$")
 
     # On the structure menu (when selecting a department/subsection), the
     # returned value after clicking on a button will be the name of the

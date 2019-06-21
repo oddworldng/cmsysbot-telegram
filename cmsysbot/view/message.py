@@ -29,10 +29,11 @@ def connect_output(session: Session) -> Keyboard:
     text = ""
 
     if not session.is_allowed:
-        text = "Oops! user %s is not allowed access to %s" % (
-            session.username,
-            "/".join(session.route),
+        text = (
+            f"Oops! user {session.username} is not allowed to access "
+            f"{'/'.join(session.route)}"
         )
+
     elif session.connected:
         text = (
             f"Successfully connected to {session.bridge_ip}!\n\n"
@@ -42,8 +43,8 @@ def connect_output(session: Session) -> Keyboard:
         )
     else:
         text = (
-            "Unable to connect to %s.\n"
-            "Please try to login with different credentials!" % session.bridge_ip
+            f"Unable to connect to {session.bridge_ip}.\n"
+            "Please try to login with different credentials!"
         )
 
     # Keyboard
@@ -61,7 +62,7 @@ def disconnect_output(bridge_ip: str) -> Keyboard:
     """
 
     # Text
-    text = "Disconnected from %s" % bridge_ip
+    text = f"Disconnected from {bridge_ip}"
 
     # Keyboard
     return Keyboard(text)
@@ -78,7 +79,7 @@ def update_ip_output(computer: Computer, last_ip: str) -> Keyboard:
     """
 
     # Text
-    text = "Computer %s: %s --> %s" % (computer.name, last_ip, computer.ip)
+    text = f"Computer {computer.name}: {last_ip} --> {computer.ip}"
 
     # Keyboard
     return Keyboard(text)
@@ -156,7 +157,7 @@ def plugin_start(plugin_name: str) -> Keyboard:
     """
 
     # Text
-    text = "-- [Executing %s] --" % plugin_name
+    text = f"-- [Executing {plugin_name}] --"
 
     # Keyboard
     return Keyboard(text)
@@ -173,7 +174,7 @@ def ask_argument(argument_text: str) -> Keyboard:
     """
 
     # Text
-    text = "Argument needed: %s " % argument_text
+    text = f"Argument needed: {argument_text}"
 
     # Keyboard
     return Keyboard(text)

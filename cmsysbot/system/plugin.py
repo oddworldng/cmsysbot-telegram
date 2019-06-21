@@ -151,7 +151,7 @@ class Plugin:
         """Get plugins names from local path defined in config."""
 
         # Set plugins path
-        path = "%s/*" % states.config_file.plugins_dir
+        path = f"{states.config_file.plugins_dir}/*"
 
         # Get plugins file names
         files = glob.glob(path)
@@ -162,7 +162,7 @@ class Plugin:
         for file in files:
             if os.path.basename(file)[0] != "_":
 
-                key = "plugin-%s" % file
+                key = f"plugin-{file}"
                 names[key] = os.path.basename(file).capitalize().replace("_", " ")
 
         return names

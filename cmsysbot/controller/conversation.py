@@ -56,10 +56,7 @@ def start_plugin_from_download(bot: Bot, update: Updater, user_data: dict):
 
     # Download the file
     file_object = message.document.get_file()
-    download_path = "%s/%s" % (
-        states.config_file.server_tmp_dir,
-        message.document.file_name,
-    )
+    download_path = f"{states.config_file.server_tmp_dir}/{message.document.file_name}"
 
     file_object.download(download_path)
 
@@ -108,7 +105,7 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:
 
     argument = user_data["ask_argument"]
-    user_data["plugin"][argument] = '"%s"' % update.message.text
+    user_data["plugin"][argument] = f'"{update.message.text}"'
 
     return collect_arguments(bot, update, user_data)
 

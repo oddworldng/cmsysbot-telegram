@@ -180,7 +180,7 @@ def ip_selection(bot: Bot, update: Updater, user_data: dict):
     route.append(next_section)
 
     # Create a path to the .json file from the route
-    filepath = "config/%s.json" % "/".join(route)
+    filepath = f"config/{'/'.join(route)}.json"
     Session.get_from(user_data).computers = Computers(filepath)
 
     Session.get_from(user_data).route = route
@@ -200,7 +200,7 @@ def confirm_connect_ip(bot: Bot, update: Updater, user_data: dict):
     Session.get_from(user_data).bridge_ip = update.callback_query.data
 
     # View
-    text = "Connect to %s?" % Session.get_from(user_data).bridge_ip
+    text = f"Connect to {Session.get_from(user_data).bridge_ip}"
     view.yes_no(
         text, yes_callback_data=State.GET_CREDENTIALS, no_callback_data=State.MAIN
     ).edit(update)

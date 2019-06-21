@@ -67,9 +67,9 @@ def connected(
 
     # Text
     text = "Status: Connected\n"
-    text += "Route: %s\n" % "/".join(route)
-    text += "Username: %s\n" % username
-    text += "Bridge ip: %s\n" % bridge_ip
+    text += f"Route: {'/'.join(route)}\n"
+    text += f"Username: {username}\n"
+    text += f"Bridge ip: {bridge_ip}\n"
 
     # Buttons
     main_buttons = [
@@ -113,7 +113,7 @@ def structure(route: List[str], sections: List[str], return_to: str) -> Keyboard
 
     # Text
     text = "Select the section to connect\n"
-    text += "Route: %s" % "/".join(route)
+    text += f"Route: {'/'.join(route)}"
 
     # Buttons
     main_buttons = [Button(section.name) for section in sections]
@@ -155,7 +155,7 @@ def ip_selection(
     """
 
     # Text
-    text = "Route: %s" % "/".join(route)
+    text = f"Route: {'/'.join(route)}"
     text += "\nNow, select a 'bridge' computer for the local connection"
 
     # Buttons
@@ -237,9 +237,9 @@ def filter_computers(computers: List[Computer]):
         main_buttons.append(Button(str(computer)))
 
         if computer.included:
-            main_buttons.append(Button("Included", "exclude-%s" % computer.mac))
+            main_buttons.append(Button("Included", f"exclude-{computer.mac}"))
         else:
-            main_buttons.append(Button("Excluded", "include-%s" % computer.mac))
+            main_buttons.append(Button("Excluded", f"include-{computer.mac}"))
 
     footer_buttons = [Button("Return", State.MAIN)]
 
