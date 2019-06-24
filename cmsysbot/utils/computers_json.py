@@ -11,9 +11,9 @@ class Computer:
     directly with the dictionary
     """
 
-    class Status(Enum):
-        OFF = "off"
+    class Status:
         ON = "on"
+        OFF = "off"
 
     def __init__(self, computer_data: Dict[str, Union[str, bool]] = {}):
         """
