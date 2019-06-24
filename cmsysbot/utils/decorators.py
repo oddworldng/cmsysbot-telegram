@@ -12,7 +12,7 @@ def connected(fun):
     @wraps(fun)
     def wrapper(bot: Bot, update: Updater, user_data):
         if Session.get_from(user_data).connected:
-            fun(bot, update, user_data)
+            return fun(bot, update, user_data)
         else:
             menu.main(bot, update, user_data)
 
@@ -23,7 +23,7 @@ def not_connected(fun):
     @wraps(fun)
     def wrapper(bot: Bot, update: Updater, user_data):
         if not Session.get_from(user_data).connected:
-            fun(bot, update, user_data)
+            return fun(bot, update, user_data)
         else:
             menu.main(bot, update, user_data)
 
