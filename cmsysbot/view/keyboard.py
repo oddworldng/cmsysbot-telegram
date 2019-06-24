@@ -5,7 +5,7 @@ chat.
 
 from typing import List
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message, ParseMode
 from telegram.ext import Updater
 
 
@@ -79,7 +79,9 @@ class Keyboard:
         """
 
         self._get_message(update).reply_text(
-            text=self.text, reply_markup=self._generate_keyboard()
+            text=self.text,
+            reply_markup=self._generate_keyboard(),
+            parse_mode=ParseMode.MARKDOWN,
         )
 
     def edit(self, update: Updater):
@@ -94,7 +96,9 @@ class Keyboard:
         """
 
         self._get_message(update).edit_text(
-            text=self.text, reply_markup=self._generate_keyboard()
+            text=self.text,
+            reply_markup=self._generate_keyboard(),
+            parse_mode=ParseMode.MARKDOWN,
         )
 
     @staticmethod
