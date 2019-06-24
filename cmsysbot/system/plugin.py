@@ -15,6 +15,7 @@ class PluginVar:
     TARGET_IP = "$TARGET_IP"
     TARGET_MAC = "$TARGET_MAC"
     MACS_LIST = "$MACS_LIST"
+    IPS_LIST = "$IPS_LIST"
     SOURCE_BRIDGE = "bridge"
     SOURCE_REMOTE = "remote"
     ROOT = False
@@ -126,7 +127,12 @@ class Plugin:
 
         if PluginVar.MACS_LIST in self.arguments:
             self.arguments[PluginVar.MACS_LIST] = " ".join(
-                list(map(lambda c: c.mac, session.computers.get_included_computers()))
+                list(map(lambda c: c.mac, session.computers.get_included()))
+            )
+
+        if PluginVar.IPS_LIST in self.arguments:
+            self.arguments[PluginVar.IPS_LIST] = " ".join(
+                list(map(lambda c: c.ip, session.computers.get_included()))
             )
 
     def fill_computer_arguments(self, computer: Computer):

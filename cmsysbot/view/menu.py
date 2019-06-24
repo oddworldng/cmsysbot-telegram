@@ -227,7 +227,7 @@ def filter_computers(computers: List[Computer]):
     """
 
     # Text
-    text = "Select the computers that will be included in future operations"
+    text = "Select the _computers_ that will be included in future operations"
 
     # Buttons
     main_buttons = [
@@ -239,19 +239,29 @@ def filter_computers(computers: List[Computer]):
     for computer in computers:
         button_text = ""
 
-        if computer.on():
-            button_text += emojize(":full_moon:", use_aliases=True)
+        callback_text = ""
+
+        # Add included/excluded status
+        if computer.included:
+            button_text += ":white_check_mark:"
+            callback_text = f"exclude-{computer.mac}"
         else:
-            button_text += emojize(":new_moon:", use_aliases=True)
+            button_text += ":x:"
+            callback_text = f"include-{computer.mac}"
+
+        button_text += " "
+
+        # Add turned on/off status
+        if computer.on():
+            button_text += ":full_moon:"
+        else:
+            button_text += ":new_moon:"
 
         button_text += f" {computer}"
 
-        if computer.included:
-            main_buttons.append(
-                Button(f"asdf {button_text}", f"exclude-{computer.mac}")
-            )
-        else:
-            main_buttons.append(Button(button_text, f"include-{computer.mac}"))
+        button_text = emojize(button_text, use_aliases=True)
+
+        main_buttons.append(Button(button_text, callback_text))
 
     footer_buttons = [Button("Return", State.MAIN)]
 
