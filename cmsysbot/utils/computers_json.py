@@ -152,33 +152,3 @@ class Computers(BaseJson):
         for computer in self.computers:
             if computer.included:
                 yield computer
-
-    def get_names(self) -> Iterator[str]:
-        """
-        DEPRECATED. Use map() with a lambda function instead.
-
-        Yield the name of each computer.
-        """
-
-        for computer in self.get_computers():
-            yield computer.name
-
-    def get_ips(self) -> Iterator[str]:
-        """
-        DEPRECATED. Use map() with a lambda function instead.
-
-        Yield the ip of each computer.
-        """
-
-        for computer in self.get_computers():
-            yield computer.ip
-
-    def get_macs(self) -> Iterator[str]:
-        """
-        DEPRECATED. Use map() with a lambda function instead.
-
-        Yield the mac of each computer.
-        """
-
-        for computer in self.get_computers():
-            yield computer.mac
