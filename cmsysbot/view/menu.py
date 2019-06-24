@@ -3,7 +3,10 @@ In this module are defined all the menus (text + keyboard) created by the bot.
 For views that are text only, see the module :mod:`cmsysbot.view.message`.
 """
 
+
 from typing import Dict, List
+
+from emoji import emojize
 
 from cmsysbot.utils import Computer, State
 
@@ -233,17 +236,24 @@ def filter_computers(computers: List[Computer]):
     ]
 
     # Add the buttons according to the computer attributes
-    for computer in computers.get_computers():
-        main_buttons.append(Button(str(computer)))
+    for computer in computers:
+        button_text = ""
+
+        if computer.on():
+            button_text += emojize(":full_moon:", use_aliases=True)
+        else:
+            button_text += emojize(":new_moon:", use_aliases=True)
+
+        button_text += f" {computer}"
 
         if computer.included:
-            main_buttons.append(Button("Included", f"exclude-{computer.mac}"))
+            main_buttons.append(
+                Button(f"asdf {button_text}", f"exclude-{computer.mac}")
+            )
         else:
-            main_buttons.append(Button("Excluded", f"include-{computer.mac}"))
+            main_buttons.append(Button(button_text, f"include-{computer.mac}"))
 
     footer_buttons = [Button("Return", State.MAIN)]
 
     # Keyboard
-    return Keyboard(
-        text, n_cols=2, main_buttons=main_buttons, footer_buttons=footer_buttons
-    )
+    return Keyboard(text, main_buttons=main_buttons, footer_buttons=footer_buttons)

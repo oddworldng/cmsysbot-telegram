@@ -1,4 +1,5 @@
 import json
+from enum import Enum
 from typing import Any, Dict, Iterator, List, Union
 
 from .base_json import BaseJson
@@ -9,6 +10,10 @@ class Computer:
     This class represents a computer. Provides getters and setters to avoid interacting
     directly with the dictionary
     """
+
+    class Status(Enum):
+        OFF = "off"
+        ON = "on"
 
     def __init__(self, computer_data: Dict[str, Union[str, bool]] = {}):
         """
@@ -21,6 +26,7 @@ class Computer:
         self.ip: str = "N/A"
         self.mac: str = "N/A"
         self.included: bool = True
+        self.status = Computer.Status.OFF
 
         # If a dictionary is passed, save the keys (name, ip, mac...) as attributes
         # values
@@ -30,6 +36,11 @@ class Computer:
                 setattr(self, key, computer_data[key])
             except AttributeError:
                 pass
+
+    def on(self) -> bool:
+        """Shortcut to test if a computer is turned on"""
+
+        return self.status == Computer.Status.ON
 
     def __str__(self) -> str:
         """Return the Computer object as a string for identification."""
@@ -44,7 +55,12 @@ class Computer:
         saved on the JSON file.
         """
 
-        return {"name": self.name, "ip": self.ip, "mac": self.mac}
+        return {
+            "name": self.name,
+            "ip": self.ip,
+            "mac": self.mac,
+            "status": self.status,
+        }
 
 
 class Computers(BaseJson):
@@ -84,9 +100,8 @@ class Computers(BaseJson):
 
         with open(filepath, "w") as outfile:
             json_scheme: Dict[str, List] = {}
-            json_scheme["computers"] = []
+            json_scheme["computers"] = [Computer().asdict()]  # Add a default computer
 
-            json_scheme["computers"].append(Computer().asdict())
             json.dump(json_scheme, outfile, indent=2)
 
             return json_scheme

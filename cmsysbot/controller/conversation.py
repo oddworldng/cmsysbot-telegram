@@ -31,6 +31,7 @@ USERNAME, PASSWORD, ANSWER = range(3)
 @connected
 def start_plugin_from_callback(bot: Bot, update: Updater, user_data: dict):
     query = update.callback_query
+    print("Start plugin")
 
     # Plugin path in server
     plugin_path_server = re.search(State.START_PLUGIN, query.data).group(1)
@@ -73,16 +74,19 @@ def start_plugin_from_download(bot: Bot, update: Updater, user_data: dict):
 @connected
 def collect_arguments(bot: Bot, update: Updater, user_data: dict):
 
-    session = Session.get_from(user_data)
+    print("Collect arguments")
 
     plugin = user_data["plugin"]
-    plugin.fill_session_arguments(session)
 
     for argument in plugin.arguments:
+        print("loop")
         if argument[0] != "$" and not plugin.arguments[argument]:
+            print("asdking")
             user_data["ask_argument"] = argument
             view.ask_argument(argument).reply(update)
             return ANSWER
+
+    print("end asking")
 
     return execute_plugin(bot, update, user_data=user_data)
 
@@ -90,6 +94,7 @@ def collect_arguments(bot: Bot, update: Updater, user_data: dict):
 @connected
 def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 
+    print("Plugin run")
     session = Session.get_from(user_data)
     plugin: Plugin = user_data["plugin"]
 
@@ -104,6 +109,7 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
 @connected
 def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:
 
+    print("Get answer")
     argument = user_data["ask_argument"]
     user_data["plugin"][argument] = f'"{update.message.text}"'
 

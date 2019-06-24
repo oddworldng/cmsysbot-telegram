@@ -57,9 +57,8 @@ class TestComputers(unittest.TestCase):
     def test_create(self, json_dump_mock):
         filepath = path.join(self.test_dir, "new_config_file.json")
 
-        expected_computers_config_dict = {
-            "computers": [{"name": "N/A", "ip": "N/A", "mac": "N/A"}]
-        }
+        # Expected dict with one default computer
+        expected_computers_config_dict = {"computers": [Computer().asdict()]}
 
         created_computers_config_dict = Computers.create(filepath)
 
