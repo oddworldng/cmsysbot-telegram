@@ -31,4 +31,12 @@ if [[ $? != 0 ]]; then
   printf "\n* 'sshpass' installed."
 fi
 
+# Check if fping is installed
+dpkg -s fping &>/dev/null
+
+if [[ $? != 0 ]]; then
+  sudo apt-get -y fping sshpass &>/dev/null
+  printf "\n* 'fping' installed."
+fi
+
 printf "\n\xE2\x9C\x85 The bridge computer is ready."

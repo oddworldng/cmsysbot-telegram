@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# CMSysBot: {
+# "root": "False",
+# "source": "bridge",
+# "arguments": ["$IPS_LIST"]
+# }
+
+## Get the status of the computers connected to the network
+
+IPS_LIST=$@
+
+fping -r 1 $IPS_LIST

@@ -8,7 +8,7 @@ from typing import Dict, List
 
 from emoji import emojize
 
-from cmsysbot.utils import Computer, State
+from cmsysbot.utils import Computer, Session, State
 
 from .keyboard import Button, Keyboard
 
@@ -36,9 +36,7 @@ def not_connected() -> Keyboard:
     return Keyboard(text, main_buttons=main_buttons)
 
 
-def connected(
-    route: List[str], plugins: Dict[str, str], username: str, bridge_ip: str
-) -> Keyboard:
+def connected(session: Session, plugins: Dict[str, str]) -> Keyboard:
     """
     .. code-block:: python
 
@@ -70,9 +68,12 @@ def connected(
 
     # Text
     text = "Status: Connected\n"
-    text += f"Route: {'/'.join(route)}\n"
-    text += f"Username: {username}\n"
-    text += f"Bridge ip: {bridge_ip}\n"
+    text += f"Route: {'/'.join(session.route)}\n"
+    text += f"Username: {session.username}\n"
+    text += f"Bridge ip: {session.bridge_ip}\n"
+    text += (
+        f"Computers: {session.computers.n_connected_computers}/{len(session.computers)}"
+    )
 
     # Buttons
     main_buttons = [

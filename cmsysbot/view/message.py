@@ -141,6 +141,14 @@ def ask_password() -> Keyboard:
     return Keyboard(text)
 
 
+def update_computers_status_message() -> Keyboard:
+    # Text
+    text = "Getting information about the computers on the network..."
+
+    # Keyboard
+    return Keyboard(text)
+
+
 # ######################################################################
 #                         PLUGIN CONVERSATION
 # ######################################################################

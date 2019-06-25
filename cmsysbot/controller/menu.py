@@ -45,12 +45,7 @@ def new_main(bot: Bot, update: Updater, user_data: dict):
     if not session.connected:
         view.not_connected().reply(update)
     else:
-        view.connected(
-            session.route,
-            Plugin.get_local_plugins(),
-            session.username,
-            session.bridge_ip,
-        ).reply(update)
+        view.connected(session, Plugin.get_local_plugins()).reply(update)
 
 
 def main(bot: Bot, update: Updater, user_data: dict):
@@ -71,12 +66,7 @@ def main(bot: Bot, update: Updater, user_data: dict):
     if not session.connected:
         view.not_connected().edit(update)
     else:
-        view.connected(
-            session.route,
-            Plugin.get_local_plugins(),
-            session.username,
-            session.bridge_ip,
-        ).edit(update)
+        view.connected(session, Plugin.get_local_plugins()).edit(update)
 
 
 @not_connected
