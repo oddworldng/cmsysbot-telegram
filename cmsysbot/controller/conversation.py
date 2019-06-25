@@ -131,11 +131,13 @@ def get_username(bot: Bot, update: Updater, user_data: dict) -> int:
     return PASSWORD
 
 
-def get_password(bot: Bot, update: Updater, user_data: dict) -> ConversationHandler:
+def get_password(
+    bot: Bot, update: Updater, user_data: dict, job_queue
+) -> ConversationHandler:
     """Get the password from the last message. End conversation"""
 
     Session.get_from(user_data).password = update.message.text
 
-    general.connect(bot, update, user_data)
+    general.connect(bot, update, user_data, job_queue)
 
     return ConversationHandler.END

@@ -14,18 +14,17 @@ connecting, disconnecting, sending commands, sending messages, etc.
 import re
 
 from telegram import Bot
-from telegram.ext import Updater
+from telegram.ext import Job, Updater
 
 from cmsysbot import view
 from cmsysbot.system import Plugin
-from cmsysbot.utils import Session, State
+from cmsysbot.utils import Session, State, states
 from cmsysbot.utils.decorators import connected, not_connected
 
 from . import menu
 
 
-@not_connected
-def connect(bot: Bot, update: Updater, user_data: dict):
+def connect(bot: Bot, update: Updater, user_data: dict, job_queue):
     """
     Tries to open a SSH connection from the bot server to the bridge computer.
 
@@ -52,7 +51,13 @@ def connect(bot: Bot, update: Updater, user_data: dict):
         initialize_bridge(bot, update, user_data)
 
         # Check the status of each computers (which are alive or unreachable)
-        update_computers_status(bot, update, user_data)
+        update_computers_status(user_data)
+
+        job_queue.run_repeating(
+            job_update_computers_status,
+            interval=states.config_file.check_status_interval,
+            context=user_data,
+        )
 
     # Show the main menu again
     menu.new_main(bot, update, user_data)
@@ -101,10 +106,16 @@ def initialize_bridge(bot: Bot, update: Updater, user_data: dict):
     ).reply(update)
 
 
-@connected
-def update_computers_status(_: Bot, update: Updater, user_data: dict):
+def job_update_computers_status(bot: Bot, job: Job):
+    user_data = job.context
 
-    view.update_computers_status_message().reply(update)
+    if Session.get_from(user_data).connected:
+        update_computers_status(user_data)
+    else:
+        job.schedule_removal()
+
+
+def update_computers_status(user_data: dict):
 
     session = Session.get_from(user_data)
 

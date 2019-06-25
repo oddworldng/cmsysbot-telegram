@@ -112,6 +112,13 @@ class Config(BaseJson):
         return self.data["plugins_dir"]
 
     @property
+    def check_status_interval(self) -> str:
+        """Get the interval of time (in seconds) between each check of the network
+        status (Connected computers)"""
+
+        return self.data["check_status_interval"]
+
+    @property
     def admins(self) -> List[str]:
         """Return a list with all the users defined as admin on the config.json"""
 

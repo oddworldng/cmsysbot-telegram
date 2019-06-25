@@ -79,23 +79,23 @@ class Computers(BaseJson):
         self.__index = 0
 
         super().__init__(filepath)
-        self.connected_computers = 0
 
         # Transform dict to array of Computer objects
         self.computers = [Computer(entry) for entry in self.data["computers"]]
+
+    @property
+    def n_connected_computers(self):
+        """Return the number of computers with Status.ON"""
+
+        return len(list(filter(lambda c: c.on(), self.computers)))
 
     def save(self):
         """
         Transform each Computer object to a Dict and write the changes to the file.
         """
-
         self.data["computers"] = [computer.asdict() for computer in self.computers]
 
         super().save()
-
-    @property
-    def n_connected_computers(self):
-        return len(list(filter(lambda c: c.on(), self.computers)))
 
     @staticmethod
     def create(filepath: str):
