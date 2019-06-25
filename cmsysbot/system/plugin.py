@@ -102,6 +102,9 @@ class Plugin:
 
     def _run_on_remote(self, computer: Computer, session: Session):
 
+        if not computer.on():
+            return (computer.name, computer.ip, "The computer is off", "")
+
         session.copy_to_remote(computer.ip, self.bridge_path, self.remote_path)
 
         # Replace the computer arguments (ip, mac...)

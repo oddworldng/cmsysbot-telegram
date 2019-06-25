@@ -183,7 +183,10 @@ def add_conversation_callbacks(dp: Dispatcher):
             ],
             conversation.PASSWORD: [
                 MessageHandler(
-                    Filters.text, conversation.get_password, pass_user_data=True
+                    Filters.text,
+                    conversation.get_password,
+                    pass_user_data=True,
+                    pass_job_queue=True,
                 )
             ],
         },
