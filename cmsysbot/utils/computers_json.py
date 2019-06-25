@@ -12,8 +12,8 @@ class Computer:
     """
 
     class Status:
-        ON = "on"
-        OFF = "off"
+        ON = "alive"
+        OFF = "unreachable"
 
     def __init__(self, computer_data: Dict[str, Union[str, bool]] = {}):
         """
@@ -37,6 +37,7 @@ class Computer:
             except AttributeError:
                 pass
 
+    # TODO: Change to "is_on?"
     def on(self) -> bool:
         """Shortcut to test if a computer is turned on"""
 
@@ -78,21 +79,23 @@ class Computers(BaseJson):
         self.__index = 0
 
         super().__init__(filepath)
+        self.connected_computers = 0
 
         # Transform dict to array of Computer objects
-        self.computers: List[Computer] = [
-            Computer(entry) for entry in self.data["computers"]
-        ]
+        self.computers = [Computer(entry) for entry in self.data["computers"]]
 
     def save(self):
         """
         Transform each Computer object to a Dict and write the changes to the file.
         """
 
-        # TODO: Really necessary or doing the conversion twice?
         self.data["computers"] = [computer.asdict() for computer in self.computers]
 
         super().save()
+
+    @property
+    def n_connected_computers(self):
+        return len(list(filter(lambda c: c.on(), self.computers)))
 
     @staticmethod
     def create(filepath: str):

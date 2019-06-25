@@ -49,12 +49,10 @@ def connect(bot: Bot, update: Updater, user_data: dict):
 
     if session.connected:
         # Check if the bridge computer has all the required dependencies
-        plugin = Plugin("plugins/_bridge_initialization")
+        initialize_bridge(bot, update, user_data)
 
-        name, ip, stdout, stderr = next(plugin.run(session))
-        view.plugin_output(
-            name, ip, "Bridge Initialization", stdout, stderr, hide_header=True
-        ).reply(update)
+        # Check the status of each computers (which are alive or unreachable)
+        update_computers_status(bot, update, user_data)
 
     # Show the main menu again
     menu.new_main(bot, update, user_data)
@@ -77,6 +75,9 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
 
     bridge_ip = Session.get_from(user_data).bridge_ip
 
+    # Save the new status of the computers
+    Session.get_from(user_data).computers.save()
+
     # Close the connection
     Session.get_from(user_data).end_connetion()
 
@@ -85,6 +86,39 @@ def disconnect(bot: Bot, update: Updater, user_data: dict):
 
     # Show the main menu again
     menu.new_main(bot, update, user_data)
+
+
+@connected
+def initialize_bridge(bot: Bot, update: Updater, user_data: dict):
+
+    session = Session.get_from(user_data)
+
+    plugin = Plugin("plugins/_bridge_initialization")
+
+    name, ip, stdout, stderr = next(plugin.run(session))
+    view.plugin_output(
+        name, ip, "Bridge Initialization", stdout, stderr, hide_header=True
+    ).reply(update)
+
+
+@connected
+def update_computers_status(_: Bot, update: Updater, user_data: dict):
+
+    view.update_computers_status_message().reply(update)
+
+    session = Session.get_from(user_data)
+
+    plugin = Plugin("plugins/_computers_status")
+    _, _, stdout, _ = next(plugin.run(session))
+    # The stdout has the format `{ip} is {status}`
+
+    # TODO: Remove n^2 loop by adding dicts to the computers_json structure
+    for line in stdout.splitlines():
+        ip, _, status = line.split()
+
+        for computer in session.computers:
+            if ip == computer.ip:
+                computer.status = status
 
 
 @connected
