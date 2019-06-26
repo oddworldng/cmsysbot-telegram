@@ -14,7 +14,7 @@ connecting, disconnecting, sending commands, sending messages, etc.
 import re
 
 from telegram import Bot
-from telegram.ext import Job, Updater
+from telegram.ext import Job, JobQueue, Updater
 
 from cmsysbot import view
 from cmsysbot.system import Plugin
@@ -24,7 +24,8 @@ from cmsysbot.utils.decorators import connected, not_connected
 from . import menu
 
 
-def connect(bot: Bot, update: Updater, user_data: dict, job_queue):
+@not_connected
+def connect(bot: Bot, update: Updater, user_data: dict, job_queue: JobQueue):
     """
     Tries to open a SSH connection from the bot server to the bridge computer.
 

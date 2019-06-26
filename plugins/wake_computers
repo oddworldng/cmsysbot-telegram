@@ -8,4 +8,9 @@
 
 MACS_LIST="$@"
 
-wakeonlan $MACS_LIST
+if [ -z "$MACS_LIST" ]; then
+  printf "You didnt specified any mac address."
+else
+  wakeonlan $MACS_LIST
+fi
+

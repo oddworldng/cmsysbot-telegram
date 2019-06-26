@@ -81,7 +81,7 @@ class Keyboard:
         self._get_message(update).reply_text(
             text=self.text,
             reply_markup=self._generate_keyboard(),
-            parse_mode=ParseMode.MARKDOWN,
+            parse_mode=ParseMode.HTML,
         )
 
     def edit(self, update: Updater):
@@ -98,7 +98,7 @@ class Keyboard:
         self._get_message(update).edit_text(
             text=self.text,
             reply_markup=self._generate_keyboard(),
-            parse_mode=ParseMode.MARKDOWN,
+            parse_mode=ParseMode.HTML,
         )
 
     @staticmethod
