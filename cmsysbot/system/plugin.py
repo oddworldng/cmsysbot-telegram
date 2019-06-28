@@ -93,14 +93,14 @@ class Plugin:
         else:
             with futures.ThreadPoolExecutor() as executor:
                 result_futures = [
-                    executor.submit(self._run_on_remote, computer, session)
+                    executor.submit(self.__run_on_remote, computer, session)
                     for computer in session.computers.get_included_computers()
                 ]
 
                 for future in futures.as_completed(result_futures):
                     yield future.result()
 
-    def _run_on_remote(self, computer: Computer, session: Session):
+    def __run_on_remote(self, computer: Computer, session: Session):
 
         if not computer.on():
             return (computer.name, computer.ip, "The computer is off", "")

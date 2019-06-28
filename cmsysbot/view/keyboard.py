@@ -84,9 +84,9 @@ class Keyboard:
         wrapper = textwrap.TextWrapper(width=4096, replace_whitespace=False)
 
         for text_chunk in wrapper.wrap(self.text):
-            self._get_message(update).reply_text(
+            self.__get_message(update).reply_text(
                 text=text_chunk,
-                reply_markup=self._generate_keyboard(),
+                reply_markup=self.__generate_keyboard(),
                 parse_mode=parse_mode,
             )
 
@@ -101,14 +101,14 @@ class Keyboard:
                 to the bot.
         """
 
-        self._get_message(update).edit_text(
+        self.__get_message(update).edit_text(
             text=self.text,
-            reply_markup=self._generate_keyboard(),
+            reply_markup=self.__generate_keyboard(),
             parse_mode=parse_mode,
         )
 
     @staticmethod
-    def _get_message(update: Updater) -> Message:
+    def __get_message(update: Updater) -> Message:
         """
         Get the attached message to 'update' or 'update.callback_query'. Useful
         when a function can be called from both :obj:`telegram.CommandHandler`
@@ -124,10 +124,10 @@ class Keyboard:
 
         if update.message:
             return update.message
-        else:
-            return update.callback_query.message
 
-    def _generate_keyboard(self) -> InlineKeyboardMarkup:
+        return update.callback_query.message
+
+    def __generate_keyboard(self) -> InlineKeyboardMarkup:
         """
         See :obj:`_build_menu`
 
@@ -136,9 +136,9 @@ class Keyboard:
                 constructed button keyboard.
         """
 
-        return InlineKeyboardMarkup(self._build_menu())
+        return InlineKeyboardMarkup(self.__build_menu())
 
-    def _build_menu(self) -> List[InlineKeyboardButton]:
+    def __build_menu(self) -> List[InlineKeyboardButton]:
         """
         Returns:
             :obj:`List[telegram.InlineKeyboardButton]` with all the keyboard
