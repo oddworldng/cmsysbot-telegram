@@ -24,9 +24,10 @@ from telegram.ext import Updater
 from cmsysbot import view
 from cmsysbot.system import Plugin
 from cmsysbot.utils import Computers, Session, State, states
-from cmsysbot.utils.decorators import connected, not_connected
+from cmsysbot.utils.decorators import connected, not_connected, send_typing_action
 
 
+@send_typing_action
 def new_main(bot: Bot, update: Updater, user_data: dict):
     """
     Send a new message with a new main menu. Depending on if the user is

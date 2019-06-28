@@ -19,12 +19,13 @@ from telegram.ext import Job, JobQueue, Updater
 from cmsysbot import view
 from cmsysbot.system import Plugin
 from cmsysbot.utils import Session, State, states
-from cmsysbot.utils.decorators import connected, not_connected
+from cmsysbot.utils.decorators import connected, not_connected, send_typing_action
 
 from . import menu
 
 
 @not_connected
+@send_typing_action
 def connect(bot: Bot, update: Updater, user_data: dict, job_queue: JobQueue):
     """
     Tries to open a SSH connection from the bot server to the bridge computer.

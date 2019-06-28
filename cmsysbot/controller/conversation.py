@@ -16,7 +16,7 @@ from telegram.ext import ConversationHandler, Updater
 from cmsysbot import view
 from cmsysbot.system import Plugin
 from cmsysbot.utils import Session, State, states
-from cmsysbot.utils.decorators import connected
+from cmsysbot.utils.decorators import connected, send_typing_action
 
 from . import general, menu
 
@@ -114,6 +114,7 @@ def get_answer(bot: Bot, update: Updater, user_data: dict) -> int:
 # ######################################################################
 
 
+@send_typing_action
 def login(bot: Bot, update: Updater) -> int:
     """ENTRY POINT. Ask for the username and wait for the answer"""
 
@@ -123,6 +124,7 @@ def login(bot: Bot, update: Updater) -> int:
     return USERNAME
 
 
+@send_typing_action
 def get_username(bot: Bot, update: Updater, user_data: dict) -> int:
     """Get the username from the last messge. Ask for the password and wait"""
 
@@ -133,6 +135,7 @@ def get_username(bot: Bot, update: Updater, user_data: dict) -> int:
     return PASSWORD
 
 
+@send_typing_action
 def get_password(
     bot: Bot, update: Updater, user_data: dict, job_queue
 ) -> ConversationHandler:
