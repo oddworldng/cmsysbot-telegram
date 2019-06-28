@@ -3,6 +3,7 @@ Module defining useful classes and methods for representing messages on the
 chat.
 """
 
+from textwrap import wrap
 from typing import List
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message, ParseMode
@@ -67,7 +68,7 @@ class Keyboard:
         self.main_buttons = main_buttons
         self.footer_buttons = footer_buttons
 
-    def reply(self, update: Updater):
+    def reply(self, update: Updater, parse_mode: ParseMode = ParseMode.HTML):
         """
         Reply to the message attached to the :obj:`update`, constructing a new
         message with the defined text and buttons. Uses :obj:`_get_message` for
@@ -78,13 +79,16 @@ class Keyboard:
                 to the bot.
         """
 
-        self._get_message(update).reply_text(
-            text=self.text,
-            reply_markup=self._generate_keyboard(),
-            parse_mode=ParseMode.HTML,
-        )
+        # 4096 is the max allowed length for a telegram message
+        # https://core.telegram.org/method/messages.sendMessage
+        for text_chunk in wrap(self.text, 4096):
+            self._get_message(update).reply_text(
+                text=text_chunk,
+                reply_markup=self._generate_keyboard(),
+                parse_mode=parse_mode,
+            )
 
-    def edit(self, update: Updater):
+    def edit(self, update: Updater, parse_mode: ParseMode = ParseMode.HTML):
         """
         Edit the message attached to the :obj:`update`, replacing it with the
         defined text and buttons. Uses :obj:`_get_message` for extracting the
@@ -98,7 +102,7 @@ class Keyboard:
         self._get_message(update).edit_text(
             text=self.text,
             reply_markup=self._generate_keyboard(),
-            parse_mode=ParseMode.HTML,
+            parse_mode=parse_mode,
         )
 
     @staticmethod

@@ -91,7 +91,9 @@ def execute_plugin(bot: Bot, update: Updater, user_data: dict):
     plugin: Plugin = user_data["plugin"]
 
     for name, ip, stdout, stderr in plugin.run(session):
-        view.plugin_output(name, ip, plugin.name, stdout, stderr).reply(update)
+        view.plugin_output(name, ip, plugin.name, stdout, stderr).reply(
+            update, parse_mode=None
+        )
 
     menu.new_main(bot, update, user_data)
 
