@@ -3,7 +3,7 @@ Module defining useful classes and methods for representing messages on the
 chat.
 """
 
-from textwrap import wrap
+import textwrap
 from typing import List
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message, ParseMode
@@ -81,7 +81,9 @@ class Keyboard:
 
         # 4096 is the max allowed length for a telegram message
         # https://core.telegram.org/method/messages.sendMessage
-        for text_chunk in wrap(self.text, 4096):
+        wrapper = textwrap.TextWrapper(width=4096, replace_whitespace=False)
+
+        for text_chunk in wrapper.wrap(self.text):
             self._get_message(update).reply_text(
                 text=text_chunk,
                 reply_markup=self._generate_keyboard(),
