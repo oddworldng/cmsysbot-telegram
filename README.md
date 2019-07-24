@@ -35,14 +35,12 @@ Contributions to the project are really appreciated! Please, refer to the [contr
 
 ### Dependencies
 
+__NOTE:__ This bot only works with __Python 3.6 or greater__
+
 #### Python3 libraries
 
 * [python-telegram-bot](https://pypi.org/project/python-telegram-bot/)
 * [paramiko](https://pypi.org/project/paramiko/)
-
-#### System dependencies
-
-* [sshpass](https://linux.die.net/man/1/sshpass)
 
 ### Installation guide
 
